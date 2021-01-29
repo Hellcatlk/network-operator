@@ -13,10 +13,7 @@ as port information and configuration.
     3. Must have the standard Kubernetes “type metadata” and “object metadata”
     4. Must have a `spec` field with the following:
         1. Required fields:
-            1. `id`(string): the port id on the device to which it belongs
-            2. `configurationRef`(ObjectReference): reference to the configuration CR that needs to be configured on this port
-        2. Optional fields:
-            1. `nextPortRef`(ObjectReference): reference to the next port information of this port link
+            1. `configurationRef`(ObjectReference): reference to the configuration CR that needs to be configured on this port
     5. Must have a `status` field with the following:
         1. Required fields:
             1. `state`(string): indicates the actual configuration status of the port
