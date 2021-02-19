@@ -12,7 +12,7 @@
 "Configuring" --> [ Configuration finished ] "Configured"
 
 "Configured" --> [ Configuration have been updated ] "Configuring"
-"Configured" --> [ Detection configuration is changed ] "Configured"
+"Configured" --> [ Detection whether the target configuration is\n consistent with the actual configuration ] "Configured"
 "Configured" --> [ !instance.DeletionTimestamp.IsZero() || spec.configurationRef is nil ] "Cleaning"
 
 "Cleaning" --> [ Check Clean progress ] "Cleaning"
