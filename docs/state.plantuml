@@ -4,21 +4,21 @@
 
 "<none>" --> "Created"
 
-"Created" --> "Configuring"
+"Created" --> [ spec.configurationRef != nil ] "Configuring"
 "Created" --> [ !instance.DeletionTimestamp.IsZero() ] "Deleted"
-"Created" --> "Created"
+"Created" --> [ spec.configurationRef == nil ] "Created"
 
-"Configuring" --> "Configuring"
-"Configuring" --> "Configured"
+"Configuring" --> [ Check configuration progress ] "Configuring"
+"Configuring" --> [ Configuration finished ] "Configured"
 
 "Configured" --> [ Configuration have been updated ] "Configuring"
 "Configured" --> [ Detection configuration is changed ] "Configured"
-"Configured" --> [ !instance.DeletionTimestamp.IsZero() || spec.configurationRef is nil ] "Deleting"
+"Configured" --> [ !instance.DeletionTimestamp.IsZero() || spec.configurationRef is nil ] "Cleaning"
 
-"Deleting" --> "Deleting"
-"Deleting" --> "Deleted"
+"Cleaning" --> [ Check Clean progress ] "Cleaning"
+"Cleaning" --> [ Clean finished ] "Cleaned"
 
-"Deleted" --> [ Spec.configurationRef isn't nil ] "<none>"
-"Deleted" --> [ CR have been removed ] (*)
+"Cleaned" --> [ Spec.configurationRef isn't nil ] "<none>"
+"Cleaned" --> [ CR have been removed ] (*)
 
 @enduml
