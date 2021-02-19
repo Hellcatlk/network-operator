@@ -5,7 +5,7 @@
 "<none>" --> "Created"
 
 "Created" --> [ spec.configurationRef != nil ] "Configuring"
-"Created" --> [ !instance.DeletionTimestamp.IsZero() ] "Deleted"
+"Created" --> [ !instance.DeletionTimestamp.IsZero() ] "Cleaned"
 "Created" --> [ spec.configurationRef == nil ] "Created"
 
 "Configuring" --> [ Check configuration progress ] "Configuring"

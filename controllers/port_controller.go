@@ -111,7 +111,9 @@ func (r *PortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, err er
 	// On object delete
 	case !instance.DeletionTimestamp.IsZero():
 		// Set instance's state to `Cleaning`
-		instance.SetState(v1alpha1.PortCleaning)
+		if instance.GetState() != v1alpha1.PortCleaning {
+			instance.SetState(v1alpha1.PortCleaning)
+		}
 		// Reconcile state
 		result, merr = m.Reconcile(context.TODO())
 		if merr != nil {
