@@ -1,20 +1,24 @@
 @startuml state
 
-(*) --> [ User create CR ] "Created"
+(*) --> [ User create CR ] "<none>"
+
+"<none>" --> "Created"
 
 "Created" --> "Configuring"
-"Created" --> [ Port have been used ] "Deleted"
+"Created" --> [ !instance.DeletionTimestamp.IsZero() ] "Deleted"
 "Created" --> "Created"
 
 "Configuring" --> "Configuring"
 "Configuring" --> "Configured"
 
 "Configured" --> [ Configuration have been updated ] "Configuring"
-"Configured" --> [ User remove CR ] "Deleting"
+"Configured" --> [ Detection configuration is changed ] "Configured"
+"Configured" --> [ !instance.DeletionTimestamp.IsZero() || spec.configurationRef is nil ] "Deleting"
 
 "Deleting" --> "Deleting"
 "Deleting" --> "Deleted"
 
+"Deleted" --> [ Spec.configurationRef isn't nil ] "<none>"
 "Deleted" --> [ CR have been removed ] (*)
 
 @enduml

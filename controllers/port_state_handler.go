@@ -15,7 +15,7 @@ import (
 
 const finalizerKey string = "metal3.io.v1alpha1"
 
-// noneHandler will be called when Port is created
+// noneHandler add finalizers to CR
 func (r *PortReconciler) noneHandler(ctx context.Context, info *machine.Information, instance interface{}) (v1alpha1.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.Port)
 
@@ -26,17 +26,17 @@ func (r *PortReconciler) noneHandler(ctx context.Context, info *machine.Informat
 		result.Requeue = true
 	}
 
-	return v1alpha1.PortCreating, ctrl.Result{Requeue: true}, err
+	return v1alpha1.PortCreated, ctrl.Result{Requeue: true}, err
 }
 
-// createHandler will be called when Port was created
-func (r *PortReconciler) creatingHandler(ctx context.Context, info *machine.Information, instance interface{}) (v1alpha1.StateType, ctrl.Result, error) {
+// createdHandler check spec.configurationRef's value, if isn't nil set the state of CR to `Configuring`
+func (r *PortReconciler) createdHandler(ctx context.Context, info *machine.Information, instance interface{}) (v1alpha1.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.Port)
 
 	// Initialize device
 	dev, err := device.New(ctx, info.Client, &i.OwnerReferences[0])
 	if err != nil {
-		return v1alpha1.PortCreating, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+		return v1alpha1.PortCreated, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
 	}
 
 	// Get port's state
@@ -49,13 +49,13 @@ func (r *PortReconciler) creatingHandler(ctx context.Context, info *machine.Info
 		// Just wait
 
 	default:
-		return v1alpha1.PortDeleted, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, fmt.Errorf("port(%s) have been used", i.Spec.ID)
+		return v1alpha1.PortCleaned, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, fmt.Errorf("port(%s) have been used", i.Spec.ID)
 	}
 
-	return v1alpha1.PortCreating, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, nil
+	return v1alpha1.PortCreated, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, nil
 }
 
-// configuringHandler will be called when configuring network
+// configuringHandler configure port's network and check configuration progress. If finished set the state of CR to `Configured` state
 func (r *PortReconciler) configuringHandler(ctx context.Context, info *machine.Information, instance interface{}) (v1alpha1.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.Port)
 
@@ -85,7 +85,8 @@ func (r *PortReconciler) configuringHandler(ctx context.Context, info *machine.I
 	return v1alpha1.PortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
 }
 
-// configuredHandler will be called when the user want to delete the network configuration for the port be configured
+// configuredHandler check whether the target configuration is consistent with the actual configuration,
+// return to `Configuring` state when inconsistent
 func (r *PortReconciler) configuredHandler(ctx context.Context, info *machine.Information, instance interface{}) (v1alpha1.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.Port)
 
@@ -95,16 +96,16 @@ func (r *PortReconciler) configuredHandler(ctx context.Context, info *machine.In
 	}
 
 	// User delete CR
-	return v1alpha1.PortDeleting, ctrl.Result{Requeue: true}, nil
+	return v1alpha1.PortCleaning, ctrl.Result{Requeue: true}, nil
 }
 
-// deletingHandler will be called when deleting network configuration
-func (r *PortReconciler) deletingHandler(ctx context.Context, info *machine.Information, instance interface{}) (v1alpha1.StateType, ctrl.Result, error) {
+// cleaningHandler will be called when deleting network configuration, when finished clean spec.configurationRef and status.configurationRef then set CR's state to `Deleted` state.
+func (r *PortReconciler) cleaningHandler(ctx context.Context, info *machine.Information, instance interface{}) (v1alpha1.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.Port)
 
 	dev, err := device.New(ctx, info.Client, &i.OwnerReferences[0])
 	if err != nil {
-		return v1alpha1.PortDeleting, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+		return v1alpha1.PortCleaning, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
 	}
 
 	switch dev.PortState(ctx, i.Spec.ID) {
@@ -113,17 +114,17 @@ func (r *PortReconciler) deletingHandler(ctx context.Context, info *machine.Info
 		err = dev.DeConfigurePort(ctx, i.Spec.ID)
 
 	case device.None, device.Deleted:
-		return v1alpha1.PortDeleted, ctrl.Result{Requeue: true}, nil
+		return v1alpha1.PortCleaned, ctrl.Result{Requeue: true}, nil
 
 	default:
 		// Just wait
 	}
 
-	return v1alpha1.PortDeleting, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+	return v1alpha1.PortCleaning, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
 }
 
-// deletedHandler will be called when the network configuration has been deleted
-func (r *PortReconciler) deletedHandler(ctx context.Context, info *machine.Information, instance interface{}) (v1alpha1.StateType, ctrl.Result, error) {
+// cleanedHandler will remove finalizers, if spec.configurationRef isn't nil set CR's state to <none>
+func (r *PortReconciler) cleanedHandler(ctx context.Context, info *machine.Information, instance interface{}) (v1alpha1.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.Port)
 
 	// Remove finalizer
@@ -133,5 +134,5 @@ func (r *PortReconciler) deletedHandler(ctx context.Context, info *machine.Infor
 		result.Requeue = true
 	}
 
-	return v1alpha1.PortDeleted, result, err
+	return v1alpha1.PortCleaned, result, err
 }

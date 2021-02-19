@@ -158,8 +158,8 @@ const (
 	// PortNone means the port can be configured.
 	PortNone StateType = ""
 
-	// PortCreating means we are configuring configuration for the port.
-	PortCreating StateType = "Creating"
+	// PortCreated means we are configuring configuration for the port.
+	PortCreated StateType = "Created"
 
 	// PortConfiguring means we are removing configuration from the port.
 	PortConfiguring StateType = "Configuring"
@@ -167,11 +167,11 @@ const (
 	// PortConfigured means the port have been configured, you can use it now.
 	PortConfigured StateType = "Configured"
 
-	// PortDeleting means the port have been configured, you can use it now.
-	PortDeleting StateType = "Deleting"
+	// PortCleaning means the port have been configured, you can use it now.
+	PortCleaning StateType = "Cleaning"
 
-	// PortDeleted means now configuration of the port have been removed.
-	PortDeleted StateType = "Deleted"
+	// PortCleaned means now configuration of the port have been removed.
+	PortCleaned StateType = "Cleaned"
 )
 
 // GetState gets the current state of the port
