@@ -4,34 +4,33 @@ import (
 	"context"
 	"testing"
 
-	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 type testInstance struct {
 	out   string
-	state v1alpha1.StateType
+	state StateType
 }
 
-func (t *testInstance) GetState() v1alpha1.StateType {
+func (t *testInstance) GetState() StateType {
 	return t.state
 }
 
-func (t *testInstance) SetState(state v1alpha1.StateType) {
+func (t *testInstance) SetState(state StateType) {
 	t.state = state
 }
 
-func handlerTest0(ctx context.Context, info *Information, instance interface{}) (v1alpha1.StateType, ctrl.Result, error) {
+func handlerTest0(ctx context.Context, info *Information, instance interface{}) (StateType, ctrl.Result, error) {
 	instance.(*testInstance).out = "Hello"
 	return "test1", ctrl.Result{}, nil
 }
 
-func handlerTest1(ctx context.Context, info *Information, instance interface{}) (v1alpha1.StateType, ctrl.Result, error) {
+func handlerTest1(ctx context.Context, info *Information, instance interface{}) (StateType, ctrl.Result, error) {
 	instance.(*testInstance).out += " world"
 	return "test2", ctrl.Result{}, nil
 }
 
-func handlerTest2(ctx context.Context, info *Information, instance interface{}) (v1alpha1.StateType, ctrl.Result, error) {
+func handlerTest2(ctx context.Context, info *Information, instance interface{}) (StateType, ctrl.Result, error) {
 	instance.(*testInstance).out += "!"
 	return "", ctrl.Result{}, nil
 }
@@ -80,17 +79,17 @@ func BenchmarkMachine(b *testing.B) {
 
 var tInstance testInstance
 
-func handlerTest00(ctx context.Context, info *Information, instance interface{}) (v1alpha1.StateType, ctrl.Result, error) {
+func handlerTest00(ctx context.Context, info *Information, instance interface{}) (StateType, ctrl.Result, error) {
 	tInstance.out = "Hello"
 	return "test1", ctrl.Result{}, nil
 }
 
-func handlerTest11(ctx context.Context, info *Information, instance interface{}) (v1alpha1.StateType, ctrl.Result, error) {
+func handlerTest11(ctx context.Context, info *Information, instance interface{}) (StateType, ctrl.Result, error) {
 	tInstance.out += " world"
 	return "test2", ctrl.Result{}, nil
 }
 
-func handlerTest22(ctx context.Context, info *Information, instance interface{}) (v1alpha1.StateType, ctrl.Result, error) {
+func handlerTest22(ctx context.Context, info *Information, instance interface{}) (StateType, ctrl.Result, error) {
 	tInstance.out += "!"
 	return "", ctrl.Result{}, nil
 }

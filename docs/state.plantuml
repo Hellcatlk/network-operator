@@ -2,23 +2,23 @@
 
 (*) --> [ User create CR ] "<none>"
 
-"<none>" --> "Created"
+"<none>" --> "Idle"
 
-"Created" --> [ spec.configurationRef != nil ] "Configuring"
-"Created" --> [ !instance.DeletionTimestamp.IsZero() ] "Cleaned"
-"Created" --> [ spec.configurationRef == nil ] "Created"
+"Idle" --> [ spec.configurationRef != nil\n (with exponential backoff)] "Validating"
+"Idle" --> [ !instance.DeletionTimestamp.IsZero() ] "Deleting"
 
-"Configuring" --> [ Check configuration progress ] "Configuring"
-"Configuring" --> [ Configuration finished ] "Configured"
+"Validating" --> [ Switch Credentials ok + configuration ok ] "Configuring"
+"Validating" --> [ Incorrect config ] "Idle"
 
-"Configured" --> [ Configuration have been updated ] "Configuring"
-"Configured" --> [ Detection whether the target configuration is\n consistent with the actual configuration ] "Configured"
-"Configured" --> [ !instance.DeletionTimestamp.IsZero() || spec.configurationRef is nil ] "Cleaning"
+"Configuring" --> [ Configuration finished ] "Active"
+"Configuring" --> [ Error + exponential backoff ] "Validating"
 
-"Cleaning" --> [ Check Clean progress ] "Cleaning"
-"Cleaning" --> [ Clean finished ] "Cleaned"
+"Active" --> [ Configuration mismatch ] "Configuring"
+"Active" --> [ !instance.DeletionTimestamp.IsZero() || spec.configurationRef is nil ] "Cleaning"
 
-"Cleaned" --> [ Spec.configurationRef isn't nil ] "<none>"
-"Cleaned" --> [ CR have been removed ] (*)
+"Cleaning" --> [ Clean finished ] "Idle"
+"Cleaning" --> [ !instance.DeletionTimestamp.IsZero() ] "Deleting"
+
+"Deleting" --> [ CR have been removed ] (*)
 
 @enduml

@@ -1,12 +1,12 @@
 repo: github.com/metal3-io/networkconfiguration-operator
 resources:
 - group: metal3.io
-  kind: Port
-  version: v1alpha1
-- group: metal3.io
   kind: Switch
   version: v1alpha1
 - group: metal3.io
   kind: SwitchPortConfiguration
+  version: v1alpha1
+- group: metal3.io
+  kind: SwitchPort
   version: v1alpha1
 version: "2"

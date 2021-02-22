@@ -62,9 +62,6 @@ type Device interface {
 	// DeConfigurePort remove the network configure from the port
 	DeConfigurePort(ctx context.Context, portID string) error
 
-	// PortState return the port's state of the device
-	PortState(ctx context.Context, portID string) PortState
-
 	// CheckPortConfigutation checks whether the configuration is configured on the port
 	CheckPortConfigutation(ctx context.Context, configuration interface{}, portID string) bool
 }

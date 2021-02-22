@@ -1,20 +1,24 @@
-# permissions for end users to view ports.
+# permissions for end users to edit switchports.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: port-viewer-role
+  name: switchport-editor-role
 rules:
 - apiGroups:
   - metal3.io
   resources:
-  - ports
+  - switchports
   verbs:
+  - create
+  - delete
   - get
   - list
+  - patch
+  - update
   - watch
 - apiGroups:
   - metal3.io
   resources:
-  - ports/status
+  - switchports/status
   verbs:
   - get

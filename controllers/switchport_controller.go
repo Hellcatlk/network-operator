@@ -31,26 +31,23 @@ import (
 	"github.com/metal3-io/networkconfiguration-operator/pkg/machine"
 )
 
-// PortReconciler reconciles a Port object
-type PortReconciler struct {
+// SwitchPortReconciler reconciles a SwitchPort object
+type SwitchPortReconciler struct {
 	client.Client
 	Log    logr.Logger
 	Scheme *runtime.Scheme
 }
 
-// +kubebuilder:rbac:groups=metal3.io,resources=ports,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=metal3.io,resources=ports/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=metal3.io,resources=switchports,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=metal3.io,resources=switchports/status,verbs=get;update;patch
 
 // Reconcile ...
-func (r *PortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, err error) {
+func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, err error) {
 	_ = context.Background()
-	_ = r.Log.WithValues("port", req.NamespacedName)
-
-	_ = context.Background()
-	_ = r.Log.WithValues("Port", req.NamespacedName)
+	_ = r.Log.WithValues("switchport", req.NamespacedName)
 
 	// Fetch the instance
-	instance := &v1alpha1.Port{}
+	instance := &v1alpha1.SwitchPort{}
 	err = r.Get(context.TODO(), req.NamespacedName, instance)
 	if err != nil {
 		// Error reading the object - requeue the request
@@ -70,11 +67,12 @@ func (r *PortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, err er
 		instance,
 		&machine.Handlers{
 			v1alpha1.PortNone:        r.noneHandler,
-			v1alpha1.PortCreated:     r.createdHandler,
+			v1alpha1.PortIdle:        r.idleHandler,
+			v1alpha1.PortValidating:  r.validatingandler,
 			v1alpha1.PortConfiguring: r.configuringHandler,
-			v1alpha1.PortConfigured:  r.configuredHandler,
+			v1alpha1.PortActive:      r.activeHandler,
 			v1alpha1.PortCleaning:    r.cleaningHandler,
-			v1alpha1.PortCleaned:     r.cleanedHandler,
+			v1alpha1.PortDeleting:    r.deletingHandler,
 		},
 	)
 
@@ -134,8 +132,8 @@ func (r *PortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, err er
 }
 
 // SetupWithManager ...
-func (r *PortReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *SwitchPortReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&metal3iov1alpha1.Port{}).
+		For(&metal3iov1alpha1.SwitchPort{}).
 		Complete(r)
 }

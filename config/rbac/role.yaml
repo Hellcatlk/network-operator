@@ -9,7 +9,7 @@ rules:
 - apiGroups:
   - metal3.io
   resources:
-  - ports
+  - switchports
   verbs:
   - create
   - delete
@@ -21,7 +21,7 @@ rules:
 - apiGroups:
   - metal3.io
   resources:
-  - ports/status
+  - switchports/status
   verbs:
   - get
   - patch

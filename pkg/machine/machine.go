@@ -6,22 +6,24 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+// StateType is the type of .status.state
+type StateType string
+
 // Handler is a state handle function
-type Handler func(ctx context.Context, info *Information, instance interface{}) (nextState v1alpha1.StateType, result ctrl.Result, err error)
+type Handler func(ctx context.Context, info *Information, instance interface{}) (nextState StateType, result ctrl.Result, err error)
 
 // Handlers includes a lot of handler
-type Handlers map[v1alpha1.StateType]Handler
+type Handlers map[StateType]Handler
 
 // Instance is a object for the CR need be reconcile
 // NOTE: Instance must be a pointer
 type Instance interface {
-	GetState() v1alpha1.StateType
-	SetState(state v1alpha1.StateType)
+	GetState() StateType
+	SetState(state StateType)
 }
 
 // Information ...
