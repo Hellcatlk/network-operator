@@ -21,6 +21,8 @@ func New(ctx context.Context, client client.Client, deviceRef *metav1.OwnerRefer
 	switch deviceRef.Kind {
 	case "Switch":
 		device, err = newSwitch(ctx, client, deviceRef)
+	case "Test":
+		device, err = newTest()
 	default:
 		err = fmt.Errorf("no device for the kind(%s)", deviceRef.Kind)
 	}

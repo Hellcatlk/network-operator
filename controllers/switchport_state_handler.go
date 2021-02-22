@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
@@ -26,56 +25,60 @@ func (r *SwitchPortReconciler) noneHandler(ctx context.Context, info *machine.In
 		result.Requeue = true
 	}
 
-	return v1alpha1.PortIdle, ctrl.Result{Requeue: true}, err
+	return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true}, err
 }
 
 // idleHandler check spec.configurationRef's value, if isn't nil set the state of CR to `Configuring`
 func (r *SwitchPortReconciler) idleHandler(ctx context.Context, info *machine.Information, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
+	if !i.DeletionTimestamp.IsZero() {
+		return v1alpha1.SwitchPortDeleting, ctrl.Result{Requeue: true}, nil
+	}
+
 	if i.Spec.ConfigurationRef == nil {
-		return v1alpha1.PortIdle, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, nil
+		return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, nil
 	}
 
-	config, err := i.Spec.ConfigurationRef.Fetch(ctx, info.Client)
+	_, err := i.Spec.ConfigurationRef.Fetch(ctx, info.Client)
 	if err != nil {
-		return v1alpha1.PortIdle, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+		return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
 	}
 
-	if config == nil {
-		return v1alpha1.PortIdle, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, fmt.Errorf("Can't fetch configuration CR")
-	}
-
-	return v1alpha1.PortValidating, ctrl.Result{Requeue: true}, nil
+	return v1alpha1.SwitchPortValidating, ctrl.Result{Requeue: true}, nil
 }
 
 func (r *SwitchPortReconciler) validatingandler(ctx context.Context, info *machine.Information, instance interface{}) (machine.StateType, ctrl.Result, error) {
 
 	// TODO: Check connection to switch
 
-	return v1alpha1.PortConfiguring, ctrl.Result{Requeue: true}, nil
+	return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true}, nil
 }
 
 // configuringHandler configure port's network and check configuration progress. If finished set the state of CR to `Configured` state
 func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *machine.Information, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
+	if i.Spec.ConfigurationRef == nil {
+		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true}, nil
+	}
+
 	dev, err := device.New(ctx, info.Client, &i.OwnerReferences[0])
 	if err != nil {
-		return v1alpha1.PortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
 	}
 
 	configuration, err := i.Spec.ConfigurationRef.Fetch(ctx, info.Client)
 	if err != nil {
-		return v1alpha1.PortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
 	}
 
 	err = dev.ConfigurePort(ctx, configuration, i.Spec.ID)
 	if err != nil {
-		return v1alpha1.PortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
 	}
 
-	return v1alpha1.PortActive, ctrl.Result{Requeue: true}, nil
+	return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true}, nil
 }
 
 // activeHandler check whether the target configuration is consistent with the actual configuration,
@@ -83,33 +86,31 @@ func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *mac
 func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.Information, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
-	// User delete CR
-	if !i.DeletionTimestamp.IsZero() {
-		return v1alpha1.PortCleaning, ctrl.Result{Requeue: true}, nil
+	if !i.DeletionTimestamp.IsZero() || i.Spec.ConfigurationRef == nil {
+		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true}, nil
 	}
 
 	dev, err := device.New(ctx, info.Client, &i.OwnerReferences[0])
 	if err != nil {
-		return v1alpha1.PortActive, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
 	}
 
 	configuration, err := i.Spec.ConfigurationRef.Fetch(ctx, info.Client)
 	if err != nil {
-		return v1alpha1.PortActive, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
 	}
 
 	isIdentical, err := dev.CheckPortConfigutation(ctx, configuration, i.Spec.ID)
 	if err != nil {
-		return v1alpha1.PortActive, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
 	}
 
-	if !isIdentical {
-		i.Status.Configuration = nil
-		return v1alpha1.PortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, nil
+	if isIdentical {
+		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, nil
 	}
 
-	// User update CR
-	return v1alpha1.PortConfiguring, ctrl.Result{Requeue: true}, nil
+	i.Status.Configuration = nil
+	return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true}, nil
 }
 
 // cleaningHandler will be called when deleting network configuration, when finished clean spec.configurationRef and status.configurationRef then set CR's state to `Deleted` state.
@@ -118,21 +119,21 @@ func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machin
 
 	dev, err := device.New(ctx, info.Client, &i.OwnerReferences[0])
 	if err != nil {
-		return v1alpha1.PortCleaning, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
 	}
 
 	err = dev.DeConfigurePort(ctx, i.Spec.ID)
 	if err != nil {
-		return v1alpha1.PortCleaning, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
 	}
 
 	// User delete CR
 	if !i.DeletionTimestamp.IsZero() {
-		return v1alpha1.PortDeleting, ctrl.Result{Requeue: true}, nil
+		return v1alpha1.SwitchPortDeleting, ctrl.Result{Requeue: true}, nil
 	}
 
 	i.Status.Configuration = nil
-	return v1alpha1.PortIdle, ctrl.Result{Requeue: true}, err
+	return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true}, err
 }
 
 // deletingHandler will remove finalizers, if spec.configurationRef isn't nil set CR's state to <none>
@@ -146,5 +147,5 @@ func (r *SwitchPortReconciler) deletingHandler(ctx context.Context, info *machin
 		result.Requeue = true
 	}
 
-	return v1alpha1.PortNone, result, err
+	return v1alpha1.SwitchPortNone, result, err
 }

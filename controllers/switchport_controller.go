@@ -66,13 +66,13 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 		},
 		instance,
 		&machine.Handlers{
-			v1alpha1.PortNone:        r.noneHandler,
-			v1alpha1.PortIdle:        r.idleHandler,
-			v1alpha1.PortValidating:  r.validatingandler,
-			v1alpha1.PortConfiguring: r.configuringHandler,
-			v1alpha1.PortActive:      r.activeHandler,
-			v1alpha1.PortCleaning:    r.cleaningHandler,
-			v1alpha1.PortDeleting:    r.deletingHandler,
+			v1alpha1.SwitchPortNone:        r.noneHandler,
+			v1alpha1.SwitchPortIdle:        r.idleHandler,
+			v1alpha1.SwitchPortValidating:  r.validatingandler,
+			v1alpha1.SwitchPortConfiguring: r.configuringHandler,
+			v1alpha1.SwitchPortActive:      r.activeHandler,
+			v1alpha1.SwitchPortCleaning:    r.cleaningHandler,
+			v1alpha1.SwitchPortDeleting:    r.deletingHandler,
 		},
 	)
 
@@ -108,10 +108,6 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 
 	// On object delete
 	case !instance.DeletionTimestamp.IsZero():
-		// Set instance's state to `Cleaning`
-		if instance.GetState() != v1alpha1.PortCleaning {
-			instance.SetState(v1alpha1.PortCleaning)
-		}
 		// Reconcile state
 		result, merr = m.Reconcile(context.TODO())
 		if merr != nil {

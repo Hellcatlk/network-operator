@@ -92,26 +92,26 @@ type SwitchPortStatus struct {
 }
 
 const (
-	// PortNone means the port can be configured
-	PortNone machine.StateType = ""
+	// SwitchPortNone means the port can be configured
+	SwitchPortNone machine.StateType = ""
 
-	// PortIdle means we are wait for configuration for the port
-	PortIdle machine.StateType = "Idle"
+	// SwitchPortIdle means we are wait for configuration for the port
+	SwitchPortIdle machine.StateType = "Idle"
 
-	// PortValidating means we are validating the connection for network device
-	PortValidating machine.StateType = "Validating"
+	// SwitchPortValidating means we are validating the connection for network device
+	SwitchPortValidating machine.StateType = "Validating"
 
-	// PortConfiguring means we are removing configuration from the port
-	PortConfiguring machine.StateType = "Configuring"
+	// SwitchPortConfiguring means we are removing configuration from the port
+	SwitchPortConfiguring machine.StateType = "Configuring"
 
-	// PortActive means the port have been configured, you can use it now
-	PortActive machine.StateType = "Active"
+	// SwitchPortActive means the port have been configured, you can use it now
+	SwitchPortActive machine.StateType = "Active"
 
-	// PortCleaning means the port have been configured, you can use it now
-	PortCleaning machine.StateType = "Cleaning"
+	// SwitchPortCleaning means the port have been configured, you can use it now
+	SwitchPortCleaning machine.StateType = "Cleaning"
 
-	// PortDeleting means we are deleting this CR
-	PortDeleting machine.StateType = "Deleting"
+	// SwitchPortDeleting means we are deleting this CR
+	SwitchPortDeleting machine.StateType = "Deleting"
 )
 
 // GetState gets the current state of the port
