@@ -17,45 +17,9 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"context"
-	"fmt"
-
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
-
-// DeviceRef is the reference for Device CR
-type DeviceRef struct {
-	Name string `json:"name"`
-
-	// If empty use default namespace.
-	// +kubebuilder:default:="default"
-	NameSpace string `json:"namespace,omitempty"`
-
-	// +kubebuilder:validation:Enum="Switch"
-	Kind string `json:"kind"`
-}
-
-// Fetch the instance
-func (ref *DeviceRef) Fetch(ctx context.Context, client client.Client) (instance interface{}, err error) {
-	switch ref.Kind {
-	case "Switch":
-		err = client.Get(
-			ctx,
-			types.NamespacedName{
-				Name:      ref.Name,
-				Namespace: ref.NameSpace,
-			},
-			instance.(*Switch),
-		)
-	default:
-		err = fmt.Errorf("no instance for the ref")
-	}
-
-	return
-}
 
 // SwitchSpec defines the desired state of Switch
 type SwitchSpec struct {

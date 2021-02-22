@@ -8,32 +8,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// PortState ...
-type PortState string
-
-const (
-	// None ...
-	None PortState = "none"
-
-	// Configuring ...
-	Configuring PortState = "configuring"
-
-	// Configured ...
-	Configured PortState = "configured"
-
-	// ConfigureFailed ...
-	ConfigureFailed PortState = "configure failed"
-
-	// Deleting ...
-	Deleting PortState = "deleting"
-
-	// Deleted ...
-	Deleted PortState = "deleted"
-
-	// DeleteFailed ...
-	DeleteFailed PortState = "delete failed"
-)
-
 // New ...
 func New(ctx context.Context, client client.Client, deviceRef *metav1.OwnerReference) (device Device, err error) {
 	// Deal possible panic
@@ -63,5 +37,5 @@ type Device interface {
 	DeConfigurePort(ctx context.Context, portID string) error
 
 	// CheckPortConfigutation checks whether the configuration is configured on the port
-	CheckPortConfigutation(ctx context.Context, configuration interface{}, portID string) bool
+	CheckPortConfigutation(ctx context.Context, configuration interface{}, portID string) (bool, error)
 }

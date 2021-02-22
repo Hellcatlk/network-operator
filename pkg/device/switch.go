@@ -48,6 +48,6 @@ func (s *Switch) DeConfigurePort(ctx context.Context, portID string) error {
 }
 
 // CheckPortConfigutation checks whether the configuration is configured on the port
-func (s *Switch) CheckPortConfigutation(ctx context.Context, configuration interface{}, portID string) bool {
-	return false
+func (s *Switch) CheckPortConfigutation(ctx context.Context, configuration interface{}, portID string) (bool, error) {
+	return false, nil
 }

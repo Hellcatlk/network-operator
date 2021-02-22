@@ -88,6 +88,26 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 		return v1alpha1.PortCleaning, ctrl.Result{Requeue: true}, nil
 	}
 
+	dev, err := device.New(ctx, info.Client, &i.OwnerReferences[0])
+	if err != nil {
+		return v1alpha1.PortActive, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+	}
+
+	configuration, err := i.Spec.ConfigurationRef.Fetch(ctx, info.Client)
+	if err != nil {
+		return v1alpha1.PortActive, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+	}
+
+	isIdentical, err := dev.CheckPortConfigutation(ctx, configuration, i.Spec.ID)
+	if err != nil {
+		return v1alpha1.PortActive, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+	}
+
+	if !isIdentical {
+		i.Status.Configuration = nil
+		return v1alpha1.PortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, nil
+	}
+
 	// User update CR
 	return v1alpha1.PortConfiguring, ctrl.Result{Requeue: true}, nil
 }
