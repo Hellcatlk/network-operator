@@ -26,7 +26,7 @@ type Instance interface {
 	SetState(state StateType)
 }
 
-// Information ...
+// Information is the information need by reconcile
 type Information struct {
 	Client client.Client
 	Logger logr.Logger

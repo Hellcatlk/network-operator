@@ -43,12 +43,12 @@ type SwitchPortReconciler struct {
 
 // Reconcile ...
 func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, err error) {
-	_ = context.Background()
-	_ = r.Log.WithValues("switchport", req.NamespacedName)
+	ctx := context.Background()
+	logger := r.Log.WithValues("switchport", req.NamespacedName)
 
 	// Fetch the instance
 	instance := &v1alpha1.SwitchPort{}
-	err = r.Get(context.TODO(), req.NamespacedName, instance)
+	err = r.Get(ctx, req.NamespacedName, instance)
 	if err != nil {
 		// Error reading the object - requeue the request
 		return reconcile.Result{}, err
@@ -62,7 +62,7 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 	m := machine.New(
 		&machine.Information{
 			Client: r.Client,
-			Logger: r.Log,
+			Logger: logger,
 		},
 		instance,
 		&machine.Handlers{
@@ -76,53 +76,20 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 		},
 	)
 
-	var merr *machine.Error
-	switch {
-	// On object created
-	case instance.DeletionTimestamp.IsZero() && len(instance.Finalizers) == 0:
-		// Reconcile state
-		result, merr = m.Reconcile(context.TODO())
-		if merr != nil {
-			err = merr.Error()
-			switch merr.Type() {
-			case machine.ReconcileError:
-				// Do something
-			case machine.HandlerError:
-				// Do something
-			}
-		}
-
-	// On object updated
-	case instance.DeletionTimestamp.IsZero():
-		// Reconcile state
-		result, merr = m.Reconcile(context.TODO())
-		if merr != nil {
-			err = merr.Error()
-			switch merr.Type() {
-			case machine.ReconcileError:
-				// Do something
-			case machine.HandlerError:
-				// Do something
-			}
-		}
-
-	// On object delete
-	case !instance.DeletionTimestamp.IsZero():
-		// Reconcile state
-		result, merr = m.Reconcile(context.TODO())
-		if merr != nil {
-			err = merr.Error()
-			switch merr.Type() {
-			case machine.ReconcileError:
-				// Do something
-			case machine.HandlerError:
-				// Do something
-			}
+	// Reconcile state machine
+	result, merr := m.Reconcile(ctx)
+	if merr != nil {
+		err = merr.Error()
+		switch merr.Type() {
+		case machine.ReconcileError:
+			logger.Error(err, "reconcile error")
+		case machine.HandlerError:
+			logger.Error(err, "handler error")
 		}
 	}
 
 	// Update object
-	err = r.Update(context.TODO(), instance)
+	err = r.Update(ctx, instance)
 
 	return ctrl.Result{}, err
 }
