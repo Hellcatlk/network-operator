@@ -59,8 +59,8 @@ func (r *SwitchPortReconciler) validatingandler(ctx context.Context, info *machi
 func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *machine.Information, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
-	if i.Spec.ConfigurationRef == nil {
-		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true}, nil
+	if !i.DeletionTimestamp.IsZero() || i.Spec.ConfigurationRef == nil {
+		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true}, nil
 	}
 
 	dev, err := device.New(ctx, info.Client, &i.OwnerReferences[0])
@@ -125,11 +125,6 @@ func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machin
 	err = dev.DeConfigurePort(ctx, i.Spec.ID)
 	if err != nil {
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
-	}
-
-	// User delete CR
-	if !i.DeletionTimestamp.IsZero() {
-		return v1alpha1.SwitchPortDeleting, ctrl.Result{Requeue: true}, nil
 	}
 
 	i.Status.Configuration = nil

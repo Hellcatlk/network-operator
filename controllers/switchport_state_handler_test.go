@@ -94,41 +94,6 @@ func TestSwitchPortStateMachine(t *testing.T) {
 			deletionTimestampExist: true,
 			expectedState:          v1alpha1.SwitchPortNone,
 		},
-		// Delete when Cleaning state
-		{
-			name:             "<None> -> Idle",
-			configurationRef: &v1alpha1.SwitchPortConfigurationRef{},
-			expectedState:    v1alpha1.SwitchPortIdle,
-		},
-		{
-			name:             "Idle -> Validating",
-			configurationRef: &v1alpha1.SwitchPortConfigurationRef{},
-			expectedState:    v1alpha1.SwitchPortValidating,
-		},
-		{
-			name:             "Validating -> Configuring",
-			configurationRef: &v1alpha1.SwitchPortConfigurationRef{},
-			expectedState:    v1alpha1.SwitchPortConfiguring,
-		},
-		{
-			name:             "Configuring -> Active",
-			configurationRef: &v1alpha1.SwitchPortConfigurationRef{},
-			expectedState:    v1alpha1.SwitchPortActive,
-		},
-		{
-			name:          "Active -> Cleaning",
-			expectedState: v1alpha1.SwitchPortCleaning,
-		},
-		{
-			name:                   "Cleaning -> Deleting",
-			deletionTimestampExist: true,
-			expectedState:          v1alpha1.SwitchPortDeleting,
-		},
-		{
-			name:                   "Deleting -> <None>",
-			deletionTimestampExist: true,
-			expectedState:          v1alpha1.SwitchPortNone,
-		},
 	}
 
 	for _, c := range cases {
