@@ -53,7 +53,7 @@ manifests:
 # Generate docs
 .PHONY: docs
 docs:
-	./tools/plantuml docs/*.plantuml
+	./tools/plantuml docs/*/*.plantuml
 
 # Run tests
 test: generate gofmt golint govet gosec unit manifests
