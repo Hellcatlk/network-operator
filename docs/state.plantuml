@@ -14,10 +14,9 @@
 "Configuring" --> [ Error + exponential backoff ] "Validating"
 
 "Active" --> [ Configuration mismatch ] "Configuring"
-"Active" --> [ !instance.DeletionTimestamp.IsZero() || spec.configurationRef is nil ] "Cleaning"
+"Active" --> [ spec.configurationRef is nil ] "Cleaning"
 
 "Cleaning" --> [ Clean finished ] "Idle"
-"Cleaning" --> [ !instance.DeletionTimestamp.IsZero() ] "Deleting"
 
 "Deleting" --> [ CR have been removed ] (*)
 
