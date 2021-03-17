@@ -10,7 +10,6 @@ import (
 type testType struct {
 	metav1.TypeMeta
 	metav1.ObjectMeta
-	testData string
 }
 
 func TestAddFinalizers(t *testing.T) {

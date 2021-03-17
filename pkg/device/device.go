@@ -12,9 +12,9 @@ import (
 func New(ctx context.Context, client client.Client, deviceRef *metav1.OwnerReference) (device Device, err error) {
 	// Deal possible panic
 	defer func() {
-		err := recover()
-		if err != nil {
-			err = fmt.Errorf("%v", err)
+		r := recover()
+		if r != nil {
+			err = fmt.Errorf("%v", r)
 		}
 	}()
 

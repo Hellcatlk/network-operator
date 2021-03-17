@@ -3,7 +3,6 @@ package machine
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/go-logr/logr"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -34,10 +33,9 @@ type Information struct {
 
 // Machine is a state machine
 type Machine struct {
-	info         *Information
-	instance     Instance
-	handlers     *Handlers
-	requeueAfter time.Duration
+	info     *Information
+	instance Instance
+	handlers *Handlers
 }
 
 // ErrorType is the error when reconcile state machine

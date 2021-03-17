@@ -22,14 +22,10 @@ spec:
         description: Switch is the Schema for the switches API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
           metadata:
             type: object
@@ -49,8 +45,7 @@ spec:
               restrictedPorts:
                 description: Restricted ports in the switch
                 items:
-                  description: RestrictedPort indicates the specific restriction on
-                    the port
+                  description: RestrictedPort indicates the specific restriction on the port
                   properties:
                     disabled:
                       description: True if this port is not available, false otherwise
@@ -59,12 +54,10 @@ spec:
                       description: Describes the port number on the device
                       type: string
                     trunkDisable:
-                      description: True if this port can be used as a trunk port,
-                        false otherwise
+                      description: True if this port can be used as a trunk port, false otherwise
                       type: boolean
                     vlanRange:
-                      description: Indicates the range of VLANs allowed by this port
-                        in the switch
+                      description: Indicates the range of VLANs allowed by this port in the switch
                       pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
                       type: string
                   type: object
@@ -73,12 +66,10 @@ spec:
                 description: The secret containing the switch credentials
                 properties:
                   name:
-                    description: Name is unique within a namespace to reference a
-                      secret resource.
+                    description: Name is unique within a namespace to reference a secret resource.
                     type: string
                   namespace:
-                    description: Namespace defines the space within which the secret
-                      name must be unique.
+                    description: Namespace defines the space within which the secret name must be unique.
                     type: string
                 type: object
             required:
