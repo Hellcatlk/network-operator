@@ -15,8 +15,9 @@ GOOS=$(shell go env GOOS)
 GOARCH=$(shell go env GOARCH)
 
 # Build manager binary
+.PHONY: build
 build: generate
-	CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} GO111MODULE=on go build -a -o bin/manager-docker main.go
+	CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} GO111MODULE=on go build -a -o bin/manager main.go
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: generate
