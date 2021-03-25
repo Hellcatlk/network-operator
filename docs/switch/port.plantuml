@@ -1,0 +1,54 @@
+@startuml port
+start
+
+:New/Updated/Deleted resource;
+if (New?) then (yes)
+    :Add finalizers;
+    :Set CR's state to Created;
+elseif (Updated?) then (yes)
+    :Get CR's state;
+    if (Created?) then (yes)
+        :Get port's state;
+        if (none/deleted?) then (yes)
+            :Set CR's state to Configuring;
+        elseif (deleting?) then (yes)
+            :Set CR's state to Created;
+        else (default?)
+            :Set CR's state to Deleted;
+            :Report error "the port have been used";
+        endif
+    elseif (Configuring?) then (yes)
+        :Get port's state;
+        if (none/deleted/configure failed?) then (yes)
+            :Set configuration to the port;
+            :Set CR's state to Configuring;
+        elseif (configured?) then (yes)
+            :Set CR's state to configured, but not reconcile again;
+        else (default?)
+            :Set CR's state to Configuring;
+        endif
+    else (Configured?)
+        :Set CR's state to Configuring;
+    endif
+else (Deleted?)
+    :Get CR's state;
+    if (Configured?) then (yes)
+        :Set CR's state to Deleting;
+    elseif (Deleting?) then (yes)
+        :Get port's state;
+        if (none/deleted?) then (yes)
+            :Set CR's state to Deleted;
+        elseif (configured/configure failed/delete failed?) then (yes)
+            :Remove configuration for the port;
+            :Set CR's state to Deleting;
+        else (default?)
+            :Set CR's state to Deleting;
+        endif
+    else (Deleted?)
+        :Remove finalizers;
+    endif
+endif
+:Patch resource to persist changes;
+
+stop
+@enduml

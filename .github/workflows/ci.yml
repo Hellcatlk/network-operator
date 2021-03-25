@@ -24,7 +24,7 @@ jobs:
       - name: manifests
         run: make manifests
       - name: unit
-        run: ./hack/installkubebuilder.sh && make unit
+        run: ./tools/install_kubebuilder.sh && make unit
   build:
     runs-on: ubuntu-latest
     steps:

@@ -1,0 +1,141 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: (devel)
+  creationTimestamp: null
+  name: switchports.metal3.io
+spec:
+  group: metal3.io
+  names:
+    kind: SwitchPort
+    listKind: SwitchPortList
+    plural: switchports
+    singular: switchport
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: SwitchPort is the Schema for the switchports API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: SwitchPortSpec defines the desired state of SwitchPort
+            properties:
+              id:
+                description: Describes the port number on the device.
+                type: string
+              portConfigurationRef:
+                description: Reference for PortConfiguration CR.
+                properties:
+                  name:
+                    type: string
+                  namespace:
+                    default: default
+                    description: If empty use default namespace.
+                    type: string
+                required:
+                - name
+                type: object
+            required:
+            - id
+            type: object
+          status:
+            description: SwitchPortStatus defines the observed state of SwitchPort
+            properties:
+              Configuration:
+                description: The current Configuration of the port.
+                properties:
+                  apiVersion:
+                    description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+                    type: string
+                  kind:
+                    description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                    type: string
+                  metadata:
+                    type: object
+                  spec:
+                    description: SwitchPortConfigurationSpec defines the desired state of SwitchPortConfiguration
+                    properties:
+                      acls:
+                        items:
+                          description: ACL describes the rules applied in the switch
+                          properties:
+                            action:
+                              enum:
+                              - allow
+                              - deny
+                              type: string
+                            des:
+                              type: string
+                            desPortRange:
+                              pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
+                              type: string
+                            protocol:
+                              enum:
+                              - TCP
+                              - UDP
+                              - ICMP
+                              - ALL
+                              type: string
+                            src:
+                              type: string
+                            srcPortRange:
+                              pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
+                              type: string
+                            type:
+                              enum:
+                              - ipv4
+                              - ipv6
+                              type: string
+                          type: object
+                        maxItems: 10
+                        type: array
+                      type:
+                        default: access
+                        description: Indicates which mode this port should be set to, valid values are access, trunk or hybrid. If empty default value is access
+                        type: string
+                      vlans:
+                        items:
+                          description: VLAN represents the name and ID of a VLAN
+                          properties:
+                            id:
+                              description: VLANID is a 12-bit 802.1Q VLAN identifier
+                              format: int32
+                              type: integer
+                            name:
+                              type: string
+                          required:
+                          - id
+                          type: object
+                        type: array
+                    type: object
+                  status:
+                    description: SwitchPortConfigurationStatus defines the observed state of SwitchPortConfiguration
+                    type: object
+                type: object
+              state:
+                description: The current configuration status of the port.
+                type: string
+            required:
+            - Configuration
+            type: object
+        type: object
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
