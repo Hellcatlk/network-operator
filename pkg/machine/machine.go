@@ -13,7 +13,7 @@ import (
 type StateType string
 
 // Handler is a state handle function
-type Handler func(ctx context.Context, info *Information, instance interface{}) (nextState StateType, result ctrl.Result, err error)
+type Handler func(ctx context.Context, info *ReconcileInfo, instance interface{}) (nextState StateType, result ctrl.Result, err error)
 
 // Handlers includes a lot of handler
 type Handlers map[StateType]Handler
@@ -25,15 +25,15 @@ type Instance interface {
 	SetState(state StateType)
 }
 
-// Information is the information need by reconcile
-type Information struct {
+// ReconcileInfo is the information need by reconcile
+type ReconcileInfo struct {
 	Client client.Client
 	Logger logr.Logger
 }
 
 // Machine is a state machine
 type Machine struct {
-	info     *Information
+	info     *ReconcileInfo
 	instance Instance
 	handlers *Handlers
 }
@@ -67,7 +67,7 @@ func (e *Error) Error() error {
 
 // New a state machine
 // NOTE: The paramater of instance must be a pointer
-func New(info *Information, instance Instance, handlers *Handlers) Machine {
+func New(info *ReconcileInfo, instance Instance, handlers *Handlers) Machine {
 	return Machine{
 		info:     info,
 		instance: instance,
