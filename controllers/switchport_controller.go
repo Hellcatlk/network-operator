@@ -27,7 +27,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
-	metal3iov1alpha1 "github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/machine"
 )
 
@@ -55,12 +54,12 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 	}
 
 	if len(instance.OwnerReferences) == 0 {
-		return result, fmt.Errorf("The OwnerReferences of port mustn't be empty")
+		return result, fmt.Errorf("the OwnerReferences of port mustn't be empty")
 	}
 
 	// Initialize state machine
 	m := machine.New(
-		&machine.Information{
+		&machine.ReconcileInfo{
 			Client: r.Client,
 			Logger: logger,
 		},
@@ -97,6 +96,6 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 // SetupWithManager ...
 func (r *SwitchPortReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&metal3iov1alpha1.SwitchPort{}).
+		For(&v1alpha1.SwitchPort{}).
 		Complete(r)
 }

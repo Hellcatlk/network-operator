@@ -15,7 +15,7 @@ import (
 const finalizerKey string = "metal3.io.v1alpha1"
 
 // noneHandler add finalizers to CR
-func (r *SwitchPortReconciler) noneHandler(ctx context.Context, info *machine.Information, instance interface{}) (machine.StateType, ctrl.Result, error) {
+func (r *SwitchPortReconciler) noneHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
 	// Add finalizer
@@ -29,7 +29,7 @@ func (r *SwitchPortReconciler) noneHandler(ctx context.Context, info *machine.In
 }
 
 // idleHandler check spec.configurationRef's value, if isn't nil set the state of CR to `Configuring`
-func (r *SwitchPortReconciler) idleHandler(ctx context.Context, info *machine.Information, instance interface{}) (machine.StateType, ctrl.Result, error) {
+func (r *SwitchPortReconciler) idleHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
 	if !i.DeletionTimestamp.IsZero() {
@@ -48,7 +48,7 @@ func (r *SwitchPortReconciler) idleHandler(ctx context.Context, info *machine.In
 	return v1alpha1.SwitchPortValidating, ctrl.Result{Requeue: true}, nil
 }
 
-func (r *SwitchPortReconciler) validatingandler(ctx context.Context, info *machine.Information, instance interface{}) (machine.StateType, ctrl.Result, error) {
+func (r *SwitchPortReconciler) validatingandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 
 	// TODO: Check connection to switch
 
@@ -56,7 +56,7 @@ func (r *SwitchPortReconciler) validatingandler(ctx context.Context, info *machi
 }
 
 // configuringHandler configure port's network and check configuration progress. If finished set the state of CR to `Configured` state
-func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *machine.Information, instance interface{}) (machine.StateType, ctrl.Result, error) {
+func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
 	if !i.DeletionTimestamp.IsZero() || i.Spec.ConfigurationRef == nil {
@@ -83,7 +83,7 @@ func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *mac
 
 // activeHandler check whether the target configuration is consistent with the actual configuration,
 // return to `Configuring` state when inconsistent
-func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.Information, instance interface{}) (machine.StateType, ctrl.Result, error) {
+func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
 	if !i.DeletionTimestamp.IsZero() || i.Spec.ConfigurationRef == nil {
@@ -114,7 +114,7 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 }
 
 // cleaningHandler will be called when deleting network configuration, when finished clean spec.configurationRef and status.configurationRef then set CR's state to `Deleted` state.
-func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machine.Information, instance interface{}) (machine.StateType, ctrl.Result, error) {
+func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
 	dev, err := device.New(ctx, info.Client, &i.OwnerReferences[0])
@@ -132,7 +132,7 @@ func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machin
 }
 
 // deletingHandler will remove finalizers, if spec.configurationRef isn't nil set CR's state to <none>
-func (r *SwitchPortReconciler) deletingHandler(ctx context.Context, info *machine.Information, instance interface{}) (machine.StateType, ctrl.Result, error) {
+func (r *SwitchPortReconciler) deletingHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
 	// Remove finalizer

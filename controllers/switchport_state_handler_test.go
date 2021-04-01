@@ -32,7 +32,7 @@ func TestSwitchPortStateMachine(t *testing.T) {
 	}
 
 	m := machine.New(
-		&machine.Information{
+		&machine.ReconcileInfo{
 			Client: &fakeClient{},
 			Logger: r.Log,
 		},

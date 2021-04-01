@@ -20,17 +20,17 @@ func (t *testInstance) SetState(state StateType) {
 	t.state = state
 }
 
-func handlerTest0(ctx context.Context, info *Information, instance interface{}) (StateType, ctrl.Result, error) {
+func handlerTest0(ctx context.Context, info *ReconcileInfo, instance interface{}) (StateType, ctrl.Result, error) {
 	instance.(*testInstance).out = "Hello"
 	return "test1", ctrl.Result{}, nil
 }
 
-func handlerTest1(ctx context.Context, info *Information, instance interface{}) (StateType, ctrl.Result, error) {
+func handlerTest1(ctx context.Context, info *ReconcileInfo, instance interface{}) (StateType, ctrl.Result, error) {
 	instance.(*testInstance).out += " world"
 	return "test2", ctrl.Result{}, nil
 }
 
-func handlerTest2(ctx context.Context, info *Information, instance interface{}) (StateType, ctrl.Result, error) {
+func handlerTest2(ctx context.Context, info *ReconcileInfo, instance interface{}) (StateType, ctrl.Result, error) {
 	instance.(*testInstance).out += "!"
 	return "", ctrl.Result{}, nil
 }
@@ -79,17 +79,17 @@ func BenchmarkMachine(b *testing.B) {
 
 var tInstance testInstance
 
-func handlerTest00(ctx context.Context, info *Information, instance interface{}) (StateType, ctrl.Result, error) {
+func handlerTest00(ctx context.Context, info *ReconcileInfo, instance interface{}) (StateType, ctrl.Result, error) {
 	tInstance.out = "Hello"
 	return "test1", ctrl.Result{}, nil
 }
 
-func handlerTest11(ctx context.Context, info *Information, instance interface{}) (StateType, ctrl.Result, error) {
+func handlerTest11(ctx context.Context, info *ReconcileInfo, instance interface{}) (StateType, ctrl.Result, error) {
 	tInstance.out += " world"
 	return "test2", ctrl.Result{}, nil
 }
 
-func handlerTest22(ctx context.Context, info *Information, instance interface{}) (StateType, ctrl.Result, error) {
+func handlerTest22(ctx context.Context, info *ReconcileInfo, instance interface{}) (StateType, ctrl.Result, error) {
 	tInstance.out += "!"
 	return "", ctrl.Result{}, nil
 }
