@@ -54,7 +54,7 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 	}
 
 	if len(instance.OwnerReferences) == 0 {
-		return result, fmt.Errorf("the OwnerReferences of port mustn't be empty")
+		return result, fmt.Errorf("the OwnerReferences of instance mustn't be empty")
 	}
 
 	// Initialize state machine
@@ -79,18 +79,16 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 	result, merr := m.Reconcile(ctx)
 	if merr != nil {
 		err = merr.Error()
-		switch merr.Type() {
-		case machine.ReconcileError:
-			logger.Error(err, "reconcile error")
-		case machine.HandlerError:
-			logger.Error(err, "handler error")
-		}
+		logger.Error(err, string(merr.Type()))
 	}
 
 	// Update object
 	err = r.Update(ctx, instance)
+	if err != nil {
+		logger.Error(err, "Update instance failed")
+	}
 
-	return ctrl.Result{}, err
+	return result, err
 }
 
 // SetupWithManager ...
