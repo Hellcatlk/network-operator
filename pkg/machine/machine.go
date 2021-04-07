@@ -88,6 +88,10 @@ func (m *Machine) Reconcile(ctx context.Context) (result ctrl.Result, merr *Erro
 		}
 	}()
 
+	result = ctrl.Result{
+		Requeue: false,
+	}
+
 	// There are any handler in handlers?
 	if m.handlers == nil {
 		return result, &Error{
