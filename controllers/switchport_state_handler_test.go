@@ -52,46 +52,61 @@ func TestSwitchPortStateMachine(t *testing.T) {
 		name                   string
 		configurationRef       *v1alpha1.SwitchPortConfigurationRef
 		deletionTimestampExist bool
+		expectedDirty          bool
 		expectedState          machine.StateType
 	}{
 		// Delete when `Idle` state
 		{
 			name:             "<None> -> Idle",
-			configurationRef: &v1alpha1.SwitchPortConfigurationRef{},
+			configurationRef: nil,
+			expectedDirty:    true,
+			expectedState:    v1alpha1.SwitchPortIdle,
+		},
+		{
+			name:             "Idle -> Idle",
+			configurationRef: nil,
+			expectedDirty:    false,
 			expectedState:    v1alpha1.SwitchPortIdle,
 		},
 		{
 			name:             "Idle -> Validating",
 			configurationRef: &v1alpha1.SwitchPortConfigurationRef{},
+			expectedDirty:    true,
 			expectedState:    v1alpha1.SwitchPortValidating,
 		},
 		{
 			name:             "Validating -> Configuring",
 			configurationRef: &v1alpha1.SwitchPortConfigurationRef{},
+			expectedDirty:    true,
 			expectedState:    v1alpha1.SwitchPortConfiguring,
 		},
 		{
 			name:             "Configuring -> Active",
 			configurationRef: &v1alpha1.SwitchPortConfigurationRef{},
+			expectedDirty:    true,
 			expectedState:    v1alpha1.SwitchPortActive,
 		},
 		{
 			name:          "Active -> Cleaning",
+			expectedDirty: true,
 			expectedState: v1alpha1.SwitchPortCleaning,
 		},
 		{
 			name:             "Cleaning -> Idle",
 			configurationRef: &v1alpha1.SwitchPortConfigurationRef{},
+			expectedDirty:    true,
 			expectedState:    v1alpha1.SwitchPortIdle,
 		},
 		{
 			name:                   "Idle -> Deleting",
 			deletionTimestampExist: true,
+			expectedDirty:          true,
 			expectedState:          v1alpha1.SwitchPortDeleting,
 		},
 		{
 			name:                   "Deleting -> <None>",
 			deletionTimestampExist: true,
+			expectedDirty:          true,
 			expectedState:          v1alpha1.SwitchPortNone,
 		},
 	}
@@ -106,7 +121,10 @@ func TestSwitchPortStateMachine(t *testing.T) {
 				instance.DeletionTimestamp = nil
 			}
 
-			m.Reconcile(context.TODO())
+			dirty, _, _ := m.Reconcile(context.TODO())
+			if c.expectedDirty != dirty {
+				t.Errorf("Expected dirty: %v, got: %v", c.expectedDirty, dirty)
+			}
 			if c.expectedState != instance.GetState() {
 				t.Errorf("Expected state: %s, got: %s", c.expectedState, instance.GetState())
 			}

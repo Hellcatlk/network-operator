@@ -76,16 +76,18 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 	)
 
 	// Reconcile state machine
-	result, merr := m.Reconcile(ctx)
+	dirty, result, merr := m.Reconcile(ctx)
 	if merr != nil {
 		err = merr.Error()
 		logger.Error(err, string(merr.Type()))
 	}
 
-	// Update object
-	err = r.Update(ctx, instance)
-	if err != nil {
-		logger.Error(err, "Update instance failed")
+	if dirty {
+		// Update object
+		err = r.Update(ctx, instance)
+		if err != nil {
+			logger.Error(err, "Update instance failed")
+		}
 	}
 
 	return result, err

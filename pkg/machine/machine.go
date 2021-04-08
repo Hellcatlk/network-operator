@@ -3,8 +3,10 @@ package machine
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"github.com/go-logr/logr"
+	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -12,17 +14,11 @@ import (
 // StateType is the type of .status.state
 type StateType string
 
-// Handler is a state handle function
-type Handler func(ctx context.Context, info *ReconcileInfo, instance interface{}) (nextState StateType, result ctrl.Result, err error)
-
-// Handlers includes a lot of handler
-type Handlers map[StateType]Handler
-
-// Instance is a object for the CR need be reconcile
-// NOTE: Instance must be a pointer
-type Instance interface {
-	GetState() StateType
-	SetState(state StateType)
+// Machine is a state machine
+type Machine struct {
+	info     *ReconcileInfo
+	instance Instance
+	handlers *Handlers
 }
 
 // ReconcileInfo is the information need by reconcile
@@ -31,12 +27,19 @@ type ReconcileInfo struct {
 	Logger logr.Logger
 }
 
-// Machine is a state machine
-type Machine struct {
-	info     *ReconcileInfo
-	instance Instance
-	handlers *Handlers
+// Instance is a object for the CR need be reconcile
+// NOTE: Instance must be a pointer
+type Instance interface {
+	GetState() StateType
+	SetState(state StateType)
+	runtime.Object
 }
+
+// Handlers includes a lot of handler
+type Handlers map[StateType]Handler
+
+// Handler is a state handle function
+type Handler func(ctx context.Context, info *ReconcileInfo, instance interface{}) (nextState StateType, result ctrl.Result, err error)
 
 // ErrorType is the error when reconcile state machine
 type ErrorType string
@@ -75,8 +78,8 @@ func New(info *ReconcileInfo, instance Instance, handlers *Handlers) Machine {
 	}
 }
 
-// Reconcile state machine
-func (m *Machine) Reconcile(ctx context.Context) (result ctrl.Result, merr *Error) {
+// Reconcile state machine. If dirty is true, it means the instance has changed,
+func (m *Machine) Reconcile(ctx context.Context) (dirty bool, result ctrl.Result, merr *Error) {
 	// Deal possible panic
 	defer func() {
 		err := recover()
@@ -94,7 +97,7 @@ func (m *Machine) Reconcile(ctx context.Context) (result ctrl.Result, merr *Erro
 
 	// There are any handler in handlers?
 	if m.handlers == nil {
-		return result, &Error{
+		return dirty, result, &Error{
 			errType: ReconcileError,
 			err:     fmt.Errorf("haven't any handler"),
 		}
@@ -103,13 +106,14 @@ func (m *Machine) Reconcile(ctx context.Context) (result ctrl.Result, merr *Erro
 	// Check the state's handler exist or not
 	handler, exist := (*m.handlers)[m.instance.GetState()]
 	if !exist {
-		return result, &Error{
+		return dirty, result, &Error{
 			errType: ReconcileError,
 			err:     fmt.Errorf("no handler for the state(%v)", m.instance.GetState()),
 		}
 	}
 
 	// Call handler
+	instanceDeepCopy := m.instance.DeepCopyObject()
 	nextState, result, err := handler(ctx, m.info, m.instance)
 	m.instance.SetState(nextState)
 	if err != nil {
@@ -119,5 +123,10 @@ func (m *Machine) Reconcile(ctx context.Context) (result ctrl.Result, merr *Erro
 		}
 	}
 
-	return result, merr
+	// Check instance need update or not
+	if !reflect.DeepEqual(m.instance, instanceDeepCopy) {
+		dirty = true
+	}
+
+	return dirty, result, merr
 }

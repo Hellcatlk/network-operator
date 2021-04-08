@@ -4,12 +4,14 @@ import (
 	"context"
 	"testing"
 
+	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 type testInstance struct {
 	out   string
 	state StateType
+	runtime.Unknown
 }
 
 func (t *testInstance) GetState() StateType {

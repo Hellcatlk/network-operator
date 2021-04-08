@@ -12,7 +12,7 @@ type testType struct {
 	metav1.ObjectMeta
 }
 
-func TestAddFinalizers(t *testing.T) {
+func TestAdd(t *testing.T) {
 	var object testType
 
 	cases := []struct {
@@ -37,7 +37,7 @@ func TestAddFinalizers(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.finalizer, func(t *testing.T) {
-			err := AddFinalizer(&object.Finalizers, c.finalizer)
+			err := Add(&object.Finalizers, c.finalizer)
 			if (err != nil) != c.expectedError {
 				t.Errorf("got unexpected error: %v", err)
 			}
@@ -48,7 +48,7 @@ func TestAddFinalizers(t *testing.T) {
 	}
 }
 
-func TestRemoveFinalizers(t *testing.T) {
+func TestRemove(t *testing.T) {
 	var object testType
 	object.Finalizers = []string{"test1", "test2", "test3"}
 
@@ -74,7 +74,7 @@ func TestRemoveFinalizers(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.finalizer, func(t *testing.T) {
-			err := RemoveFinalizer(&object.Finalizers, c.finalizer)
+			err := Remove(&object.Finalizers, c.finalizer)
 			if (err != nil) != c.expectedError {
 				t.Errorf("got unexpected error: %v", err)
 			}

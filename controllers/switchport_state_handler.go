@@ -19,7 +19,7 @@ func (r *SwitchPortReconciler) noneHandler(ctx context.Context, info *machine.Re
 	i := instance.(*v1alpha1.SwitchPort)
 
 	// Add finalizer
-	err := finalizer.AddFinalizer(&i.Finalizers, finalizerKey)
+	err := finalizer.Add(&i.Finalizers, finalizerKey)
 	result := reconcile.Result{}
 	if err == nil {
 		result.Requeue = true
@@ -28,7 +28,7 @@ func (r *SwitchPortReconciler) noneHandler(ctx context.Context, info *machine.Re
 	return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true}, err
 }
 
-// idleHandler check spec.configurationRef's value, if isn't nil set the state of CR to `Configuring`
+// idleHandler check spec.configurationRef's value, if isn't nil set the state of CR to `Validating`
 func (r *SwitchPortReconciler) idleHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
@@ -55,7 +55,7 @@ func (r *SwitchPortReconciler) validatingandler(ctx context.Context, info *machi
 	return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true}, nil
 }
 
-// configuringHandler configure port's network and check configuration progress. If finished set the state of CR to `Configured` state
+// configuringHandler configure port's network and check configuration progress. If finished set the state of CR to `Active` state
 func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
@@ -113,7 +113,7 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 	return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true}, nil
 }
 
-// cleaningHandler will be called when deleting network configuration, when finished clean spec.configurationRef and status.configurationRef then set CR's state to `Deleted` state.
+// cleaningHandler will be called when deleting network configuration, when finished clean spec.configurationRef and status.configurationRef then set CR's state to `Idle` state.
 func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
@@ -131,13 +131,13 @@ func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machin
 	return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true}, err
 }
 
-// deletingHandler will remove finalizers, if spec.configurationRef isn't nil set CR's state to <none>
+// deletingHandler will remove finalizers
 func (r *SwitchPortReconciler) deletingHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
-	// Remove finalizer
-	err := finalizer.RemoveFinalizer(&i.Finalizers, finalizerKey)
 	result := reconcile.Result{}
+	// Remove finalizer
+	err := finalizer.Remove(&i.Finalizers, finalizerKey)
 	if err != nil {
 		result.Requeue = true
 	}
