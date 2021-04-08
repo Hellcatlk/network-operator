@@ -19,7 +19,7 @@ func (r *SwitchPortReconciler) noneHandler(ctx context.Context, info *machine.Re
 	i := instance.(*v1alpha1.SwitchPort)
 
 	// Add finalizer
-	err := finalizer.AddFinalizer(&i.Finalizers, finalizerKey)
+	err := finalizer.Add(&i.Finalizers, finalizerKey)
 	result := reconcile.Result{}
 	if err == nil {
 		result.Requeue = true
@@ -135,9 +135,9 @@ func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machin
 func (r *SwitchPortReconciler) deletingHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
-	// Remove finalizer
-	err := finalizer.RemoveFinalizer(&i.Finalizers, finalizerKey)
 	result := reconcile.Result{}
+	// Remove finalizer
+	err := finalizer.Remove(&i.Finalizers, finalizerKey)
 	if err != nil {
 		result.Requeue = true
 	}

@@ -7,7 +7,7 @@ import (
 )
 
 // AddFinalizer create finalizer, must unique for every object.
-func AddFinalizer(finalizers *[]string, finalizer string) (err error) {
+func Add(finalizers *[]string, finalizer string) (err error) {
 	if stringslice.Contains(*finalizers, finalizer) {
 		return errors.New("the finalizer of object must be unique")
 	}
@@ -16,7 +16,7 @@ func AddFinalizer(finalizers *[]string, finalizer string) (err error) {
 }
 
 // RemoveFinalizer remove finalizer
-func RemoveFinalizer(finalizers *[]string, finalizer string) (err error) {
+func Remove(finalizers *[]string, finalizer string) (err error) {
 	if !stringslice.Delete(finalizers, finalizer) {
 		return errors.New("haven't find finalizer in finalizers")
 	}
