@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"reflect"
 	"time"
 
 	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
@@ -13,6 +14,7 @@ import (
 )
 
 const finalizerKey string = "metal3.io.v1alpha1"
+const requeueAfterTime time.Duration = time.Second * 10
 
 // noneHandler add finalizers to CR
 func (r *SwitchPortReconciler) noneHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
@@ -37,20 +39,28 @@ func (r *SwitchPortReconciler) idleHandler(ctx context.Context, info *machine.Re
 	}
 
 	if i.Spec.ConfigurationRef == nil {
-		return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, nil
+		return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, nil
 	}
 
 	_, err := i.Spec.ConfigurationRef.Fetch(ctx, info.Client)
 	if err != nil {
-		return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+		return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
 	return v1alpha1.SwitchPortValidating, ctrl.Result{Requeue: true}, nil
 }
 
 func (r *SwitchPortReconciler) validatingandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
+	i := instance.(*v1alpha1.SwitchPort)
 
-	// TODO: Check connection to switch
+	// TODO: Check connection with switch
+
+	// Copy configuration to Status.Configuration
+	configuration, err := i.Spec.ConfigurationRef.Fetch(ctx, info.Client)
+	if err != nil {
+		return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+	}
+	i.Status.Configuration = configuration
 
 	return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true}, nil
 }
@@ -65,17 +75,12 @@ func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *mac
 
 	dev, err := device.New(ctx, info.Client, &i.OwnerReferences[0])
 	if err != nil {
-		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	configuration, err := i.Spec.ConfigurationRef.Fetch(ctx, info.Client)
+	err = dev.ConfigurePort(ctx, i.Status.Configuration, i.Spec.ID)
 	if err != nil {
-		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
-	}
-
-	err = dev.ConfigurePort(ctx, configuration, i.Spec.ID)
-	if err != nil {
-		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
 	return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true}, nil
@@ -89,27 +94,24 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 	if !i.DeletionTimestamp.IsZero() || i.Spec.ConfigurationRef == nil {
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true}, nil
 	}
+	configuration, err := i.Spec.ConfigurationRef.Fetch(ctx, info.Client)
+	if err != nil {
+		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+	}
+	if !reflect.DeepEqual(configuration, i.Status.Configuration) {
+		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true}, nil
+	}
 
 	dev, err := device.New(ctx, info.Client, &i.OwnerReferences[0])
 	if err != nil {
-		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	configuration, err := i.Spec.ConfigurationRef.Fetch(ctx, info.Client)
-	if err != nil {
-		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+	isIdentical, err := dev.CheckPortConfigutation(ctx, i.Status.Configuration, i.Spec.ID)
+	if err != nil || isIdentical {
+		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	isIdentical, err := dev.CheckPortConfigutation(ctx, configuration, i.Spec.ID)
-	if err != nil {
-		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
-	}
-
-	if isIdentical {
-		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, nil
-	}
-
-	i.Status.Configuration = nil
 	return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true}, nil
 }
 
@@ -119,12 +121,12 @@ func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machin
 
 	dev, err := device.New(ctx, info.Client, &i.OwnerReferences[0])
 	if err != nil {
-		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
 	err = dev.DeConfigurePort(ctx, i.Spec.ID)
 	if err != nil {
-		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: time.Second * 10}, err
+		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
 	i.Status.Configuration = nil

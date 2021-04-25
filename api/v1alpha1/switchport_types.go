@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/metal3-io/networkconfiguration-operator/pkg/machine"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -38,6 +39,10 @@ type SwitchPortRef struct {
 
 // Fetch the instance
 func (ref *SwitchPortRef) Fetch(ctx context.Context, client client.Client) (instance *SwitchPort, err error) {
+	if ref == nil {
+		return nil, fmt.Errorf("reference is nil")
+	}
+
 	err = client.Get(
 		ctx,
 		types.NamespacedName{
@@ -70,6 +75,10 @@ type SwitchPortConfigurationRef struct {
 
 // Fetch the instance
 func (ref *SwitchPortConfigurationRef) Fetch(ctx context.Context, client client.Client) (instance *SwitchPortConfiguration, err error) {
+	if ref == nil {
+		return nil, fmt.Errorf("reference is nil")
+	}
+
 	err = client.Get(
 		ctx,
 		types.NamespacedName{
