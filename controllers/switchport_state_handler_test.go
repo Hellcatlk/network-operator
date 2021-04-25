@@ -87,6 +87,12 @@ func TestSwitchPortStateMachine(t *testing.T) {
 			expectedState:    v1alpha1.SwitchPortActive,
 		},
 		{
+			name:             "Active -> Active",
+			configurationRef: &v1alpha1.SwitchPortConfigurationRef{},
+			expectedDirty:    false,
+			expectedState:    v1alpha1.SwitchPortActive,
+		},
+		{
 			name:          "Active -> Cleaning",
 			expectedDirty: true,
 			expectedState: v1alpha1.SwitchPortCleaning,
