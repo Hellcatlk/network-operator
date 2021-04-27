@@ -4,19 +4,15 @@
 
 "<none>" --> "Idle"
 
-"Idle" --> [ spec.configurationRef != nil\n (with exponential backoff)] "Validating"
+"Idle" --> [ spec.configurationRef != nil\n (with exponential backoff)] "Configuring*"
 "Idle" --> [ !instance.DeletionTimestamp.IsZero() ] "Deleting"
 
-"Validating" --> [ Switch Credentials ok + configuration ok ] "Configuring"
-"Validating" --> [ Incorrect config ] "Idle"
+"Configuring*" --> [ Configuration finished ] "Active*"
 
-"Configuring" --> [ Configuration finished ] "Active"
-"Configuring" --> [ Error + exponential backoff ] "Validating"
+"Active*" --> [ Configuration mismatch ] "Configuring*"
+"Active*" --> [ spec.configurationRef is nil ] "Cleaning*"
 
-"Active" --> [ Configuration mismatch ] "Configuring"
-"Active" --> [ spec.configurationRef is nil ] "Cleaning"
-
-"Cleaning" --> [ Clean finished ] "Idle"
+"Cleaning*" --> [ Clean finished ] "Idle"
 
 "Deleting" --> [ CR have been removed ] (*)
 
