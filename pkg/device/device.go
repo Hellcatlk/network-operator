@@ -14,17 +14,11 @@ type Switch interface {
 	// PowerOff
 	PowerOff(ctx context.Context) (err error)
 
-	// CreateVlan
-	CreateVlan(ctx context.Context, vlans []v1alpha1.VLAN) (err error)
-
-	// DeleteVlan
-	DeleteVlan(ctx context.Context, vlans []v1alpha1.VLAN) (err error)
-
 	// GetPortAttr
-	GetPortAttr(ctx context.Context, portID string) (vlans []v1alpha1.VLAN, portType v1alpha1.PortType, err error)
+	GetPortAttr(ctx context.Context, portID string) (configuration *v1alpha1.SwitchPortConfiguration, err error)
 
 	// SetPortAttr
-	SetPortAttr(ctx context.Context, portID string, vlans []v1alpha1.VLAN, portType v1alpha1.PortType) (err error)
+	SetPortAttr(ctx context.Context, portID string, configuration *v1alpha1.SwitchPortConfiguration) (err error)
 
 	// ResetPort
 	ResetPort(ctx context.Context, portID string) (err error)

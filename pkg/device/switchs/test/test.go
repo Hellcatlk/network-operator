@@ -31,11 +31,11 @@ func (tt *TestTest) DeleteVlan(ctx context.Context, vlans []v1alpha1.VLAN) (err 
 	return
 }
 
-func (tt *TestTest) GetPortAttr(ctx context.Context, portID string) (vlans []v1alpha1.VLAN, portType v1alpha1.PortType, err error) {
-	return
+func (tt *TestTest) GetPortAttr(ctx context.Context, portID string) (configuration *v1alpha1.SwitchPortConfiguration, err error) {
+	return &v1alpha1.SwitchPortConfiguration{}, nil
 }
 
-func (tt *TestTest) SetPortAttr(ctx context.Context, portID string, vlans []v1alpha1.VLAN, portType v1alpha1.PortType) (err error) {
+func (tt *TestTest) SetPortAttr(ctx context.Context, portID string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
 	return
 }
 
