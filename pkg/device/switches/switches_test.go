@@ -1,4 +1,4 @@
-package switchs
+package switches
 
 import (
 	"context"
