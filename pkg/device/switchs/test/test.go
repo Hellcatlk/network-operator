@@ -7,38 +7,36 @@ import (
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device"
 )
 
-func NewTT(ctx context.Context, address string) (sw device.Switch, err error) {
-	return &TestTest{}, nil
+// NewTest return test backend
+func NewTest(ctx context.Context, address string, username string, password string) (sw device.Switch, err error) {
+	return &Test{}, nil
 }
 
-// TestTest just for test
-type TestTest struct {
+// Test just for test
+type Test struct {
 }
 
-func (tt *TestTest) PowerOn(ctx context.Context) (err error) {
+// PowerOn just for test
+func (t *Test) PowerOn(ctx context.Context) (err error) {
 	return
 }
 
-func (tt *TestTest) PowerOff(ctx context.Context) (err error) {
+// PowerOff just for test
+func (t *Test) PowerOff(ctx context.Context) (err error) {
 	return
 }
 
-func (tt *TestTest) CreateVlan(ctx context.Context, vlans []v1alpha1.VLAN) (err error) {
-	return
-}
-
-func (tt *TestTest) DeleteVlan(ctx context.Context, vlans []v1alpha1.VLAN) (err error) {
-	return
-}
-
-func (tt *TestTest) GetPortAttr(ctx context.Context, portID string) (configuration *v1alpha1.SwitchPortConfiguration, err error) {
+// GetPortAttr just for test
+func (t *Test) GetPortAttr(ctx context.Context, portID string) (configuration *v1alpha1.SwitchPortConfiguration, err error) {
 	return &v1alpha1.SwitchPortConfiguration{}, nil
 }
 
-func (tt *TestTest) SetPortAttr(ctx context.Context, portID string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
+// SetPortAttr just for test
+func (t *Test) SetPortAttr(ctx context.Context, portID string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
 	return
 }
 
-func (tt *TestTest) ResetPort(ctx context.Context, portID string) (err error) {
+// ResetPort just for test
+func (t *Test) ResetPort(ctx context.Context, portID string) (err error) {
 	return
 }

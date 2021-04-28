@@ -33,7 +33,7 @@ func TestNew(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			_, err := New(context.Background(), c.OS, c.URL)
+			_, err := New(context.Background(), c.OS, c.URL, "", "")
 			if (err != nil) != c.expectError {
 				t.Errorf("Got unexpected error: %v", err)
 			}

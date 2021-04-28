@@ -29,8 +29,16 @@ type SwitchSpec struct {
 	// The url of switch
 	URL string `json:"url"`
 
+	// Username of switch
+	// TODO: Just use on demo
+	Username string `json:"username,omitempty"`
+
+	// Password of switch.
+	// TODO: Just use on demo
+	Password string `json:"password,omitempty"`
+
 	// The secret containing the switch credentials
-	Secret *corev1.SecretReference `json:"secret"`
+	Secret *corev1.SecretReference `json:"secret,omitempty"`
 
 	// Restricted ports in the switch
 	RestrictedPorts []RestrictedPort `json:"restrictedPorts,omitempty"`

@@ -8,18 +8,18 @@ import (
 
 // Switch is a interface for different protocol
 type Switch interface {
-	// PowerOn
+	// PowerOn enable switch
 	PowerOn(ctx context.Context) (err error)
 
-	// PowerOff
+	// PowerOff disable switch
 	PowerOff(ctx context.Context) (err error)
 
-	// GetPortAttr
+	// GetPortAttr get the port's configure
 	GetPortAttr(ctx context.Context, portID string) (configuration *v1alpha1.SwitchPortConfiguration, err error)
 
-	// SetPortAttr
+	// SetPortAttr set configure to the port
 	SetPortAttr(ctx context.Context, portID string, configuration *v1alpha1.SwitchPortConfiguration) (err error)
 
-	// ResetPort
+	// ResetPort remove all configure of the port
 	ResetPort(ctx context.Context, portID string) (err error)
 }

@@ -34,10 +34,14 @@ type SwitchPortConfigurationSpec struct {
 	// +kubebuilder:validation:MaxItems=10
 	ACLs []ACL `json:"acls,omitempty"`
 
-	// UntaggedVLAN is the untagged vlan's index in Vlans
+	// The untagged vlan's index in vlans
 	UntaggedVLAN uint `json:"untaggedVLAN,omitempty"`
 
+	// Vlans to which the port belongs
 	Vlans []VLAN `json:"vlans,omitempty"`
+
+	// Disable port
+	Disable bool `json:"disable,omitempty"`
 }
 
 // ACL describes the rules applied in the switch
