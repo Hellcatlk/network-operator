@@ -37,7 +37,7 @@ func New(ctx context.Context, os string, rawurl string) (sw device.Switch, err e
 	}
 
 	if news[os] == nil {
-		return nil, fmt.Errorf("haven't %s switch type", os)
+		return nil, fmt.Errorf("invalid OS %s", os)
 	}
 
 	new := news[os][u.Scheme]
