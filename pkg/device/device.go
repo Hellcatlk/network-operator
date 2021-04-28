@@ -2,42 +2,24 @@ package device
 
 import (
 	"context"
-	"fmt"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
 )
 
-// New ...
-func New(ctx context.Context, client client.Client, deviceRef *metav1.OwnerReference) (device Device, err error) {
-	// Deal possible panic
-	defer func() {
-		r := recover()
-		if r != nil {
-			err = fmt.Errorf("%v", r)
-		}
-	}()
+// Switch is a interface for different protocol
+type Switch interface {
+	// PowerOn enable switch
+	PowerOn(ctx context.Context) (err error)
 
-	switch deviceRef.Kind {
-	case "Switch":
-		device, err = newSwitch(ctx, client, deviceRef)
-	case "Test":
-		device, err = newTest()
-	default:
-		err = fmt.Errorf("no device for the kind(%s)", deviceRef.Kind)
-	}
+	// PowerOff disable switch
+	PowerOff(ctx context.Context) (err error)
 
-	return
-}
+	// GetPortAttr get the port's configure
+	GetPortAttr(ctx context.Context, portID string) (configuration *v1alpha1.SwitchPortConfiguration, err error)
 
-// Device ...
-type Device interface {
-	// ConfigurePort set the network configure to the port
-	ConfigurePort(ctx context.Context, configuration interface{}, portID string) error
+	// SetPortAttr set configure to the port
+	SetPortAttr(ctx context.Context, portID string, configuration *v1alpha1.SwitchPortConfiguration) (err error)
 
-	// DeConfigurePort remove the network configure from the port
-	DeConfigurePort(ctx context.Context, portID string) error
-
-	// CheckPortConfigutation checks whether the configuration is configured on the port
-	CheckPortConfigutation(ctx context.Context, configuration interface{}, portID string) (bool, error)
+	// ResetPort remove all configure of the port
+	ResetPort(ctx context.Context, portID string) (err error)
 }

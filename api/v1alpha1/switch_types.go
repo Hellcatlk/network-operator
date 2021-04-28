@@ -26,14 +26,19 @@ type SwitchSpec struct {
 	// The type of OS this switch runs
 	OS string `json:"os"`
 
-	// Port to use for SSH connection
-	Port int32 `json:"port,omitempty"`
+	// The url of switch
+	URL string `json:"url"`
 
-	// IP Address of the switch
-	IP string `json:"ip"`
+	// Username of switch
+	// TODO: Just use on demo
+	Username string `json:"username,omitempty"`
+
+	// Password of switch.
+	// TODO: Just use on demo
+	Password string `json:"password,omitempty"`
 
 	// The secret containing the switch credentials
-	Secret *corev1.SecretReference `json:"secret"`
+	Secret *corev1.SecretReference `json:"secret,omitempty"`
 
 	// Restricted ports in the switch
 	RestrictedPorts []RestrictedPort `json:"restrictedPorts,omitempty"`

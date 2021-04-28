@@ -34,12 +34,14 @@ type SwitchPortConfigurationSpec struct {
 	// +kubebuilder:validation:MaxItems=10
 	ACLs []ACL `json:"acls,omitempty"`
 
+	// The untagged vlan's index in vlans
+	UntaggedVLAN uint `json:"untaggedVLAN,omitempty"`
+
+	// Vlans to which the port belongs
 	Vlans []VLAN `json:"vlans,omitempty"`
 
-	// Indicates which mode this port should be set to, valid values are access, trunk or hybrid.
-	// If empty default value is access
-	// +kubebuilder:default:="access"
-	Type string `json:"type,omitempty"`
+	// Disable port
+	Disable bool `json:"disable,omitempty"`
 }
 
 // ACL describes the rules applied in the switch
