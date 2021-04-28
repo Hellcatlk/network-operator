@@ -19,6 +19,18 @@ type fakeClient struct {
 }
 
 func (c *fakeClient) Get(ctx context.Context, key types.NamespacedName, obj runtime.Object) error {
+	switch key.Name {
+	case "Switch":
+		*obj.(*v1alpha1.Switch) = v1alpha1.Switch{
+			Spec: v1alpha1.SwitchSpec{
+				OS:  "test",
+				URL: "test://1234",
+			},
+		}
+	case "SwitchPortConfiguration":
+		*obj.(*v1alpha1.SwitchPortConfiguration) = v1alpha1.SwitchPortConfiguration{}
+	}
+
 	return nil
 }
 
@@ -27,7 +39,7 @@ func TestSwitchPortStateMachine(t *testing.T) {
 	instance := v1alpha1.SwitchPort{}
 	instance.OwnerReferences = []metav1.OwnerReference{
 		{
-			Kind: "Test",
+			Name: "Switch",
 		},
 	}
 
@@ -50,47 +62,45 @@ func TestSwitchPortStateMachine(t *testing.T) {
 
 	cases := []struct {
 		name                   string
-		configurationRef       *v1alpha1.SwitchPortConfigurationRef
+		configurationRefExist  bool
 		deletionTimestampExist bool
 		expectedDirty          bool
 		expectedState          machine.StateType
 	}{
 		// Delete when `Idle` state
 		{
-			name:             "<None> -> Idle",
-			configurationRef: nil,
-			expectedDirty:    true,
-			expectedState:    v1alpha1.SwitchPortIdle,
+			name:          "<None> -> Idle",
+			expectedDirty: true,
+			expectedState: v1alpha1.SwitchPortIdle,
 		},
 		{
-			name:             "Idle -> Idle",
-			configurationRef: nil,
-			expectedDirty:    false,
-			expectedState:    v1alpha1.SwitchPortIdle,
+			name:          "Idle -> Idle",
+			expectedDirty: false,
+			expectedState: v1alpha1.SwitchPortIdle,
 		},
 		{
-			name:             "Idle -> Validating",
-			configurationRef: &v1alpha1.SwitchPortConfigurationRef{},
-			expectedDirty:    true,
-			expectedState:    v1alpha1.SwitchPortValidating,
+			name:                  "Idle -> Validating",
+			configurationRefExist: true,
+			expectedDirty:         true,
+			expectedState:         v1alpha1.SwitchPortValidating,
 		},
 		{
-			name:             "Validating -> Configuring",
-			configurationRef: &v1alpha1.SwitchPortConfigurationRef{},
-			expectedDirty:    true,
-			expectedState:    v1alpha1.SwitchPortConfiguring,
+			name:                  "Validating -> Configuring",
+			configurationRefExist: true,
+			expectedDirty:         true,
+			expectedState:         v1alpha1.SwitchPortConfiguring,
 		},
 		{
-			name:             "Configuring -> Active",
-			configurationRef: &v1alpha1.SwitchPortConfigurationRef{},
-			expectedDirty:    true,
-			expectedState:    v1alpha1.SwitchPortActive,
+			name:                  "Configuring -> Active",
+			configurationRefExist: true,
+			expectedDirty:         true,
+			expectedState:         v1alpha1.SwitchPortActive,
 		},
 		{
-			name:             "Active -> Active",
-			configurationRef: &v1alpha1.SwitchPortConfigurationRef{},
-			expectedDirty:    false,
-			expectedState:    v1alpha1.SwitchPortActive,
+			name:                  "Active -> Active",
+			configurationRefExist: true,
+			expectedDirty:         false,
+			expectedState:         v1alpha1.SwitchPortActive,
 		},
 		{
 			name:          "Active -> Cleaning",
@@ -98,10 +108,10 @@ func TestSwitchPortStateMachine(t *testing.T) {
 			expectedState: v1alpha1.SwitchPortCleaning,
 		},
 		{
-			name:             "Cleaning -> Idle",
-			configurationRef: &v1alpha1.SwitchPortConfigurationRef{},
-			expectedDirty:    true,
-			expectedState:    v1alpha1.SwitchPortIdle,
+			name:                  "Cleaning -> Idle",
+			configurationRefExist: true,
+			expectedDirty:         true,
+			expectedState:         v1alpha1.SwitchPortIdle,
 		},
 		{
 			name:                   "Idle -> Deleting",
@@ -119,7 +129,14 @@ func TestSwitchPortStateMachine(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			instance.Spec.ConfigurationRef = c.configurationRef
+			if c.configurationRefExist {
+				instance.Spec.ConfigurationRef = &v1alpha1.SwitchPortConfigurationRef{
+					Name: "SwitchPortConfiguration",
+				}
+			} else {
+				instance.Spec.ConfigurationRef = nil
+			}
+
 			if c.deletionTimestampExist {
 				now := metav1.Now()
 				instance.DeletionTimestamp = &now
@@ -127,12 +144,15 @@ func TestSwitchPortStateMachine(t *testing.T) {
 				instance.DeletionTimestamp = nil
 			}
 
-			dirty, _, _ := m.Reconcile(context.TODO())
+			dirty, _, merr := m.Reconcile(context.TODO())
 			if c.expectedDirty != dirty {
 				t.Errorf("Expected dirty: %v, got: %v", c.expectedDirty, dirty)
 			}
 			if c.expectedState != instance.GetState() {
 				t.Errorf("Expected state: %s, got: %s", c.expectedState, instance.GetState())
+			}
+			if merr != nil {
+				t.Errorf("Error type: %v, error message: %v", merr.Type(), merr.Error())
 			}
 		})
 	}

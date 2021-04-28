@@ -43,6 +43,7 @@ func (ref *SwitchPortRef) Fetch(ctx context.Context, client client.Client) (inst
 		return nil, fmt.Errorf("reference is nil")
 	}
 
+	instance = &SwitchPort{}
 	err = client.Get(
 		ctx,
 		types.NamespacedName{
@@ -79,6 +80,7 @@ func (ref *SwitchPortConfigurationRef) Fetch(ctx context.Context, client client.
 		return nil, fmt.Errorf("reference is nil")
 	}
 
+	instance = &SwitchPortConfiguration{}
 	err = client.Get(
 		ctx,
 		types.NamespacedName{
@@ -124,13 +126,32 @@ const (
 )
 
 // GetState gets the current state of the port
-func (n *SwitchPort) GetState() machine.StateType {
-	return n.Status.State
+func (sp *SwitchPort) GetState() machine.StateType {
+	return sp.Status.State
 }
 
 // SetState sets the state of the port
-func (n *SwitchPort) SetState(state machine.StateType) {
-	n.Status.State = state
+func (sp *SwitchPort) SetState(state machine.StateType) {
+	sp.Status.State = state
+}
+
+// FetchOwnerReference fetch OwnerReference[0]
+func (sp *SwitchPort) FetchOwnerReference(ctx context.Context, client client.Client) (instance *Switch, err error) {
+	if sp == nil {
+		return nil, fmt.Errorf("reference is nil")
+	}
+
+	instance = &Switch{}
+	err = client.Get(
+		ctx,
+		types.NamespacedName{
+			Name:      sp.OwnerReferences[0].Name,
+			Namespace: sp.Namespace,
+		},
+		instance,
+	)
+
+	return instance, err
 }
 
 // +kubebuilder:object:root=true

@@ -29,6 +29,14 @@ type VLAN struct {
 	Name string `json:"name,omitempty"`
 }
 
+type PortType string
+
+const (
+	Access PortType = "access"
+	Trunk  PortType = "trunk"
+	Hybrid PortType = "hybrid"
+)
+
 // SwitchPortConfigurationSpec defines the desired state of SwitchPortConfiguration
 type SwitchPortConfigurationSpec struct {
 	// +kubebuilder:validation:MaxItems=10
@@ -39,7 +47,8 @@ type SwitchPortConfigurationSpec struct {
 	// Indicates which mode this port should be set to, valid values are access, trunk or hybrid.
 	// If empty default value is access
 	// +kubebuilder:default:="access"
-	Type string `json:"type,omitempty"`
+	// +kubebuilder:validation:Enum="access";"trunk";"hybrid"
+	Type PortType `json:"type,omitempty"`
 }
 
 // ACL describes the rules applied in the switch

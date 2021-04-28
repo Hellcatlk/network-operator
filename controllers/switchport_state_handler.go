@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/device"
+	"github.com/metal3-io/networkconfiguration-operator/pkg/device/switchs"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/machine"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/util/finalizer"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -38,13 +38,8 @@ func (r *SwitchPortReconciler) idleHandler(ctx context.Context, info *machine.Re
 		return v1alpha1.SwitchPortDeleting, ctrl.Result{Requeue: true}, nil
 	}
 
-	if i.Spec.ConfigurationRef == nil {
+	if i.Spec.ConfigurationRef == nil || len(i.OwnerReferences) != 0 {
 		return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, nil
-	}
-
-	_, err := i.Spec.ConfigurationRef.Fetch(ctx, info.Client)
-	if err != nil {
-		return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
 	return v1alpha1.SwitchPortValidating, ctrl.Result{Requeue: true}, nil
@@ -73,12 +68,17 @@ func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *mac
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true}, nil
 	}
 
-	dev, err := device.New(ctx, info.Client, &i.OwnerReferences[0])
+	owner, err := i.FetchOwnerReference(ctx, info.Client)
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	err = dev.ConfigurePort(ctx, i.Status.Configuration, i.Spec.ID)
+	sw, err := switchs.New(ctx, owner.Spec.OS, owner.Spec.URL)
+	if err != nil {
+		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+	}
+
+	sw.SetPortAttr(ctx, i.Spec.ID, i.Status.Configuration.Spec.Vlans, i.Status.Configuration.Spec.Type)
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
@@ -102,13 +102,18 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true}, nil
 	}
 
-	dev, err := device.New(ctx, info.Client, &i.OwnerReferences[0])
+	owner, err := i.FetchOwnerReference(ctx, info.Client)
+	if err != nil {
+		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+	}
+
+	sw, err := switchs.New(ctx, owner.Spec.OS, owner.Spec.URL)
 	if err != nil {
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	isIdentical, err := dev.CheckPortConfigutation(ctx, i.Status.Configuration, i.Spec.ID)
-	if err != nil || isIdentical {
+	vlans, portType, err := sw.GetPortAttr(ctx, i.Spec.ID)
+	if err != nil || (reflect.DeepEqual(vlans, i.Status.Configuration.Spec.Vlans) && reflect.DeepEqual(portType, i.Status.Configuration.Spec.Type)) {
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
@@ -119,12 +124,17 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
-	dev, err := device.New(ctx, info.Client, &i.OwnerReferences[0])
+	owner, err := i.FetchOwnerReference(ctx, info.Client)
+	if err != nil {
+		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+	}
+
+	sw, err := switchs.New(ctx, owner.Spec.OS, owner.Spec.URL)
 	if err != nil {
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	err = dev.DeConfigurePort(ctx, i.Spec.ID)
+	err = sw.ResetPort(ctx, i.Spec.ID)
 	if err != nil {
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
