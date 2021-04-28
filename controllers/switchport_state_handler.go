@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/device/switchs"
+	"github.com/metal3-io/networkconfiguration-operator/pkg/device/switches"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/machine"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/util/finalizer"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -73,7 +73,7 @@ func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *mac
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
-	sw, err := switchs.New(ctx, owner.Spec.OS, owner.Spec.URL, owner.Spec.Username, owner.Spec.Password)
+	sw, err := switches.New(ctx, owner.Spec.OS, owner.Spec.URL, owner.Spec.Username, owner.Spec.Password)
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
@@ -108,7 +108,7 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 	if err != nil {
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
-	sw, err := switchs.New(ctx, owner.Spec.OS, owner.Spec.URL, owner.Spec.Username, owner.Spec.Password)
+	sw, err := switches.New(ctx, owner.Spec.OS, owner.Spec.URL, owner.Spec.Username, owner.Spec.Password)
 	if err != nil {
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
@@ -129,7 +129,7 @@ func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machin
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
-	sw, err := switchs.New(ctx, owner.Spec.OS, owner.Spec.URL, owner.Spec.Username, owner.Spec.Password)
+	sw, err := switches.New(ctx, owner.Spec.OS, owner.Spec.URL, owner.Spec.Username, owner.Spec.Password)
 	if err != nil {
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}

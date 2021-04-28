@@ -1,4 +1,4 @@
-package switchs
+package switches
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 	"net/url"
 
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/device/switchs/openvswitch"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/device/switchs/test"
+	"github.com/metal3-io/networkconfiguration-operator/pkg/device/switches/openvswitch"
+	"github.com/metal3-io/networkconfiguration-operator/pkg/device/switches/test"
 )
 
 type newType func(ctx context.Context, address string, username string, password string) (sw device.Switch, err error)
