@@ -9,6 +9,7 @@ import (
 	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/util/option"
+	"github.com/metal3-io/networkconfiguration-operator/pkg/util/ssh"
 )
 
 // NewCLI return openvswitch cli backend, username and password is invalid for the backend
@@ -36,9 +37,7 @@ type CLI struct {
 
 // PowerOn enable openvswitch
 func (c *CLI) PowerOn(ctx context.Context) (err error) {
-	cmd := exec.Command("ovs-vsctl", "list", "br", c.bridge)
-	err = cmd.Run()
-	return err
+	return ssh.Run(c.address, c.username, c.password, exec.Command("ovs-vsctl", "list", "br", c.bridge))
 }
 
 // PowerOff disable openvswitch
@@ -66,14 +65,10 @@ func (c *CLI) SetPortAttr(ctx context.Context, portID string, configuration *v1a
 		}
 	}
 
-	cmd := exec.Command("ovs-vsctl", "set ", "port", portID, tag)
-	err = cmd.Run()
-	return err
+	return ssh.Run(c.address, c.username, c.password, exec.Command("ovs-vsctl", "set ", "port", portID, tag))
 }
 
 // ResetPort remove all configure of the port
 func (c *CLI) ResetPort(ctx context.Context, portID string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
-	cmd := exec.Command("ovs-vsctl", "set ", "port", portID, "tag=")
-	err = cmd.Run()
-	return err
+	return ssh.Run(c.address, c.username, c.password, exec.Command("ovs-vsctl", "set ", "port", portID, "tag="))
 }
