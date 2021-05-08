@@ -10,7 +10,7 @@ import (
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device/switches/test"
 )
 
-type newType func(ctx context.Context, address string, username string, password string) (sw device.Switch, err error)
+type newType func(ctx context.Context, host string, username string, password string) (sw device.Switch, err error)
 
 var news map[string]map[string]newType
 

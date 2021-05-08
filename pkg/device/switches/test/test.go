@@ -8,7 +8,7 @@ import (
 )
 
 // NewTest return test backend
-func NewTest(ctx context.Context, address string, username string, password string) (sw device.Switch, err error) {
+func NewTest(ctx context.Context, host string, username string, password string) (sw device.Switch, err error) {
 	return &Test{}, nil
 }
 
@@ -37,6 +37,6 @@ func (t *Test) SetPortAttr(ctx context.Context, portID string, configuration *v1
 }
 
 // ResetPort just for test
-func (t *Test) ResetPort(ctx context.Context, portID string) (err error) {
+func (t *Test) ResetPort(ctx context.Context, portID string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
 	return
 }

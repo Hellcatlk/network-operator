@@ -37,6 +37,6 @@ func (c *CLI) SetPortAttr(ctx context.Context, portID string, configuration *v1a
 }
 
 // ResetPort remove all configure of the port
-func (c *CLI) ResetPort(ctx context.Context, portID string) (err error) {
+func (c *CLI) ResetPort(ctx context.Context, portID string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
 	return
 }
