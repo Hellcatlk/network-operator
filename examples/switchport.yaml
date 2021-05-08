@@ -6,7 +6,7 @@ metadata:
     - apiVersion: metal3.io/v1alpha1
       kind: Switch
       name: switch-example
-      uuid: <switch-uuid>
+      uid: <switch-uuid>
 spec:
   id: "vnet0"
   configurationRef:

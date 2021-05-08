@@ -85,10 +85,11 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 	}
 
 	if dirty {
+		logger.Error(err, "Updating switch port")
 		// Update object
 		err = r.Update(ctx, instance)
 		if err != nil {
-			logger.Error(err, "Update instance failed")
+			logger.Error(err, "Update switch port failed")
 		}
 	}
 

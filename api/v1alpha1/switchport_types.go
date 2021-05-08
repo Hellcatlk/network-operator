@@ -99,7 +99,7 @@ type SwitchPortStatus struct {
 	State machine.StateType `json:"state,omitempty"`
 
 	// The current Configuration of the port.
-	Configuration *SwitchPortConfiguration `json:"Configuration"`
+	Configuration *SwitchPortConfiguration `json:"configuration,omitempty"`
 }
 
 const (
