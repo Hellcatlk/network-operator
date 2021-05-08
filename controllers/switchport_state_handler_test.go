@@ -10,6 +10,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 type fakeClient struct {
@@ -46,7 +47,7 @@ func TestSwitchPortStateMachine(t *testing.T) {
 	m := machine.New(
 		&machine.ReconcileInfo{
 			Client: &fakeClient{},
-			Logger: r.Log,
+			Logger: log.NullLogger{},
 		},
 		&instance,
 		&machine.Handlers{
