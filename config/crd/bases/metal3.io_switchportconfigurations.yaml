@@ -79,7 +79,6 @@ spec:
                   properties:
                     id:
                       description: VLANID is a 12-bit 802.1Q VLAN identifier
-                      format: int32
                       type: integer
                     name:
                       type: string
