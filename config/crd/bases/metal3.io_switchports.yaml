@@ -32,7 +32,7 @@ spec:
           spec:
             description: SwitchPortSpec defines the desired state of SwitchPort
             properties:
-              ConfigurationRef:
+              configurationRef:
                 description: Reference for PortConfiguration CR.
                 properties:
                   name:
