@@ -6,7 +6,6 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 type testInstance struct {
@@ -41,10 +40,7 @@ func handlerTest2(ctx context.Context, info *ReconcileInfo, instance interface{}
 func TestMachine(t *testing.T) {
 	var instance testInstance
 	m := New(
-		&ReconcileInfo{
-			Client: nil,
-			Logger: log.NullLogger{},
-		},
+		nil,
 		&instance,
 		&Handlers{
 			"":      handlerTest0,
@@ -69,10 +65,7 @@ func TestMachine(t *testing.T) {
 func BenchmarkMachine(b *testing.B) {
 	var instance testInstance
 	m := New(
-		&ReconcileInfo{
-			Client: nil,
-			Logger: log.NullLogger{},
-		},
+		nil,
 		&instance,
 		&Handlers{
 			"":      handlerTest0,
@@ -105,10 +98,7 @@ func handlerTest22(ctx context.Context, info *ReconcileInfo, instance interface{
 
 func BenchmarkMachineNoAssert(b *testing.B) {
 	m := New(
-		&ReconcileInfo{
-			Client: nil,
-			Logger: log.NullLogger{},
-		},
+		nil,
 		&tInstance,
 		&Handlers{
 			"":      handlerTest00,
