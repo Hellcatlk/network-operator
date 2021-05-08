@@ -59,7 +59,7 @@ func (ref *SwitchPortRef) Fetch(ctx context.Context, client client.Client) (inst
 // SwitchPortSpec defines the desired state of SwitchPort
 type SwitchPortSpec struct {
 	// Reference for PortConfiguration CR.
-	ConfigurationRef *SwitchPortConfigurationRef `json:"ConfigurationRef,omitempty"`
+	ConfigurationRef *SwitchPortConfigurationRef `json:"configurationRef,omitempty"`
 
 	// Describes the port number on the device.
 	ID string `json:"id"`

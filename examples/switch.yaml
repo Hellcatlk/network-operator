@@ -7,5 +7,5 @@ spec:
   url: ssh://<host-ip>
   username: <host-username>
   password: <host-password>
-  option:
+  options:
     "bridge": "br-test"
