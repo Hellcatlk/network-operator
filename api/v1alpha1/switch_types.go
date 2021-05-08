@@ -31,11 +31,16 @@ type SwitchSpec struct {
 
 	// Username of switch
 	// TODO: Just use on demo
-	Username string `json:"username,omitempty"`
+	Username string `json:"username"`
 
 	// Password of switch.
 	// TODO: Just use on demo
-	Password string `json:"password,omitempty"`
+	Password string `json:"password"`
+
+	// Include somethings need by different backend
+	// For openvswitch cli backend, the value of options is:
+	// "bridge": "<bridge-name>"
+	Options map[string]string `json:"options,omitempty"`
 
 	// The secret containing the switch credentials
 	Secret *corev1.SecretReference `json:"secret,omitempty"`
