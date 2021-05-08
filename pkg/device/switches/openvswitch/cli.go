@@ -8,7 +8,7 @@ import (
 
 	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/util/ssh"
+	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/ssh"
 )
 
 // NewCLI return openvswitch cli backend, username and password is invalid for the backend
