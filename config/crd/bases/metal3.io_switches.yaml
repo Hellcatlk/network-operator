@@ -32,6 +32,11 @@ spec:
           spec:
             description: SwitchSpec defines the desired state of Switch
             properties:
+              options:
+                additionalProperties:
+                  type: string
+                description: 'Include somethings need by different backend For openvswitch cli backend, the value of options is: "bridge": "<bridge-name>"'
+                type: object
               os:
                 description: The type of OS this switch runs
                 type: string
@@ -76,7 +81,9 @@ spec:
                 type: string
             required:
             - os
+            - password
             - url
+            - username
             type: object
           status:
             description: SwitchStatus defines the observed state of Switch
