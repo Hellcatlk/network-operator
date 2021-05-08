@@ -9,6 +9,18 @@ rules:
 - apiGroups:
   - metal3.io
   resources:
+  - switch
+  verbs:
+  - get
+- apiGroups:
+  - metal3.io
+  resources:
+  - switchportconfiguration
+  verbs:
+  - get
+- apiGroups:
+  - metal3.io
+  resources:
   - switchports
   verbs:
   - create
