@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os/exec"
 	"strconv"
+	"strings"
 
 	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device"
@@ -61,7 +62,7 @@ func (c *SSH) GetPortAttr(ctx context.Context, portID string) (configuration *v1
 		return nil, fmt.Errorf("get port failed: %v", err)
 	}
 
-	id, err := strconv.Atoi(string(output))
+	id, err := strconv.Atoi(strings.Trim(string(output), "\n"))
 	if err != nil {
 		return nil, fmt.Errorf("get port failed: %v", err)
 	}
