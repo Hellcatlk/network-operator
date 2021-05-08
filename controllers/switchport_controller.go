@@ -81,7 +81,7 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 	dirty, result, merr := m.Reconcile(ctx)
 	if merr != nil {
 		err = merr.Error()
-		logger.Error(err, "state machine error", "error type", merr.Type())
+		logger.Error(err, string(merr.Type()))
 	}
 
 	if dirty {

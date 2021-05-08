@@ -23,13 +23,14 @@ func (r *SwitchPortReconciler) noneHandler(ctx context.Context, info *machine.Re
 	i := instance.(*v1alpha1.SwitchPort)
 
 	// Add finalizer
-	err := finalizer.Add(&i.Finalizers, finalizerKey)
-	result := reconcile.Result{}
-	if err == nil {
-		result.Requeue = true
+	if len(i.Finalizers) == 0 {
+		err := finalizer.Add(&i.Finalizers, finalizerKey)
+		if err != nil {
+			return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, nil
+		}
 	}
 
-	return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true}, err
+	return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true}, nil
 }
 
 // idleHandler check spec.configurationRef's value, if isn't nil set the state of CR to `Validating`
