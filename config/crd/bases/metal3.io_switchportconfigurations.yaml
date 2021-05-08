@@ -66,11 +66,14 @@ spec:
                   type: object
                 maxItems: 10
                 type: array
-              type:
-                default: access
-                description: Indicates which mode this port should be set to, valid values are access, trunk or hybrid. If empty default value is access
-                type: string
+              disable:
+                description: Disable port
+                type: boolean
+              untaggedVLAN:
+                description: The untagged vlan's index in vlans
+                type: integer
               vlans:
+                description: Vlans to which the port belongs
                 items:
                   description: VLAN represents the name and ID of a VLAN
                   properties:

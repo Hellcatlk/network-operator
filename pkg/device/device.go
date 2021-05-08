@@ -21,5 +21,5 @@ type Switch interface {
 	SetPortAttr(ctx context.Context, portID string, configuration *v1alpha1.SwitchPortConfiguration) (err error)
 
 	// ResetPort remove all configure of the port
-	ResetPort(ctx context.Context, portID string) (err error)
+	ResetPort(ctx context.Context, portID string, configuration *v1alpha1.SwitchPortConfiguration) (err error)
 }

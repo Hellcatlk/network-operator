@@ -32,16 +32,12 @@ spec:
           spec:
             description: SwitchSpec defines the desired state of Switch
             properties:
-              ip:
-                description: IP Address of the switch
-                type: string
               os:
                 description: The type of OS this switch runs
                 type: string
-              port:
-                description: Port to use for SSH connection
-                format: int32
-                type: integer
+              password:
+                description: 'Password of switch. TODO: Just use on demo'
+                type: string
               restrictedPorts:
                 description: Restricted ports in the switch
                 items:
@@ -72,10 +68,15 @@ spec:
                     description: Namespace defines the space within which the secret name must be unique.
                     type: string
                 type: object
+              url:
+                description: The url of switch
+                type: string
+              username:
+                description: 'Username of switch TODO: Just use on demo'
+                type: string
             required:
-            - ip
             - os
-            - secret
+            - url
             type: object
           status:
             description: SwitchStatus defines the observed state of Switch

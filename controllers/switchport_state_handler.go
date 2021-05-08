@@ -133,7 +133,7 @@ func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machin
 	if err != nil {
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
-	err = sw.ResetPort(ctx, i.Spec.ID)
+	err = sw.ResetPort(ctx, i.Spec.ID, i.Status.Configuration)
 	if err != nil {
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
