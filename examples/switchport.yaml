@@ -1,0 +1,13 @@
+apiVersion: metal3.io/v1alpha1
+kind: SwitchPort
+metadata:
+  name: switchport-example
+  ownerReferences:
+    - apiVersion: metal3.io/v1alpha1
+      kind: Switch
+      name: switch-example
+spec:
+  id: "vnet0"
+  configurationRef:
+    name: switchportconfiguration-example
+    namespace: metal3
