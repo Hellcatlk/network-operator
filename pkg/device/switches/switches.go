@@ -8,9 +8,10 @@ import (
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device/switches/openvswitch"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device/switches/test"
+	"github.com/metal3-io/networkconfiguration-operator/pkg/util/option"
 )
 
-type newType func(ctx context.Context, host string, username string, password string) (sw device.Switch, err error)
+type newType func(ctx context.Context, host string, username string, password string, options []option.Option) (sw device.Switch, err error)
 
 var news map[string]map[string]newType
 
@@ -32,7 +33,7 @@ func Register(os string, protocolType string, new newType) {
 }
 
 // New return a implementation of switch interface
-func New(ctx context.Context, os string, rawurl string, username string, password string) (sw device.Switch, err error) {
+func New(ctx context.Context, os string, rawurl string, username string, password string, options ...option.Option) (sw device.Switch, err error) {
 	u, err := url.Parse(rawurl)
 	if err != nil {
 		return nil, err
@@ -46,5 +47,5 @@ func New(ctx context.Context, os string, rawurl string, username string, passwor
 	if new == nil {
 		return nil, fmt.Errorf("invalid scheme %s", u.Scheme)
 	}
-	return new(ctx, u.Host, username, password)
+	return new(ctx, u.Host, username, password, options)
 }

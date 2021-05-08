@@ -8,21 +8,30 @@ import (
 
 	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device"
+	"github.com/metal3-io/networkconfiguration-operator/pkg/util/option"
 )
 
 // NewCLI return openvswitch cli backend, username and password is invalid for the backend
-func NewCLI(ctx context.Context, address string, username string, password string) (sw device.Switch, err error) {
-	if address == "" {
-		return nil, fmt.Errorf("the format of url must be: \"cli:<bridge name>\"")
+
+func NewCLI(ctx context.Context, address string, username string, password string, options []option.Option) (sw device.Switch, err error) {
+	if option.IsExist(options, "bridge") {
+		return nil, fmt.Errorf("bridge of openvswitch cli backend is required")
 	}
+
 	return &CLI{
-		bridge: address,
+		address:  address,
+		username: username,
+		password: password,
+		bridge:   option.Get(options, "bridge").(string),
 	}, nil
 }
 
 // CLI control local openvswitch by CLI
 type CLI struct {
-	bridge string
+	address  string
+	username string
+	password string
+	bridge   string
 }
 
 // PowerOn enable openvswitch
