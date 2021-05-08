@@ -110,7 +110,7 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 	if err != nil {
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
-	if !reflect.DeepEqual(configuration, i.Status.Configuration) {
+	if !reflect.DeepEqual(configuration.Spec, i.Status.Configuration.Spec) {
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true}, nil
 	}
 
@@ -124,7 +124,7 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 	configuration, err = sw.GetPortAttr(ctx, i.Spec.ID)
-	if err != nil || reflect.DeepEqual(configuration, i.Status.Configuration) {
+	if err != nil || reflect.DeepEqual(configuration.Spec, i.Status.Configuration.Spec) {
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
