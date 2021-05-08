@@ -3,6 +3,7 @@ package ssh
 import (
 	"net"
 	"os/exec"
+	"strings"
 
 	"golang.org/x/crypto/ssh"
 )
@@ -19,6 +20,9 @@ func Run(address string, username string, password string, cmd *exec.Cmd) error 
 	}
 	config.SetDefaults()
 
+	if !strings.Contains(address, ":") {
+		address = address + ":22"
+	}
 	client, err := ssh.Dial("tcp", address, config)
 	if err != nil {
 		return err
