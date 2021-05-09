@@ -64,7 +64,7 @@ func (c *SSH) GetPortAttr(ctx context.Context, portID string) (configuration *v1
 
 	id, err := strconv.Atoi(strings.Trim(string(output), "\n"))
 	if err != nil {
-		return nil, fmt.Errorf("get port failed: %v", err)
+		return &v1alpha1.SwitchPortConfiguration{}, nil
 	}
 
 	return &v1alpha1.SwitchPortConfiguration{
