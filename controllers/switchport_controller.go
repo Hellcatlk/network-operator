@@ -21,10 +21,10 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/machine"
@@ -51,8 +51,11 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 	instance := &v1alpha1.SwitchPort{}
 	err = r.Get(ctx, req.NamespacedName, instance)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return ctrl.Result{}, nil
+		}
 		// Error reading the object - requeue the request
-		return reconcile.Result{}, err
+		return ctrl.Result{}, err
 	}
 
 	if len(instance.OwnerReferences) == 0 {

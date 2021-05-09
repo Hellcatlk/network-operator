@@ -78,7 +78,7 @@ func New(info *ReconcileInfo, instance Instance, handlers *Handlers) Machine {
 	}
 }
 
-// Reconcile state machine. If dirty is true, it means the instance has changed,
+// Reconcile state machine. If dirty is true, it means the instance has changed.
 func (m *Machine) Reconcile(ctx context.Context) (dirty bool, result ctrl.Result, merr *Error) {
 	// Deal possible panic
 	defer func() {
