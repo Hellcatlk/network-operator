@@ -123,6 +123,7 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
+	info.Logger.Info("configuration of port has been changed externally")
 	return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true}, nil
 }
 
