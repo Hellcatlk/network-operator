@@ -19,11 +19,11 @@ spec:
   - additionalPrinterColumns:
     - description: state
       jsonPath: .status.state
-      name: State
+      name: STATE
       type: string
     - description: error
       jsonPath: .status.error
-      name: Error
+      name: ERROR
       type: string
     name: v1alpha1
     schema:

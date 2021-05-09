@@ -54,6 +54,7 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 	instance := &v1alpha1.SwitchPort{}
 	err = r.Get(ctx, req.NamespacedName, instance)
 	if err != nil {
+		// The object has been deleted
 		if errors.IsNotFound(err) {
 			return ctrl.Result{}, nil
 		}
