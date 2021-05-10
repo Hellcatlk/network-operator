@@ -155,6 +155,7 @@ func (sp *SwitchPort) FetchOwnerReference(ctx context.Context, client client.Cli
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:printcolumn:name="State",type="string",JSONPath=".status.state",description="state"
 
 // SwitchPort is the Schema for the switchports API
 type SwitchPort struct {
