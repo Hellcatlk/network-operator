@@ -20,12 +20,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// VLANID is a 12-bit 802.1Q VLAN identifier
-type VLANID int32
-
 // VLAN represents the name and ID of a VLAN
 type VLAN struct {
-	ID   VLANID `json:"id"`
+	// VLANID is a 12-bit 802.1Q VLAN identifier
+	ID int `json:"id"`
+
 	Name string `json:"name,omitempty"`
 }
 
