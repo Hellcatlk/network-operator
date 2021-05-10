@@ -3,6 +3,15 @@
 
 ## Quick start
 
+1. Run `make install`
+2. Run `make run`
+
 ## NOTE
 
 Use like `kubebuilder create api --group metal3.io --version v1alpha1 --kind NetworkConfiguration` add API
+
+## Supported backend
+
+|os|protocol|url format|
+|:-|:-|:-|
+|openvswitch|ssh|ssh://\<host-ip>|

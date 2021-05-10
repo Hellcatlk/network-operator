@@ -19,7 +19,7 @@ func init() {
 
 	// Register backend
 	Register("test", "test", test.NewTest)
-	Register("openvswitch", "cli", openvswitch.NewCLI)
+	Register("openvswitch", "ssh", openvswitch.NewSSH)
 }
 
 // Register New() function of a switch interface's implementation

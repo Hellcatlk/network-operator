@@ -32,10 +32,7 @@ spec:
           spec:
             description: SwitchPortSpec defines the desired state of SwitchPort
             properties:
-              id:
-                description: Describes the port number on the device.
-                type: string
-              portConfigurationRef:
+              ConfigurationRef:
                 description: Reference for PortConfiguration CR.
                 properties:
                   name:
@@ -47,6 +44,9 @@ spec:
                 required:
                 - name
                 type: object
+              id:
+                description: Describes the port number on the device.
+                type: string
             required:
             - id
             type: object

@@ -1,0 +1,11 @@
+apiVersion: metal3.io/v1alpha1
+kind: Switch
+metadata:
+  name: switch-example
+spec:
+  os: openvswitch
+  url: ssh://<host-ip>
+  username: <host-username>
+  password: <host-password>
+  option:
+    "bridge": "br-test"
