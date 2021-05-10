@@ -28,7 +28,7 @@ import (
 
 	metal3iov1alpha1 "github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
 	"github.com/metal3-io/networkconfiguration-operator/controllers"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/util/trace"
+	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/trace"
 	// +kubebuilder:scaffold:imports
 )
 
