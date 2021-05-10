@@ -20,9 +20,9 @@ jobs:
       - name: gosec
         run: make gosec
       - name: generate
-        run: make generate
+        run: make generate && ./hack/gitdiff.sh
       - name: manifests
-        run: make manifests
+        run: make manifests && ./hack/gitdiff.sh
       - name: unit
         run: ./tools/install_kubebuilder.sh && make unit
   build:

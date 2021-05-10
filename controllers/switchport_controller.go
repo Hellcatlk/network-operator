@@ -37,6 +37,8 @@ type SwitchPortReconciler struct {
 	Scheme *runtime.Scheme
 }
 
+// +kubebuilder:rbac:groups=metal3.io,resources=switch,verbs=get
+// +kubebuilder:rbac:groups=metal3.io,resources=switchportconfiguration,verbs=get
 // +kubebuilder:rbac:groups=metal3.io,resources=switchports,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=metal3.io,resources=switchports/status,verbs=get;update;patch
 
