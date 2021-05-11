@@ -17,7 +17,7 @@ type Certificate struct {
 }
 
 // Fetch secret
-func Fetch(ctx context.Context, client client.Client, ref *corev1.SecretReference) (sercet *Certificate, err error) {
+func Fetch(ctx context.Context, client client.Client, ref *corev1.SecretReference) (cert *Certificate, err error) {
 	if ref == nil {
 		return nil, fmt.Errorf("reference is nil")
 	}
@@ -35,25 +35,33 @@ func Fetch(ctx context.Context, client client.Client, ref *corev1.SecretReferenc
 		return nil, err
 	}
 
-	return &Certificate{
-		Username: decode(instance, "username"),
-		Password: decode(instance, "password"),
-	}, nil
+	cert = &Certificate{}
+
+	cert.Username, err = decode(instance, "username")
+	if err != nil {
+		return nil, err
+	}
+
+	cert.Password, err = decode(instance, "password")
+	if err != nil {
+		return nil, err
+	}
+
+	return cert, nil
 }
 
-// Parse key and return decoding it by base64
-func decode(secret *corev1.Secret, key string) string {
+// decode key's value and decode it by base64
+func decode(secret *corev1.Secret, key string) (string, error) {
 	if secret == nil {
-		return ""
+		return "", fmt.Errorf("secret is nil")
 	}
 
 	// Decode to byte
 	bytes := make([]byte, base64.StdEncoding.DecodedLen(len(secret.Data[key])))
-	len, err := base64.StdEncoding.Decode(bytes, []byte(secret.Data[key]))
+	len, err := base64.StdEncoding.Decode(bytes, secret.Data[key])
 	if err != nil {
-		return ""
+		return "", err
 	}
-	bytes = bytes[:len]
 
-	return string(bytes)
+	return string(bytes[:len]), nil
 }
