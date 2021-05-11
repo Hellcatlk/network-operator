@@ -12,9 +12,9 @@
 
 ## Supported backend
 
-|os|url|
-|:-|:-|
-|openvswitch|ssh://\<host-ip>|
+|os|url|options|
+|:-|:-|:-|
+|openvswitch|ssh://\<host-ip>|"birdge":"\<birdge-name>"|
 
 ## NOTE
 
