@@ -9,19 +9,20 @@ import (
 
 	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device"
+	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/certificate"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/ssh"
 )
 
 // NewSSH return openvswitch ssh backend
-func NewSSH(ctx context.Context, address string, username string, password string, options map[string]string) (sw device.Switch, err error) {
+func NewSSH(ctx context.Context, address string, cert *certificate.Certificate, options map[string]string) (sw device.Switch, err error) {
 	if len(options) == 0 || options["bridge"] == "" {
 		return nil, fmt.Errorf("bridge of openvswitch cli backend is required")
 	}
 
 	return &SSH{
 		address:  address,
-		username: username,
-		password: password,
+		username: cert.Username,
+		password: cert.Password,
 		bridge:   options["bridge"],
 	}, nil
 }
