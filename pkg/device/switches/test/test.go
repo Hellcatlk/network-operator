@@ -27,16 +27,16 @@ func (t *Test) PowerOff(ctx context.Context) (err error) {
 }
 
 // GetPortAttr just for test
-func (t *Test) GetPortAttr(ctx context.Context, portID string) (configuration *v1alpha1.SwitchPortConfiguration, err error) {
+func (t *Test) GetPortAttr(ctx context.Context, name string) (configuration *v1alpha1.SwitchPortConfiguration, err error) {
 	return &v1alpha1.SwitchPortConfiguration{}, nil
 }
 
 // SetPortAttr just for test
-func (t *Test) SetPortAttr(ctx context.Context, portID string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
+func (t *Test) SetPortAttr(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
 	return
 }
 
 // ResetPort just for test
-func (t *Test) ResetPort(ctx context.Context, portID string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
+func (t *Test) ResetPort(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
 	return
 }

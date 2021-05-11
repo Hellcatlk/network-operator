@@ -40,19 +40,15 @@ spec:
               os:
                 description: The type of OS this switch runs
                 type: string
-              password:
-                description: 'Password of switch. TODO: Just use on demo'
-                type: string
-              restrictedPorts:
-                description: Restricted ports in the switch
-                items:
-                  description: RestrictedPort indicates the specific restriction on the port
+              ports:
+                additionalProperties:
+                  description: Port indicates the specific restriction on the port
                   properties:
                     disabled:
                       description: True if this port is not available, false otherwise
                       type: boolean
-                    portID:
-                      description: Describes the port number on the device
+                    name:
+                      description: Describes the port name on the device
                       type: string
                     trunkDisable:
                       description: True if this port can be used as a trunk port, false otherwise
@@ -62,7 +58,8 @@ spec:
                       pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
                       type: string
                   type: object
-                type: array
+                description: Restricted ports in the switch
+                type: object
               secret:
                 description: The secret containing the switch credentials
                 properties:
@@ -76,14 +73,9 @@ spec:
               url:
                 description: The url of switch
                 type: string
-              username:
-                description: 'Username of switch TODO: Just use on demo'
-                type: string
             required:
             - os
-            - password
             - url
-            - username
             type: object
           status:
             description: SwitchStatus defines the observed state of Switch

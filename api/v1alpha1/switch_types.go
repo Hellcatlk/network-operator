@@ -21,38 +21,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// SwitchSpec defines the desired state of Switch
-type SwitchSpec struct {
-	// The type of OS this switch runs
-	OS string `json:"os"`
-
-	// The url of switch
-	URL string `json:"url"`
-
-	// Username of switch
-	// TODO: Just use on demo
-	Username string `json:"username"`
-
-	// Password of switch.
-	// TODO: Just use on demo
-	Password string `json:"password"`
-
-	// Include somethings need by different backend
-	// For openvswitch cli backend, the value of options is:
-	// "bridge": "<bridge-name>"
-	Options map[string]string `json:"options,omitempty"`
-
-	// The secret containing the switch credentials
-	Secret *corev1.SecretReference `json:"secret,omitempty"`
-
-	// Restricted ports in the switch
-	RestrictedPorts []RestrictedPort `json:"restrictedPorts,omitempty"`
-}
-
-// RestrictedPort indicates the specific restriction on the port
-type RestrictedPort struct {
-	// Describes the port number on the device
-	PortID string `json:"portID,omitempty"`
+// Port indicates the specific restriction on the port
+type Port struct {
+	// Describes the port name on the device
+	Name string `json:"name,omitempty"`
 
 	// True if this port is not available, false otherwise
 	Disabled bool `json:"disabled,omitempty"`
@@ -65,19 +37,30 @@ type RestrictedPort struct {
 	VlanRange string `json:"vlanRange,omitempty"`
 }
 
+// SwitchSpec defines the desired state of Switch
+type SwitchSpec struct {
+	// The type of OS this switch runs
+	OS string `json:"os"`
+
+	// The url of switch
+	URL string `json:"url"`
+
+	// Include somethings need by different backend
+	// For openvswitch cli backend, the value of options is:
+	// "bridge": "<bridge-name>"
+	Options map[string]string `json:"options,omitempty"`
+
+	// The secret containing the switch credentials
+	Secret *corev1.SecretReference `json:"secret,omitempty"`
+
+	// Restricted ports in the switch
+	Ports map[string]Port `json:"ports,omitempty"`
+}
+
 // SwitchStatus defines the observed state of Switch
 type SwitchStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-}
-
-// +kubebuilder:object:root=true
-
-// SwitchList contains a list of Switch
-type SwitchList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Switch `json:"items"`
 }
 
 // +kubebuilder:object:root=true
@@ -89,6 +72,15 @@ type Switch struct {
 
 	Spec   SwitchSpec   `json:"spec,omitempty"`
 	Status SwitchStatus `json:"status,omitempty"`
+}
+
+// +kubebuilder:object:root=true
+
+// SwitchList contains a list of Switch
+type SwitchList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []Switch `json:"items"`
 }
 
 func init() {

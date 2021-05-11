@@ -52,9 +52,9 @@ func (c *SSH) PowerOff(ctx context.Context) (err error) {
 }
 
 // GetPortAttr get the port's configure
-func (c *SSH) GetPortAttr(ctx context.Context, portID string) (configuration *v1alpha1.SwitchPortConfiguration, err error) {
+func (c *SSH) GetPortAttr(ctx context.Context, name string) (configuration *v1alpha1.SwitchPortConfiguration, err error) {
 	output, err := ssh.Output(c.address, c.username, c.password, exec.Command(
-		"ovs-vsctl", "list", "port", portID,
+		"ovs-vsctl", "list", "port", name,
 		"|", "grep", "-E", "-w", "^tag",
 		"|", "grep", "-o", "[0-9]*",
 	)) // #nosec
@@ -79,7 +79,7 @@ func (c *SSH) GetPortAttr(ctx context.Context, portID string) (configuration *v1
 }
 
 // SetPortAttr set configure to the port
-func (c *SSH) SetPortAttr(ctx context.Context, portID string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
+func (c *SSH) SetPortAttr(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
 	if configuration == nil {
 		return nil
 	}
@@ -89,7 +89,7 @@ func (c *SSH) SetPortAttr(ctx context.Context, portID string, configuration *v1a
 	}
 
 	err = ssh.Run(c.address, c.username, c.password, exec.Command(
-		"ovs-vsctl", "set", "port", portID, "tag="+strconv.Itoa(int(configuration.Spec.Vlans[0].ID)),
+		"ovs-vsctl", "set", "port", name, "tag="+strconv.Itoa(int(configuration.Spec.Vlans[0].ID)),
 	)) // #nosec
 	if err != nil {
 		return fmt.Errorf("set port failed: %v", err)
@@ -99,7 +99,7 @@ func (c *SSH) SetPortAttr(ctx context.Context, portID string, configuration *v1a
 }
 
 // ResetPort remove all configure of the port
-func (c *SSH) ResetPort(ctx context.Context, portID string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
+func (c *SSH) ResetPort(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
 	if configuration == nil {
 		return nil
 	}
@@ -109,7 +109,7 @@ func (c *SSH) ResetPort(ctx context.Context, portID string, configuration *v1alp
 	}
 
 	err = ssh.Run(c.address, c.username, c.password, exec.Command(
-		"ovs-vsctl", "remove ", "port", portID, "tag", strconv.Itoa(int(configuration.Spec.Vlans[0].ID)),
+		"ovs-vsctl", "remove ", "port", name, "tag", strconv.Itoa(int(configuration.Spec.Vlans[0].ID)),
 	)) // #nosec
 	if err != nil {
 		return fmt.Errorf("set port failed: %v", err)
