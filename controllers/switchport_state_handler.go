@@ -9,6 +9,7 @@ import (
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device/switches"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/machine"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/finalizer"
+	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/secret"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
@@ -77,7 +78,7 @@ func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *mac
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	secret, err := owner.FetchSecret(ctx, info.Client)
+	secret, err := secret.Fetch(ctx, info.Client, owner.Spec.Secret)
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
@@ -122,7 +123,7 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	secret, err := owner.FetchSecret(ctx, info.Client)
+	secret, err := secret.Fetch(ctx, info.Client, owner.Spec.Secret)
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
@@ -153,7 +154,7 @@ func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machin
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	secret, err := owner.FetchSecret(ctx, info.Client)
+	secret, err := secret.Fetch(ctx, info.Client, owner.Spec.Secret)
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}

@@ -17,13 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"context"
-	"fmt"
-
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // Port indicates the specific restriction on the port
@@ -66,25 +61,6 @@ type SwitchSpec struct {
 type SwitchStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-}
-
-// FetchSecret fetch .Spec.Secret
-func (s *Switch) FetchSecret(ctx context.Context, client client.Client) (instance *corev1.Secret, err error) {
-	if s == nil || s.Spec.Secret == nil {
-		return nil, fmt.Errorf("reference is nil")
-	}
-
-	instance = &corev1.Secret{}
-	err = client.Get(
-		ctx,
-		types.NamespacedName{
-			Name:      s.Spec.Secret.Name,
-			Namespace: s.Spec.Secret.Namespace,
-		},
-		instance,
-	)
-
-	return
 }
 
 // +kubebuilder:object:root=true
