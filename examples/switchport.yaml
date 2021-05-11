@@ -8,7 +8,6 @@ metadata:
       name: switch-example
       uid: <switch-uuid>
 spec:
-  id: "vnet0"
   configurationRef:
     name: switchportconfiguration-example
     namespace: metal3

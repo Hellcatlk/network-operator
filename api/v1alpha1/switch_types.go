@@ -17,42 +17,19 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+	"fmt"
+
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// SwitchSpec defines the desired state of Switch
-type SwitchSpec struct {
-	// The type of OS this switch runs
-	OS string `json:"os"`
-
-	// The url of switch
-	URL string `json:"url"`
-
-	// Username of switch
-	// TODO: Just use on demo
-	Username string `json:"username"`
-
-	// Password of switch.
-	// TODO: Just use on demo
-	Password string `json:"password"`
-
-	// Include somethings need by different backend
-	// For openvswitch cli backend, the value of options is:
-	// "bridge": "<bridge-name>"
-	Options map[string]string `json:"options,omitempty"`
-
-	// The secret containing the switch credentials
-	Secret *corev1.SecretReference `json:"secret,omitempty"`
-
-	// Restricted ports in the switch
-	RestrictedPorts []RestrictedPort `json:"restrictedPorts,omitempty"`
-}
-
-// RestrictedPort indicates the specific restriction on the port
-type RestrictedPort struct {
-	// Describes the port number on the device
-	PortID string `json:"portID,omitempty"`
+// Port indicates the specific restriction on the port
+type Port struct {
+	// Describes the port name on the device
+	Name string `json:"name,omitempty"`
 
 	// True if this port is not available, false otherwise
 	Disabled bool `json:"disabled,omitempty"`
@@ -65,19 +42,49 @@ type RestrictedPort struct {
 	VlanRange string `json:"vlanRange,omitempty"`
 }
 
+// SwitchSpec defines the desired state of Switch
+type SwitchSpec struct {
+	// The type of OS this switch runs
+	OS string `json:"os"`
+
+	// The url of switch
+	URL string `json:"url"`
+
+	// Include somethings need by different backend
+	// For openvswitch cli backend, the value of options is:
+	// "bridge": "<bridge-name>"
+	Options map[string]string `json:"options,omitempty"`
+
+	// The secret containing the switch credentials
+	Secret *corev1.SecretReference `json:"secret,omitempty"`
+
+	// Restricted ports in the switch
+	Ports map[string]Port `json:"ports,omitempty"`
+}
+
 // SwitchStatus defines the observed state of Switch
 type SwitchStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
-// +kubebuilder:object:root=true
+// FetchSecret fetch .Spec.Secret
+func (s *Switch) FetchSecret(ctx context.Context, client client.Client) (instance *corev1.Secret, err error) {
+	if s == nil || s.Spec.Secret == nil {
+		return nil, fmt.Errorf("reference is nil")
+	}
 
-// SwitchList contains a list of Switch
-type SwitchList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Switch `json:"items"`
+	instance = &corev1.Secret{}
+	err = client.Get(
+		ctx,
+		types.NamespacedName{
+			Name:      s.Spec.Secret.Name,
+			Namespace: s.Spec.Secret.Namespace,
+		},
+		instance,
+	)
+
+	return
 }
 
 // +kubebuilder:object:root=true
@@ -89,6 +96,15 @@ type Switch struct {
 
 	Spec   SwitchSpec   `json:"spec,omitempty"`
 	Status SwitchStatus `json:"status,omitempty"`
+}
+
+// +kubebuilder:object:root=true
+
+// SwitchList contains a list of Switch
+type SwitchList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []Switch `json:"items"`
 }
 
 func init() {

@@ -53,11 +53,6 @@ spec:
                 required:
                 - name
                 type: object
-              id:
-                description: Describes the port number on the device.
-                type: string
-            required:
-            - id
             type: object
           status:
             description: SwitchPortStatus defines the observed state of SwitchPort

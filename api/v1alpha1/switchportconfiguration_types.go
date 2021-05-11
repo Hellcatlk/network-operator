@@ -20,6 +20,28 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// ACL describes the rules applied in the switch
+type ACL struct {
+	// +kubebuilder:validation:Enum="ipv4";"ipv6"
+	Type string `json:"type,omitempty"`
+
+	// +kubebuilder:validation:Enum="allow";"deny"
+	Action string `json:"action,omitempty"`
+
+	// +kubebuilder:validation:Enum="TCP";"UDP";"ICMP";"ALL"
+	Protocol string `json:"protocol,omitempty"`
+
+	Src string `json:"src,omitempty"`
+
+	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
+	SrcPortRange string `json:"srcPortRange,omitempty"`
+
+	Des string `json:"des,omitempty"`
+
+	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
+	DesPortRange string `json:"desPortRange,omitempty"`
+}
+
 // VLAN represents the name and ID of a VLAN
 type VLAN struct {
 	// VLANID is a 12-bit 802.1Q VLAN identifier
@@ -41,28 +63,6 @@ type SwitchPortConfigurationSpec struct {
 
 	// Disable port
 	Disable bool `json:"disable,omitempty"`
-}
-
-// ACL describes the rules applied in the switch
-type ACL struct {
-	// +kubebuilder:validation:Enum="ipv4";"ipv6"
-	Type string `json:"type,omitempty"`
-
-	// +kubebuilder:validation:Enum="allow";"deny"
-	Action string `json:"action,omitempty"`
-
-	// +kubebuilder:validation:Enum="TCP";"UDP";"ICMP";"ALL"
-	Protocol string `json:"protocol,omitempty"`
-
-	Src string `json:"src,omitempty"`
-
-	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
-	SrcPortRange string `json:"srcPortRange,omitempty"`
-
-	Des string `json:"des,omitempty"`
-
-	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
-	DesPortRange string `json:"desPortRange,omitempty"`
 }
 
 // SwitchPortConfigurationStatus defines the observed state of SwitchPortConfiguration

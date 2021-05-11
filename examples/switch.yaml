@@ -1,3 +1,14 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: switch-example-secret
+type: Opaque
+data:
+  username: <host-username>
+  password: <host-password>
+
+---
 apiVersion: metal3.io/v1alpha1
 kind: Switch
 metadata:
@@ -5,7 +16,10 @@ metadata:
 spec:
   os: openvswitch
   url: ssh://<host-ip>
-  username: <host-username>
-  password: <host-password>
+  secret:
+    name: switch-example-secret
   options:
     "bridge": "<bridge-name>"
+  ports:
+    "switchport-example":
+      name: "vnet0"

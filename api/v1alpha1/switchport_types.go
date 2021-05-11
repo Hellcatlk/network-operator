@@ -26,52 +26,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// SwitchPortRef is the reference for Port CR
-type SwitchPortRef struct {
-	Name string `json:"name"`
-
-	// If empty use default namespace.
-	// +kubebuilder:default:="default"
-	NameSpace string `json:"namespace,omitempty"`
-
-	APIVersions string `json:"apiVersions"`
-}
-
-// Fetch the instance
-func (ref *SwitchPortRef) Fetch(ctx context.Context, client client.Client) (instance *SwitchPort, err error) {
-	if ref == nil {
-		return nil, fmt.Errorf("reference is nil")
-	}
-
-	instance = &SwitchPort{}
-	err = client.Get(
-		ctx,
-		types.NamespacedName{
-			Name:      ref.Name,
-			Namespace: ref.NameSpace,
-		},
-		instance,
-	)
-
-	return
-}
-
-// SwitchPortSpec defines the desired state of SwitchPort
-type SwitchPortSpec struct {
-	// Reference for PortConfiguration CR.
-	ConfigurationRef *SwitchPortConfigurationRef `json:"configurationRef,omitempty"`
-
-	// Describes the port number on the device.
-	ID string `json:"id"`
-}
-
 // SwitchPortConfigurationRef is the reference for Configuration CR
 type SwitchPortConfigurationRef struct {
 	Name string `json:"name"`
 
 	// If empty use default namespace.
 	// +kubebuilder:default:="default"
-	NameSpace string `json:"namespace,omitempty"`
+	Namespace string `json:"namespace,omitempty"`
 }
 
 // Fetch the instance
@@ -85,12 +46,18 @@ func (ref *SwitchPortConfigurationRef) Fetch(ctx context.Context, client client.
 		ctx,
 		types.NamespacedName{
 			Name:      ref.Name,
-			Namespace: ref.NameSpace,
+			Namespace: ref.Namespace,
 		},
 		instance,
 	)
 
 	return
+}
+
+// SwitchPortSpec defines the desired state of SwitchPort
+type SwitchPortSpec struct {
+	// Reference for PortConfiguration CR.
+	ConfigurationRef *SwitchPortConfigurationRef `json:"configurationRef,omitempty"`
 }
 
 // SwitchPortStatus defines the observed state of SwitchPort
@@ -140,7 +107,7 @@ func (sp *SwitchPort) SetState(state machine.StateType) {
 
 // FetchOwnerReference fetch OwnerReference[0]
 func (sp *SwitchPort) FetchOwnerReference(ctx context.Context, client client.Client) (instance *Switch, err error) {
-	if sp == nil {
+	if sp == nil || len(sp.OwnerReferences) == 0 {
 		return nil, fmt.Errorf("reference is nil")
 	}
 
