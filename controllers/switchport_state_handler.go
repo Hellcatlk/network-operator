@@ -23,12 +23,7 @@ func (r *SwitchPortReconciler) noneHandler(ctx context.Context, info *machine.Re
 	i := instance.(*v1alpha1.SwitchPort)
 
 	// Add finalizer
-	if len(i.Finalizers) == 0 {
-		err := finalizer.Add(&i.Finalizers, finalizerKey)
-		if err != nil {
-			return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, nil
-		}
-	}
+	finalizer.Add(&i.Finalizers, finalizerKey)
 
 	return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true}, nil
 }
@@ -140,7 +135,7 @@ func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machin
 	// Remove switch's port configuration
 	owner, err := i.FetchOwnerReference(ctx, info.Client)
 	if err != nil {
-		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 	sw, err := switches.New(ctx, owner.Spec.OS, owner.Spec.URL, owner.Spec.Username, owner.Spec.Password, owner.Spec.Options)
 	if err != nil {
@@ -161,12 +156,8 @@ func (r *SwitchPortReconciler) deletingHandler(ctx context.Context, info *machin
 
 	i := instance.(*v1alpha1.SwitchPort)
 
-	result := reconcile.Result{}
 	// Remove finalizer
-	err := finalizer.Remove(&i.Finalizers, finalizerKey)
-	if err != nil {
-		result.Requeue = true
-	}
+	finalizer.Remove(&i.Finalizers, finalizerKey)
 
-	return v1alpha1.SwitchPortNone, result, err
+	return v1alpha1.SwitchPortNone, reconcile.Result{}, nil
 }
