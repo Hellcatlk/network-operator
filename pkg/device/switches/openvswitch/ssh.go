@@ -26,7 +26,7 @@ func NewSSH(ctx context.Context, address string, username string, password strin
 	}, nil
 }
 
-// CLI control local openvswitch by CLI
+// SSH control openvswitch by ssh and cli
 type SSH struct {
 	address  string
 	username string
