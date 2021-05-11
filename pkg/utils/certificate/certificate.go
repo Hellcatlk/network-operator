@@ -31,6 +31,9 @@ func Fetch(ctx context.Context, client client.Client, ref *corev1.SecretReferenc
 		},
 		instance,
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	return &Certificate{
 		Username: decode(instance, "username"),
