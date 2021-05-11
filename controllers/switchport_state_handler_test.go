@@ -6,6 +6,7 @@ import (
 
 	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/machine"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -26,10 +27,15 @@ func (c *fakeClient) Get(ctx context.Context, key types.NamespacedName, obj runt
 			Spec: v1alpha1.SwitchSpec{
 				OS:  "test",
 				URL: "test://1234",
+				Secret: &corev1.SecretReference{
+					Name: "Secret",
+				},
 			},
 		}
 	case "SwitchPortConfiguration":
 		*obj.(*v1alpha1.SwitchPortConfiguration) = v1alpha1.SwitchPortConfiguration{}
+	case "Secret":
+		*obj.(*corev1.Secret) = corev1.Secret{}
 	}
 
 	return nil
