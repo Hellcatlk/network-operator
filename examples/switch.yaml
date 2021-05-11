@@ -8,4 +8,4 @@ spec:
   username: <host-username>
   password: <host-password>
   options:
-    "bridge": "br-test"
+    "bridge": "<bridge-name>"

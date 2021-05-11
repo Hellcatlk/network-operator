@@ -158,8 +158,8 @@ func (sp *SwitchPort) FetchOwnerReference(ctx context.Context, client client.Cli
 }
 
 // +kubebuilder:object:root=true
-// +kubebuilder:printcolumn:name="State",type="string",JSONPath=".status.state",description="state"
-// +kubebuilder:printcolumn:name="Error",type="string",JSONPath=".status.error",description="error"
+// +kubebuilder:printcolumn:name="STATE",type="string",JSONPath=".status.state",description="state"
+// +kubebuilder:printcolumn:name="ERROR",type="string",JSONPath=".status.error",description="error"
 
 // SwitchPort is the Schema for the switchports API
 type SwitchPort struct {
