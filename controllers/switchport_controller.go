@@ -61,8 +61,8 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 		return ctrl.Result{}, err
 	}
 
-	if len(instance.OwnerReferences) == 0 {
-		return result, fmt.Errorf("the OwnerReferences of instance mustn't be empty")
+	if len(instance.OwnerReferences) == 0 || instance.OwnerReferences[0].Kind != "Switch" {
+		return result, fmt.Errorf("the OwnerReferences[0] must exist, and it's must be \"Switch\"")
 	}
 
 	// Initialize state machine
@@ -88,17 +88,21 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 	if merr != nil {
 		err = merr.Error()
 		logger.Error(err, string(merr.Type()))
+		instance.Status.Error = fmt.Sprintf("%s: %s", string(merr.Type()), err)
+	} else {
+		instance.Status.Error = ""
 	}
 
+	// Only update switch port when it dirty
 	if dirty {
 		logger.Info("updating switch port")
-		// Update object
 		err = r.Update(ctx, instance)
 		if err != nil {
 			logger.Error(err, "update switch port failed")
 		}
 	}
 
+	// Set default requeue after time
 	if result.Requeue && result.RequeueAfter == 0 {
 		result.RequeueAfter = defaultRequeueAfterTime
 	}
