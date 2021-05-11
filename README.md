@@ -14,7 +14,7 @@
 
 |os|url|options|
 |:-|:-|:-|
-|openvswitch|ssh://\<host-ip>|"birdge":"\<birdge-name>"|
+|openvswitch|ssh://\<host-ip>|"birdge": "\<birdge-name>"|
 
 ## NOTE
 
