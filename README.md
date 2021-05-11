@@ -8,7 +8,7 @@
 1. Run `make install`
 2. Run `make run`
 
-**NOTE**: There are some examples under [examples](./examples)
+**NOTE**: There are some CR's examples under [examples](./examples)
 
 ## Supported backend
 
