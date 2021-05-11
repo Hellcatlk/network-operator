@@ -9,33 +9,19 @@ rules:
 - apiGroups:
   - ""
   resources:
-  - events
-  verbs:
-  - create
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  resources:
   - secrets
   verbs:
   - get
-  - list
-  - update
-  - watch
 - apiGroups:
   - metal3.io
   resources:
-  - switch
+  - switches
   verbs:
   - get
 - apiGroups:
   - metal3.io
   resources:
-  - switchportconfiguration
+  - switchportconfigurations
   verbs:
   - get
 - apiGroups:
