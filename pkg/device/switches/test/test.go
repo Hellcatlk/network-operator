@@ -5,10 +5,11 @@ import (
 
 	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device"
+	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/certificate"
 )
 
 // NewTest return test backend
-func NewTest(ctx context.Context, host string, username string, password string, options map[string]string) (sw device.Switch, err error) {
+func NewTest(ctx context.Context, host string, cert *certificate.Certificate, options map[string]string) (sw device.Switch, err error) {
 	return &Test{}, nil
 }
 

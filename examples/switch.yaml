@@ -5,8 +5,8 @@ metadata:
   name: switch-example-secret
 type: Opaque
 data:
-  username: <host-username>
-  password: <host-password>
+  username: <base64-host-username>
+  password: <base64-host-password>
 
 ---
 apiVersion: metal3.io/v1alpha1

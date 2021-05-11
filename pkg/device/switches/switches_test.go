@@ -3,6 +3,8 @@ package switches
 import (
 	"context"
 	"testing"
+
+	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/certificate"
 )
 
 func TestNew(t *testing.T) {
@@ -33,7 +35,7 @@ func TestNew(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			_, err := New(context.Background(), c.OS, c.URL, "", "", nil)
+			_, err := New(context.Background(), c.OS, c.URL, &certificate.Certificate{}, nil)
 			if (err != nil) != c.expectError {
 				t.Errorf("Got unexpected error: %v", err)
 			}
