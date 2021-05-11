@@ -19,6 +19,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -29,6 +30,8 @@ import (
 	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/machine"
 )
+
+const defaultRequeueAfterTime time.Duration = time.Second * 5
 
 // SwitchPortReconciler reconciles a SwitchPort object
 type SwitchPortReconciler struct {
@@ -96,6 +99,9 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 		}
 	}
 
+	if result.Requeue && result.RequeueAfter == 0 {
+		result.RequeueAfter = defaultRequeueAfterTime
+	}
 	return result, err
 }
 

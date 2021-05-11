@@ -39,7 +39,7 @@ func (r *SwitchPortReconciler) idleHandler(ctx context.Context, info *machine.Re
 	}
 
 	if i.Spec.ConfigurationRef == nil || len(i.OwnerReferences) == 0 {
-		return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, nil
+		return v1alpha1.SwitchPortIdle, ctrl.Result{}, nil
 	}
 
 	return v1alpha1.SwitchPortValidating, ctrl.Result{Requeue: true}, nil
