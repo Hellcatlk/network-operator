@@ -18,7 +18,7 @@ spec:
   bridge: "<bridge-name>"
   secret:
     name: switch-example-secret
-
+    namespace: default
 ---
 apiVersion: metal3.io/v1alpha1
 kind: Switch

@@ -10,4 +10,3 @@ metadata:
 spec:
   configurationRef:
     name: switchportconfiguration-example
-    namespace: metal3
