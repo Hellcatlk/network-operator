@@ -19,4 +19,4 @@
 ## NOTE
 
 1. Run `./tools/install_kubebuilder.sh`
-2. Use like `kubebuilder create api --group metal3.io --version v1alpha1 --kind NetworkConfiguration` add API
+2. Run `kubebuilder create api --group metal3.io --version v1alpha1 --kind <ResourceKind>` add API
