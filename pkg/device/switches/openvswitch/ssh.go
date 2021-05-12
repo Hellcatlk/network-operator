@@ -10,7 +10,7 @@ import (
 	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/certificate"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/ssh"
+	ussh "github.com/metal3-io/networkconfiguration-operator/pkg/utils/ssh"
 )
 
 // NewSSH return openvswitch ssh backend
@@ -19,7 +19,7 @@ func NewSSH(ctx context.Context, Host string, cert *certificate.Certificate, opt
 		return nil, fmt.Errorf("bridge of openvswitch cli backend is required")
 	}
 
-	return &SSH{
+	return &ssh{
 		Host:     Host,
 		username: cert.Username,
 		password: cert.Password,
@@ -28,7 +28,7 @@ func NewSSH(ctx context.Context, Host string, cert *certificate.Certificate, opt
 }
 
 // SSH control openvswitch by ssh and cli
-type SSH struct {
+type ssh struct {
 	Host     string
 	username string
 	password string
@@ -36,8 +36,8 @@ type SSH struct {
 }
 
 // PowerOn enable openvswitch
-func (c *SSH) PowerOn(ctx context.Context) (err error) {
-	err = ssh.Run(c.Host, c.username, c.password, exec.Command(
+func (c *ssh) PowerOn(ctx context.Context) (err error) {
+	err = ussh.Run(c.Host, c.username, c.password, exec.Command(
 		"ovs-vsctl", "list", "br", c.bridge,
 	)) // #nosec
 	if err != nil {
@@ -48,13 +48,13 @@ func (c *SSH) PowerOn(ctx context.Context) (err error) {
 }
 
 // PowerOff disable openvswitch
-func (c *SSH) PowerOff(ctx context.Context) (err error) {
+func (c *ssh) PowerOff(ctx context.Context) (err error) {
 	return
 }
 
 // GetPortAttr get the port's configure
-func (c *SSH) GetPortAttr(ctx context.Context, name string) (configuration *v1alpha1.SwitchPortConfiguration, err error) {
-	output, err := ssh.Output(c.Host, c.username, c.password, exec.Command(
+func (c *ssh) GetPortAttr(ctx context.Context, name string) (configuration *v1alpha1.SwitchPortConfiguration, err error) {
+	output, err := ussh.Output(c.Host, c.username, c.password, exec.Command(
 		"ovs-vsctl", "list", "port", name,
 		"|", "grep", "-E", "-w", "^tag",
 		"|", "grep", "-o", "[0-9]*",
@@ -80,7 +80,7 @@ func (c *SSH) GetPortAttr(ctx context.Context, name string) (configuration *v1al
 }
 
 // SetPortAttr set configure to the port
-func (c *SSH) SetPortAttr(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
+func (c *ssh) SetPortAttr(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
 	if configuration == nil {
 		return nil
 	}
@@ -89,7 +89,7 @@ func (c *SSH) SetPortAttr(ctx context.Context, name string, configuration *v1alp
 		return fmt.Errorf("vlans's len port of openvswitch is 1")
 	}
 
-	err = ssh.Run(c.Host, c.username, c.password, exec.Command(
+	err = ussh.Run(c.Host, c.username, c.password, exec.Command(
 		"ovs-vsctl", "set", "port", name, "tag="+strconv.Itoa(int(configuration.Spec.Vlans[0].ID)),
 	)) // #nosec
 	if err != nil {
@@ -100,7 +100,7 @@ func (c *SSH) SetPortAttr(ctx context.Context, name string, configuration *v1alp
 }
 
 // ResetPort remove all configure of the port
-func (c *SSH) ResetPort(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
+func (c *ssh) ResetPort(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
 	if configuration == nil {
 		return nil
 	}
@@ -109,7 +109,7 @@ func (c *SSH) ResetPort(ctx context.Context, name string, configuration *v1alpha
 		return fmt.Errorf("vlans's len port of openvswitch is 1")
 	}
 
-	err = ssh.Run(c.Host, c.username, c.password, exec.Command(
+	err = ussh.Run(c.Host, c.username, c.password, exec.Command(
 		"ovs-vsctl", "remove ", "port", name, "tag", strconv.Itoa(int(configuration.Spec.Vlans[0].ID)),
 	)) // #nosec
 	if err != nil {
