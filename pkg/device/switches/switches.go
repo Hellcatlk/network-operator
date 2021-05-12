@@ -11,7 +11,7 @@ import (
 	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/certificate"
 )
 
-type newType func(ctx context.Context, host string, cert *certificate.Certificate, options map[string]string) (sw device.Switch, err error)
+type newType func(ctx context.Context, ip string, cert *certificate.Certificate, options map[string]string) (sw device.Switch, err error)
 
 var news map[string]map[string]newType
 

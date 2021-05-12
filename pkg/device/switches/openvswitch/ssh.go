@@ -14,13 +14,13 @@ import (
 )
 
 // NewSSH return openvswitch ssh backend
-func NewSSH(ctx context.Context, address string, cert *certificate.Certificate, options map[string]string) (sw device.Switch, err error) {
+func NewSSH(ctx context.Context, ip string, cert *certificate.Certificate, options map[string]string) (sw device.Switch, err error) {
 	if len(options) == 0 || options["bridge"] == "" {
 		return nil, fmt.Errorf("bridge of openvswitch cli backend is required")
 	}
 
 	return &SSH{
-		address:  address,
+		ip:       ip,
 		username: cert.Username,
 		password: cert.Password,
 		bridge:   options["bridge"],
@@ -29,7 +29,7 @@ func NewSSH(ctx context.Context, address string, cert *certificate.Certificate, 
 
 // SSH control openvswitch by ssh and cli
 type SSH struct {
-	address  string
+	ip       string
 	username string
 	password string
 	bridge   string
@@ -37,7 +37,7 @@ type SSH struct {
 
 // PowerOn enable openvswitch
 func (c *SSH) PowerOn(ctx context.Context) (err error) {
-	err = ssh.Run(c.address, c.username, c.password, exec.Command(
+	err = ssh.Run(c.ip, c.username, c.password, exec.Command(
 		"ovs-vsctl", "list", "br", c.bridge,
 	)) // #nosec
 	if err != nil {
@@ -54,7 +54,7 @@ func (c *SSH) PowerOff(ctx context.Context) (err error) {
 
 // GetPortAttr get the port's configure
 func (c *SSH) GetPortAttr(ctx context.Context, name string) (configuration *v1alpha1.SwitchPortConfiguration, err error) {
-	output, err := ssh.Output(c.address, c.username, c.password, exec.Command(
+	output, err := ssh.Output(c.ip, c.username, c.password, exec.Command(
 		"ovs-vsctl", "list", "port", name,
 		"|", "grep", "-E", "-w", "^tag",
 		"|", "grep", "-o", "[0-9]*",
@@ -89,7 +89,7 @@ func (c *SSH) SetPortAttr(ctx context.Context, name string, configuration *v1alp
 		return fmt.Errorf("vlans's len port of openvswitch is 1")
 	}
 
-	err = ssh.Run(c.address, c.username, c.password, exec.Command(
+	err = ssh.Run(c.ip, c.username, c.password, exec.Command(
 		"ovs-vsctl", "set", "port", name, "tag="+strconv.Itoa(int(configuration.Spec.Vlans[0].ID)),
 	)) // #nosec
 	if err != nil {
@@ -109,7 +109,7 @@ func (c *SSH) ResetPort(ctx context.Context, name string, configuration *v1alpha
 		return fmt.Errorf("vlans's len port of openvswitch is 1")
 	}
 
-	err = ssh.Run(c.address, c.username, c.password, exec.Command(
+	err = ssh.Run(c.ip, c.username, c.password, exec.Command(
 		"ovs-vsctl", "remove ", "port", name, "tag", strconv.Itoa(int(configuration.Spec.Vlans[0].ID)),
 	)) // #nosec
 	if err != nil {
