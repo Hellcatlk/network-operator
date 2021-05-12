@@ -3,7 +3,7 @@ package device
 import (
 	"context"
 
-	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
+	"github.com/Hellcatlk/networkconfiguration-operator/api/v1alpha1"
 )
 
 // Switch is a interface for different protocol

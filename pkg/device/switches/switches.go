@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/metal3-io/networkconfiguration-operator/pkg/device"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/device/switches/openvswitch"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/device/switches/test"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/provider"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/certificate"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/device"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/device/switches/openvswitch"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/device/switches/test"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/provider"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/certificate"
 )
 
 type newType func(ctx context.Context, Host string, cert *certificate.Certificate, options map[string]string) (sw device.Switch, err error)

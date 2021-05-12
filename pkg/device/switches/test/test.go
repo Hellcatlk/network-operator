@@ -3,9 +3,9 @@ package test
 import (
 	"context"
 
-	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/device"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/certificate"
+	"github.com/Hellcatlk/networkconfiguration-operator/api/v1alpha1"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/device"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/certificate"
 )
 
 // NewTest return test backend

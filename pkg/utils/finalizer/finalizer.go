@@ -1,7 +1,7 @@
 package finalizer
 
 import (
-	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/stringslice"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/stringslice"
 )
 
 // Add create finalizer, must unique for every object.
