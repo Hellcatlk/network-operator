@@ -128,11 +128,11 @@ func TestSwitchPortStateMachine(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			if c.configurationRefExist {
-				instance.Spec.ConfigurationRef = &v1alpha1.SwitchPortConfigurationReference{
+				instance.Spec.Configuration = &v1alpha1.SwitchPortConfigurationReference{
 					Name: "SwitchPortConfiguration",
 				}
 			} else {
-				instance.Spec.ConfigurationRef = nil
+				instance.Spec.Configuration = nil
 			}
 
 			if c.deletionTimestampExist {

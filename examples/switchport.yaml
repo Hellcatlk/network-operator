@@ -8,5 +8,5 @@ metadata:
       name: switch-example
       uid: <switch-uuid>
 spec:
-  configurationRef:
+  configuration:
     name: switchportconfiguration-example
