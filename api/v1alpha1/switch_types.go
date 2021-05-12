@@ -17,8 +17,14 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+	"fmt"
+
+	"github.com/metal3-io/networkconfiguration-operator/pkg/provider"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // Port indicates the specific restriction on the port
@@ -37,21 +43,76 @@ type Port struct {
 	VlanRange string `json:"vlanRange,omitempty"`
 }
 
+// ProviderSwitchRef is the reference for ProviderSwitch CR
+type ProviderSwitchRef struct {
+	Kind string `json:"kind"`
+
+	Name string `json:"name"`
+
+	// If empty use default namespace.
+	// +kubebuilder:default:="default"
+	Namespace string `json:"namespace,omitempty"`
+}
+
+type testSwitch struct {
+}
+
+// GetOS  return switch's os
+func (s *testSwitch) GetOS() string {
+	return "test"
+}
+
+// GetProtocol return switch's protocol
+func (s *testSwitch) GetProtocol() string {
+	return "test"
+}
+
+// GetHost return switch's host
+func (s *testSwitch) GetHost() string {
+	return ""
+}
+
+// GetSecret return switch's certificate secret reference
+func (s *testSwitch) GetSecret() *corev1.SecretReference {
+	return &corev1.SecretReference{}
+}
+
+// GetOptions return switch's options
+func (s *testSwitch) GetOptions() map[string]string {
+	return nil
+}
+
+// Fetch the instance
+func (ref *ProviderSwitchRef) Fetch(ctx context.Context, client client.Client) (instance provider.Switch, err error) {
+	if ref == nil {
+		return nil, fmt.Errorf("provider switch reference is nil")
+	}
+
+	switch ref.Kind {
+	case "TestSwitch":
+		instance = &testSwitch{}
+	case "OVSSwitch":
+		ps := &OVSSwitch{}
+		err = client.Get(
+			ctx,
+			types.NamespacedName{
+				Name:      ref.Name,
+				Namespace: ref.Namespace,
+			},
+			ps,
+		)
+		instance = ps
+	default:
+		err = fmt.Errorf("unknown provider switch kind")
+	}
+
+	return instance, err
+}
+
 // SwitchSpec defines the desired state of Switch
 type SwitchSpec struct {
-	// The type of OS this switch runs
-	OS string `json:"os"`
-
-	// The url of switch
-	URL string `json:"url"`
-
-	// Include somethings need by different backend
-	// For openvswitch cli backend, the value of options is:
-	// "bridge": "<bridge-name>"
-	Options map[string]string `json:"options,omitempty"`
-
-	// The secret containing the switch credentials
-	Secret *corev1.SecretReference `json:"secret,omitempty"`
+	// Reference of provider switch
+	ProviderSwitch *ProviderSwitchRef `json:"providerSwitch,omitempty"`
 
 	// Restricted ports in the switch
 	Ports map[string]Port `json:"ports,omitempty"`

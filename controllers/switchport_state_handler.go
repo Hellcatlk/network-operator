@@ -8,7 +8,7 @@ import (
 	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device/switches"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/machine"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/certificate"
+	"github.com/metal3-io/networkconfiguration-operator/pkg/provider"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/finalizer"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -68,12 +68,17 @@ func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *mac
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	cert, err := certificate.Fetch(ctx, info.Client, owner.Spec.Secret)
+	providerSwitch, err := owner.Spec.ProviderSwitch.Fetch(ctx, info.Client)
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	sw, err := switches.New(ctx, owner.Spec.OS, owner.Spec.URL, cert, owner.Spec.Options)
+	config, err := provider.FromSwitch(ctx, info.Client, providerSwitch)
+	if err != nil {
+		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+	}
+
+	sw, err := switches.New(ctx, config)
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
@@ -113,12 +118,17 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	cert, err := certificate.Fetch(ctx, info.Client, owner.Spec.Secret)
+	providerSwitch, err := owner.Spec.ProviderSwitch.Fetch(ctx, info.Client)
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	sw, err := switches.New(ctx, owner.Spec.OS, owner.Spec.URL, cert, owner.Spec.Options)
+	config, err := provider.FromSwitch(ctx, info.Client, providerSwitch)
+	if err != nil {
+		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+	}
+
+	sw, err := switches.New(ctx, config)
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
@@ -144,12 +154,17 @@ func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machin
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	cert, err := certificate.Fetch(ctx, info.Client, owner.Spec.Secret)
+	providerSwitch, err := owner.Spec.ProviderSwitch.Fetch(ctx, info.Client)
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	sw, err := switches.New(ctx, owner.Spec.OS, owner.Spec.URL, cert, owner.Spec.Options)
+	config, err := provider.FromSwitch(ctx, info.Client, providerSwitch)
+	if err != nil {
+		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+	}
+
+	sw, err := switches.New(ctx, config)
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}

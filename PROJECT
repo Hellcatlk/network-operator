@@ -9,4 +9,7 @@ resources:
 - group: metal3.io
   kind: SwitchPort
   version: v1alpha1
+- group: metal3.io
+  kind: OVSSwitch
+  version: v1alpha1
 version: "2"

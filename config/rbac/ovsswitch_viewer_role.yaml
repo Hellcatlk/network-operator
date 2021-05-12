@@ -1,0 +1,20 @@
+# permissions for end users to view ovsswitches.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ovsswitch-viewer-role
+rules:
+- apiGroups:
+  - metal3.io
+  resources:
+  - ovsswitches
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - metal3.io
+  resources:
+  - ovsswitches/status
+  verbs:
+  - get

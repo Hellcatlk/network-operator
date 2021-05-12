@@ -9,7 +9,7 @@ import (
 )
 
 // NewTest return test backend
-func NewTest(ctx context.Context, ip string, cert *certificate.Certificate, options map[string]string) (sw device.Switch, err error) {
+func NewTest(ctx context.Context, Host string, cert *certificate.Certificate, options map[string]string) (sw device.Switch, err error) {
 	return &Test{}, nil
 }
 
