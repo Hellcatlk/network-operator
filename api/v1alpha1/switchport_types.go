@@ -26,8 +26,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// SwitchPortConfigurationRef is the reference for Configuration CR
-type SwitchPortConfigurationRef struct {
+// SwitchPortReference is the reference for SwitchPort CR
+type SwitchPortReference struct {
 	Name string `json:"name"`
 
 	// If empty use default namespace.
@@ -36,7 +36,35 @@ type SwitchPortConfigurationRef struct {
 }
 
 // Fetch the instance
-func (ref *SwitchPortConfigurationRef) Fetch(ctx context.Context, client client.Client) (instance *SwitchPortConfiguration, err error) {
+func (ref *SwitchPortReference) Fetch(ctx context.Context, client client.Client) (instance *SwitchPort, err error) {
+	if ref == nil {
+		return nil, fmt.Errorf("switch port configuration reference is nil")
+	}
+
+	instance = &SwitchPort{}
+	err = client.Get(
+		ctx,
+		types.NamespacedName{
+			Name:      ref.Name,
+			Namespace: ref.Namespace,
+		},
+		instance,
+	)
+
+	return
+}
+
+// SwitchPortConfigurationReference is the reference for SwitchPortConfiguration CR
+type SwitchPortConfigurationReference struct {
+	Name string `json:"name"`
+
+	// If empty use default namespace.
+	// +kubebuilder:default:="default"
+	Namespace string `json:"namespace,omitempty"`
+}
+
+// Fetch the instance
+func (ref *SwitchPortConfigurationReference) Fetch(ctx context.Context, client client.Client) (instance *SwitchPortConfiguration, err error) {
 	if ref == nil {
 		return nil, fmt.Errorf("switch port configuration reference is nil")
 	}
@@ -57,7 +85,7 @@ func (ref *SwitchPortConfigurationRef) Fetch(ctx context.Context, client client.
 // SwitchPortSpec defines the desired state of SwitchPort
 type SwitchPortSpec struct {
 	// Reference for PortConfiguration CR.
-	ConfigurationRef *SwitchPortConfigurationRef `json:"configurationRef,omitempty"`
+	ConfigurationRef *SwitchPortConfigurationReference `json:"configurationRef,omitempty"`
 }
 
 // SwitchPortStatus defines the observed state of SwitchPort
