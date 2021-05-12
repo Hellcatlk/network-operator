@@ -40,6 +40,7 @@ type SwitchPortReconciler struct {
 	Scheme *runtime.Scheme
 }
 
+// +kubebuilder:rbac:groups=metal3.io,resources=ovsswitches,verbs=get
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get
 // +kubebuilder:rbac:groups=metal3.io,resources=switches,verbs=get
 // +kubebuilder:rbac:groups=metal3.io,resources=switchportconfigurations,verbs=get
