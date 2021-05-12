@@ -12,9 +12,9 @@
 
 ## Supported backend
 
-|provider switch|
-|:-|
-|OVSSwitch|
+|provider switch|os|protocol|
+|:-|:-|:-|
+|OVSSwitch|openvswitch|ssh|
 
 ## NOTE
 
