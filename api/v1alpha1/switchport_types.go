@@ -38,7 +38,7 @@ type SwitchPortConfigurationRef struct {
 // Fetch the instance
 func (ref *SwitchPortConfigurationRef) Fetch(ctx context.Context, client client.Client) (instance *SwitchPortConfiguration, err error) {
 	if ref == nil {
-		return nil, fmt.Errorf("reference is nil")
+		return nil, fmt.Errorf("switch port configuration reference is nil")
 	}
 
 	instance = &SwitchPortConfiguration{}
@@ -105,7 +105,7 @@ func (sp *SwitchPort) SetState(state machine.StateType) {
 // FetchOwnerReference fetch OwnerReference[0]
 func (sp *SwitchPort) FetchOwnerReference(ctx context.Context, client client.Client) (instance *Switch, err error) {
 	if sp == nil || len(sp.OwnerReferences) == 0 {
-		return nil, fmt.Errorf("reference is nil")
+		return nil, fmt.Errorf("switch port reference is nil")
 	}
 
 	instance = &Switch{}

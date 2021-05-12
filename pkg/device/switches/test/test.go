@@ -9,35 +9,35 @@ import (
 )
 
 // NewTest return test backend
-func NewTest(ctx context.Context, host string, cert *certificate.Certificate, options map[string]string) (sw device.Switch, err error) {
-	return &Test{}, nil
+func NewTest(ctx context.Context, Host string, cert *certificate.Certificate, options map[string]string) (sw device.Switch, err error) {
+	return &test{}, nil
 }
 
 // Test just for test
-type Test struct {
+type test struct {
 }
 
 // PowerOn just for test
-func (t *Test) PowerOn(ctx context.Context) (err error) {
+func (t *test) PowerOn(ctx context.Context) (err error) {
 	return
 }
 
 // PowerOff just for test
-func (t *Test) PowerOff(ctx context.Context) (err error) {
+func (t *test) PowerOff(ctx context.Context) (err error) {
 	return
 }
 
 // GetPortAttr just for test
-func (t *Test) GetPortAttr(ctx context.Context, name string) (configuration *v1alpha1.SwitchPortConfiguration, err error) {
+func (t *test) GetPortAttr(ctx context.Context, name string) (configuration *v1alpha1.SwitchPortConfiguration, err error) {
 	return &v1alpha1.SwitchPortConfiguration{}, nil
 }
 
 // SetPortAttr just for test
-func (t *Test) SetPortAttr(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
+func (t *test) SetPortAttr(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
 	return
 }
 
 // ResetPort just for test
-func (t *Test) ResetPort(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
+func (t *test) ResetPort(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
 	return
 }

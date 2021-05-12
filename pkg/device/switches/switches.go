@@ -3,15 +3,15 @@ package switches
 import (
 	"context"
 	"fmt"
-	"net/url"
 
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device/switches/openvswitch"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/device/switches/test"
+	"github.com/metal3-io/networkconfiguration-operator/pkg/provider"
 	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/certificate"
 )
 
-type newType func(ctx context.Context, host string, cert *certificate.Certificate, options map[string]string) (sw device.Switch, err error)
+type newType func(ctx context.Context, Host string, cert *certificate.Certificate, options map[string]string) (sw device.Switch, err error)
 
 var news map[string]map[string]newType
 
@@ -33,19 +33,16 @@ func Register(os string, protocolType string, new newType) {
 }
 
 // New return a implementation of switch interface
-func New(ctx context.Context, os string, rawurl string, cert *certificate.Certificate, options map[string]string) (sw device.Switch, err error) {
-	u, err := url.Parse(rawurl)
-	if err != nil {
-		return nil, err
+func New(ctx context.Context, config *provider.Config) (sw device.Switch, err error) {
+
+	if news[config.OS] == nil {
+		return nil, fmt.Errorf("invalid OS %s", config.OS)
 	}
 
-	if news[os] == nil {
-		return nil, fmt.Errorf("invalid OS %s", os)
-	}
-
-	new := news[os][u.Scheme]
+	new := news[config.OS][config.Protocol]
 	if new == nil {
-		return nil, fmt.Errorf("invalid scheme %s", u.Scheme)
+		return nil, fmt.Errorf("invalid protocol %s", config.Protocol)
 	}
-	return new(ctx, u.Host, cert, options)
+
+	return new(ctx, config.Host, config.Cert, config.Options)
 }

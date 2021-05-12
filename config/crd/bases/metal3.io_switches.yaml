@@ -32,14 +32,6 @@ spec:
           spec:
             description: SwitchSpec defines the desired state of Switch
             properties:
-              options:
-                additionalProperties:
-                  type: string
-                description: 'Include somethings need by different backend For openvswitch cli backend, the value of options is: "bridge": "<bridge-name>"'
-                type: object
-              os:
-                description: The type of OS this switch runs
-                type: string
               ports:
                 additionalProperties:
                   description: Port indicates the specific restriction on the port
@@ -60,22 +52,21 @@ spec:
                   type: object
                 description: Restricted ports in the switch
                 type: object
-              secret:
-                description: The secret containing the switch credentials
+              providerSwitch:
+                description: Reference of provider switch
                 properties:
+                  kind:
+                    type: string
                   name:
-                    description: Name is unique within a namespace to reference a secret resource.
                     type: string
                   namespace:
-                    description: Namespace defines the space within which the secret name must be unique.
+                    default: default
+                    description: If empty use default namespace.
                     type: string
+                required:
+                - kind
+                - name
                 type: object
-              url:
-                description: The url of switch
-                type: string
-            required:
-            - os
-            - url
             type: object
           status:
             description: SwitchStatus defines the observed state of Switch
