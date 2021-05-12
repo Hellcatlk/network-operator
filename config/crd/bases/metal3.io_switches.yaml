@@ -53,7 +53,7 @@ spec:
                 description: Restricted ports in the switch
                 type: object
               providerSwitch:
-                description: Reference of provider switch
+                description: The reference of provider switch
                 properties:
                   kind:
                     type: string

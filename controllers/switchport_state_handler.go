@@ -39,12 +39,12 @@ func (r *SwitchPortReconciler) idleHandler(ctx context.Context, info *machine.Re
 		return v1alpha1.SwitchPortDeleting, ctrl.Result{Requeue: true}, nil
 	}
 
-	if i.Spec.ConfigurationRef == nil || len(i.OwnerReferences) == 0 {
+	if i.Spec.Configuration == nil || len(i.OwnerReferences) == 0 {
 		return v1alpha1.SwitchPortIdle, ctrl.Result{}, nil
 	}
 
 	// Copy configuration to Status.Configuration
-	configuration, err := i.Spec.ConfigurationRef.Fetch(ctx, info.Client)
+	configuration, err := i.Spec.Configuration.Fetch(ctx, info.Client)
 	if err != nil {
 		return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
@@ -59,7 +59,7 @@ func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *mac
 
 	i := instance.(*v1alpha1.SwitchPort)
 
-	if !i.DeletionTimestamp.IsZero() || i.Spec.ConfigurationRef == nil {
+	if !i.DeletionTimestamp.IsZero() || i.Spec.Configuration == nil {
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true}, nil
 	}
 
@@ -99,11 +99,11 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 
 	i := instance.(*v1alpha1.SwitchPort)
 
-	if !i.DeletionTimestamp.IsZero() || i.Spec.ConfigurationRef == nil {
+	if !i.DeletionTimestamp.IsZero() || i.Spec.Configuration == nil {
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true}, nil
 	}
 
-	configuration, err := i.Spec.ConfigurationRef.Fetch(ctx, info.Client)
+	configuration, err := i.Spec.Configuration.Fetch(ctx, info.Client)
 	if err != nil {
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
