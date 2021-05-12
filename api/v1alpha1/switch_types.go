@@ -20,7 +20,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/metal3-io/networkconfiguration-operator/pkg/provider"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/provider"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"

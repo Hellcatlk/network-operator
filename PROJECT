@@ -1,4 +1,4 @@
-repo: github.com/metal3-io/networkconfiguration-operator
+repo: github.com/Hellcatlk/networkconfiguration-operator
 resources:
 - group: metal3.io
   kind: Switch

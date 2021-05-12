@@ -5,11 +5,11 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/metal3-io/networkconfiguration-operator/api/v1alpha1"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/device/switches"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/machine"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/provider"
-	"github.com/metal3-io/networkconfiguration-operator/pkg/utils/finalizer"
+	"github.com/Hellcatlk/networkconfiguration-operator/api/v1alpha1"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/device/switches"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/machine"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/provider"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/finalizer"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )

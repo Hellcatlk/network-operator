@@ -1,4 +1,4 @@
-module github.com/metal3-io/networkconfiguration-operator
+module github.com/Hellcatlk/networkconfiguration-operator
 
 go 1.13
 
