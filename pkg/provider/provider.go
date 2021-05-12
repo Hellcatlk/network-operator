@@ -41,6 +41,7 @@ func FromSwitch(ctx context.Context, client client.Client, sw Switch) (*Config, 
 	if err != nil {
 		return nil, err
 	}
+
 	return &Config{
 		OS:       sw.GetOS(),
 		Protocol: sw.GetProtocol(),
