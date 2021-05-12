@@ -79,9 +79,6 @@ const (
 	// SwitchPortIdle means we are wait for configuration for the port
 	SwitchPortIdle machine.StateType = "Idle"
 
-	// SwitchPortValidating means we are validating the connection for network device
-	SwitchPortValidating machine.StateType = "Validating"
-
 	// SwitchPortConfiguring means we are removing configuration from the port
 	SwitchPortConfiguring machine.StateType = "Configuring"
 

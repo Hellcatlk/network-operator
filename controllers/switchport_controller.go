@@ -77,7 +77,6 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 		&machine.Handlers{
 			v1alpha1.SwitchPortNone:        r.noneHandler,
 			v1alpha1.SwitchPortIdle:        r.idleHandler,
-			v1alpha1.SwitchPortValidating:  r.validatingandler,
 			v1alpha1.SwitchPortConfiguring: r.configuringHandler,
 			v1alpha1.SwitchPortActive:      r.activeHandler,
 			v1alpha1.SwitchPortCleaning:    r.cleaningHandler,

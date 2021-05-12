@@ -43,16 +43,6 @@ func (r *SwitchPortReconciler) idleHandler(ctx context.Context, info *machine.Re
 		return v1alpha1.SwitchPortIdle, ctrl.Result{}, nil
 	}
 
-	return v1alpha1.SwitchPortValidating, ctrl.Result{Requeue: true}, nil
-}
-
-func (r *SwitchPortReconciler) validatingandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
-	info.Logger.Info("validating")
-
-	i := instance.(*v1alpha1.SwitchPort)
-
-	// TODO: Check connection with switch
-
 	// Copy configuration to Status.Configuration
 	configuration, err := i.Spec.ConfigurationRef.Fetch(ctx, info.Client)
 	if err != nil {

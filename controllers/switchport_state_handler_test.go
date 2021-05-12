@@ -59,7 +59,6 @@ func TestSwitchPortStateMachine(t *testing.T) {
 		&machine.Handlers{
 			v1alpha1.SwitchPortNone:        r.noneHandler,
 			v1alpha1.SwitchPortIdle:        r.idleHandler,
-			v1alpha1.SwitchPortValidating:  r.validatingandler,
 			v1alpha1.SwitchPortConfiguring: r.configuringHandler,
 			v1alpha1.SwitchPortActive:      r.activeHandler,
 			v1alpha1.SwitchPortCleaning:    r.cleaningHandler,
@@ -86,13 +85,7 @@ func TestSwitchPortStateMachine(t *testing.T) {
 			expectedState: v1alpha1.SwitchPortIdle,
 		},
 		{
-			name:                  "Idle -> Validating",
-			configurationRefExist: true,
-			expectedDirty:         true,
-			expectedState:         v1alpha1.SwitchPortValidating,
-		},
-		{
-			name:                  "Validating -> Configuring",
+			name:                  "Idle -> Configuring",
 			configurationRefExist: true,
 			expectedDirty:         true,
 			expectedState:         v1alpha1.SwitchPortConfiguring,
