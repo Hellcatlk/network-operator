@@ -32,9 +32,24 @@ spec:
           spec:
             description: OVSSwitchSpec defines the desired state of OVSSwitch
             properties:
-              foo:
-                description: Foo is an example field of OVSSwitch. Edit OVSSwitch_types.go to remove/update
+              bridge:
                 type: string
+              host:
+                type: string
+              secret:
+                description: The secret containing the switch credentials
+                properties:
+                  name:
+                    description: Name is unique within a namespace to reference a secret resource.
+                    type: string
+                  namespace:
+                    description: Namespace defines the space within which the secret name must be unique.
+                    type: string
+                type: object
+            required:
+            - bridge
+            - host
+            - secret
             type: object
           status:
             description: OVSSwitchStatus defines the observed state of OVSSwitch
