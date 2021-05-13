@@ -16,7 +16,7 @@
 |:-|:-|:-|
 |OVSSwitch|openvswitch|ssh|
 
-## NOTE
+## Notes
 
-1. Run `./tools/install_kubebuilder.sh`
+1. Run `./tools/install_kubebuilder.sh` to install kubebuilder
 2. Run `kubebuilder create api --group metal3.io --version v1alpha1 --kind <ResourceKind>` add API
