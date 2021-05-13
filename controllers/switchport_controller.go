@@ -89,7 +89,7 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 	dirty, result, merr := m.Reconcile(ctx)
 	if merr != nil {
 		logger.Error(merr.Error(), string(merr.Type()))
-		instance.Status.Error = fmt.Sprintf("%s: %s", string(merr.Type()), err)
+		instance.Status.Error = fmt.Sprintf("%s: %s", string(merr.Type()), merr.Error())
 	} else {
 		instance.Status.Error = ""
 	}
