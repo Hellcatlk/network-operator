@@ -45,6 +45,8 @@ type ACL struct {
 // VLAN represents the name and ID of a VLAN
 type VLAN struct {
 	// VLANID is a 12-bit 802.1Q VLAN identifier
+	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:validation:Maximum=4094
 	ID int `json:"id"`
 
 	Name string `json:"name,omitempty"`
