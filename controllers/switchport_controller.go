@@ -90,7 +90,7 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 	var errorMessage string
 	if merr != nil {
 		logger.Error(merr.Error(), string(merr.Type()))
-		errorMessage = fmt.Sprintf("%s: %s", string(merr.Type()), merr.Error())
+		errorMessage = fmt.Sprintf("%s: %s", merr.Type(), merr.Error())
 	}
 
 	// Only update switch port when it dirty
