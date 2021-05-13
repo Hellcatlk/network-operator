@@ -30,9 +30,9 @@ type ReconcileInfo struct {
 // Instance is a object for the CR need be reconcile
 // NOTE: Instance must be a pointer
 type Instance interface {
+	runtime.Object
 	GetState() StateType
 	SetState(state StateType)
-	runtime.Object
 }
 
 // Handlers includes a lot of handler

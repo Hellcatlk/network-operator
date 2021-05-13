@@ -60,7 +60,7 @@ func (c *ssh) GetPortAttr(ctx context.Context, name string) (configuration *v1al
 		"|", "grep", "-o", "[0-9]*",
 	)) // #nosec
 	if err != nil {
-		return nil, fmt.Errorf("get port failed: %v", err)
+		return nil, fmt.Errorf("get port failed: %s[%v]", output, err)
 	}
 
 	id, err := strconv.Atoi(strings.Trim(string(output), "\n"))
@@ -89,11 +89,11 @@ func (c *ssh) SetPortAttr(ctx context.Context, name string, configuration *v1alp
 		return fmt.Errorf("vlans's len port of openvswitch is 1")
 	}
 
-	err = ussh.Run(c.Host, c.username, c.password, exec.Command(
+	output, err := ussh.Output(c.Host, c.username, c.password, exec.Command(
 		"ovs-vsctl", "set", "port", name, "tag="+strconv.Itoa(int(configuration.Spec.Vlans[0].ID)),
 	)) // #nosec
 	if err != nil {
-		return fmt.Errorf("set port failed: %v", err)
+		return fmt.Errorf("set port failed: %s[%v]", output, err)
 	}
 
 	return nil
@@ -109,11 +109,11 @@ func (c *ssh) ResetPort(ctx context.Context, name string, configuration *v1alpha
 		return fmt.Errorf("vlans's len port of openvswitch is 1")
 	}
 
-	err = ussh.Run(c.Host, c.username, c.password, exec.Command(
+	output, err := ussh.Output(c.Host, c.username, c.password, exec.Command(
 		"ovs-vsctl", "remove ", "port", name, "tag", strconv.Itoa(int(configuration.Spec.Vlans[0].ID)),
 	)) // #nosec
 	if err != nil {
-		return fmt.Errorf("set port failed: %v", err)
+		return fmt.Errorf("set port failed: %s[%v]", output, err)
 	}
 
 	return nil
