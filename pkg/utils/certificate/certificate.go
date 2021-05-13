@@ -16,17 +16,17 @@ type Certificate struct {
 }
 
 // Fetch secret
-func Fetch(ctx context.Context, client client.Client, ref *corev1.SecretReference) (*Certificate, error) {
-	if ref == nil {
-		return nil, fmt.Errorf("reference is nil")
+func Fetch(ctx context.Context, client client.Client, secretRef *corev1.SecretReference) (*Certificate, error) {
+	if secretRef == nil {
+		return nil, fmt.Errorf("secret reference is nil")
 	}
 
 	instance := &corev1.Secret{}
 	err := client.Get(
 		ctx,
 		types.NamespacedName{
-			Name:      ref.Name,
-			Namespace: ref.Namespace,
+			Name:      secretRef.Name,
+			Namespace: secretRef.Namespace,
 		},
 		instance,
 	)
