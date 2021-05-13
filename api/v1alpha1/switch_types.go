@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	"github.com/Hellcatlk/networkconfiguration-operator/pkg/provider"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -54,34 +53,6 @@ type ProviderSwitchRef struct {
 	Namespace string `json:"namespace,omitempty"`
 }
 
-type testSwitch struct {
-}
-
-// GetOS  return switch's os
-func (s *testSwitch) GetOS() string {
-	return "test"
-}
-
-// GetProtocol return switch's protocol
-func (s *testSwitch) GetProtocol() string {
-	return "test"
-}
-
-// GetHost return switch's host
-func (s *testSwitch) GetHost() string {
-	return ""
-}
-
-// GetSecret return switch's certificate secret reference
-func (s *testSwitch) GetSecret() *corev1.SecretReference {
-	return &corev1.SecretReference{}
-}
-
-// GetOptions return switch's options
-func (s *testSwitch) GetOptions() map[string]string {
-	return nil
-}
-
 // Fetch the instance
 func (ref *ProviderSwitchRef) Fetch(ctx context.Context, client client.Client) (instance provider.Switch, err error) {
 	if ref == nil {
@@ -90,7 +61,7 @@ func (ref *ProviderSwitchRef) Fetch(ctx context.Context, client client.Client) (
 
 	switch ref.Kind {
 	case "TestSwitch":
-		instance = &testSwitch{}
+		instance = &provider.TestSwitch{}
 	case "OVSSwitch":
 		ps := &OVSSwitch{}
 		err = client.Get(

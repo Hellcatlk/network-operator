@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/certificate"
 	corev1 "k8s.io/api/core/v1"
@@ -37,6 +38,10 @@ type Switch interface {
 
 // FromSwitch get config from provider switch
 func FromSwitch(ctx context.Context, client client.Client, sw Switch) (*Config, error) {
+	if sw == nil {
+		return nil, fmt.Errorf("provider switch is nil")
+	}
+
 	cert, err := certificate.Fetch(ctx, client, sw.GetSecret())
 	if err != nil {
 		return nil, err
