@@ -332,6 +332,11 @@ func (in *SwitchPortConfigurationSpec) DeepCopyInto(out *SwitchPortConfiguration
 		*out = make([]ACL, len(*in))
 		copy(*out, *in)
 	}
+	if in.UntaggedVLAN != nil {
+		in, out := &in.UntaggedVLAN, &out.UntaggedVLAN
+		*out = new(int)
+		**out = **in
+	}
 	if in.Vlans != nil {
 		in, out := &in.Vlans, &out.Vlans
 		*out = make([]VLAN, len(*in))
