@@ -86,7 +86,7 @@ func (m *Machine) Reconcile(ctx context.Context) (dirty bool, result ctrl.Result
 		if err != nil {
 			merr = &Error{
 				errType: HandlerError,
-				err:     fmt.Errorf("handler panic: %v", err),
+				err:     fmt.Errorf("handler panic on %s state: %s", m.instance.GetState(), err),
 			}
 		}
 	}()
@@ -108,7 +108,7 @@ func (m *Machine) Reconcile(ctx context.Context) (dirty bool, result ctrl.Result
 	if !exist {
 		return dirty, result, &Error{
 			errType: ReconcileError,
-			err:     fmt.Errorf("no handler for the state(%v)", m.instance.GetState()),
+			err:     fmt.Errorf("no handler for the state(%s)", m.instance.GetState()),
 		}
 	}
 
@@ -123,7 +123,7 @@ func (m *Machine) Reconcile(ctx context.Context) (dirty bool, result ctrl.Result
 		}
 	}
 
-	// Check instance need update or not
+	// Check instance is dirty or not
 	if !reflect.DeepEqual(m.instance, instanceDeepCopy) {
 		dirty = true
 	}
