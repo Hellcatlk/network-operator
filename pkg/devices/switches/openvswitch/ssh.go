@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -41,7 +42,7 @@ func (c *ssh) PowerOn(ctx context.Context) (err error) {
 		"ovs-vsctl", "list", "br", c.bridge,
 	)) // #nosec
 	if err != nil {
-		return fmt.Errorf("check birdge failed: %v", err)
+		return fmt.Errorf("check birdge failed: %s", err)
 	}
 
 	return nil
@@ -60,7 +61,7 @@ func (c *ssh) GetPortAttr(ctx context.Context, name string) (configuration *v1al
 		"|", "grep", "-o", "[0-9]*",
 	)) // #nosec
 	if err != nil {
-		return nil, fmt.Errorf("get port failed: %s[%v]", output, err)
+		return nil, fmt.Errorf("get port failed: %s[%s]", output, err)
 	}
 
 	id, err := strconv.Atoi(strings.Trim(string(output), "\n"))
@@ -89,7 +90,16 @@ func (c *ssh) SetPortAttr(ctx context.Context, name string, configuration *v1alp
 		"ovs-vsctl", "set", "port", name, "tag="+strconv.Itoa(*configuration.Spec.UntaggedVLAN),
 	)) // #nosec
 	if err != nil {
-		return fmt.Errorf("set port failed: %s[%v]", output, err)
+		return fmt.Errorf("set port failed: %s[%s]", output, err)
+	}
+
+	actualConfiguration, err := c.GetPortAttr(ctx, name)
+	if err != nil {
+		return fmt.Errorf("get port failed: %s", err)
+	}
+
+	if !reflect.DeepEqual(configuration, actualConfiguration) {
+		return fmt.Errorf("set port failed: the actual configuration is inconsistent with the target configuration")
 	}
 
 	return nil
@@ -109,7 +119,7 @@ func (c *ssh) ResetPort(ctx context.Context, name string, configuration *v1alpha
 		"ovs-vsctl", "remove ", "port", name, "tag", strconv.Itoa(*configuration.Spec.UntaggedVLAN),
 	)) // #nosec
 	if err != nil {
-		return fmt.Errorf("set port failed: %s[%v]", output, err)
+		return fmt.Errorf("set port failed: %s[%s]", output, err)
 	}
 
 	return nil
