@@ -8,13 +8,13 @@ import (
 	"strings"
 
 	"github.com/Hellcatlk/networkconfiguration-operator/api/v1alpha1"
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/device"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/devices"
 	"github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/certificate"
 	ussh "github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/ssh"
 )
 
 // NewSSH return openvswitch ssh backend
-func NewSSH(ctx context.Context, Host string, cert *certificate.Certificate, options map[string]string) (sw device.Switch, err error) {
+func NewSSH(ctx context.Context, Host string, cert *certificate.Certificate, options map[string]string) (sw devices.Switch, err error) {
 	if len(options) == 0 || options["bridge"] == "" {
 		return nil, fmt.Errorf("bridge of openvswitch cli backend is required")
 	}

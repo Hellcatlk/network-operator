@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/Hellcatlk/networkconfiguration-operator/api/v1alpha1"
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/device/switches"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/devices/switches"
 	"github.com/Hellcatlk/networkconfiguration-operator/pkg/machine"
 	"github.com/Hellcatlk/networkconfiguration-operator/pkg/provider"
 	"github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/finalizer"

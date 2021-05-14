@@ -4,14 +4,14 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/device"
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/device/switches/openvswitch"
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/device/switches/test"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/devices"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/devices/switches/openvswitch"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/devices/switches/test"
 	"github.com/Hellcatlk/networkconfiguration-operator/pkg/provider"
 	"github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/certificate"
 )
 
-type newType func(ctx context.Context, Host string, cert *certificate.Certificate, options map[string]string) (sw device.Switch, err error)
+type newType func(ctx context.Context, Host string, cert *certificate.Certificate, options map[string]string) (sw devices.Switch, err error)
 
 var news map[string]map[string]newType
 
@@ -33,7 +33,7 @@ func Register(os string, protocolType string, new newType) {
 }
 
 // New return a implementation of switch interface
-func New(ctx context.Context, config *provider.Config) (sw device.Switch, err error) {
+func New(ctx context.Context, config *provider.Config) (sw devices.Switch, err error) {
 
 	if news[config.OS] == nil {
 		return nil, fmt.Errorf("invalid OS %s", config.OS)
