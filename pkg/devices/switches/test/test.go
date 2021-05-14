@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/Hellcatlk/networkconfiguration-operator/api/v1alpha1"
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/device"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/devices"
 	"github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/certificate"
 )
 
 // NewTest return test backend
-func NewTest(ctx context.Context, Host string, cert *certificate.Certificate, options map[string]string) (sw device.Switch, err error) {
+func NewTest(ctx context.Context, Host string, cert *certificate.Certificate, options map[string]string) (sw devices.Switch, err error) {
 	return &test{}, nil
 }
 
