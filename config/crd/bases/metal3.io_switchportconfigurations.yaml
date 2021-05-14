@@ -70,10 +70,12 @@ spec:
                 description: Disable port
                 type: boolean
               untaggedVLAN:
-                description: The untagged vlan's index in vlans
+                description: Untagged vlan's vlan id. If untaggedVLAN isn't nil, the port's mode is `access`
+                maximum: 4094
+                minimum: 0
                 type: integer
               vlans:
-                description: Vlans to which the port belongs
+                description: The vlans to which the trunk port belongs, conflicts with `untaggedVLAN` Vlans to which the port belongs
                 items:
                   description: VLAN represents the name and ID of a VLAN
                   properties:
