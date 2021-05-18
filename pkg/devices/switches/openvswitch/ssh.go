@@ -98,7 +98,7 @@ func (c *ssh) SetPortAttr(ctx context.Context, name string, configuration *v1alp
 		return fmt.Errorf("get port failed: %s", err)
 	}
 
-	if !reflect.DeepEqual(configuration, actualConfiguration) {
+	if !reflect.DeepEqual(configuration.Spec, actualConfiguration.Spec) {
 		return fmt.Errorf("set port failed: the actual configuration is inconsistent with the target configuration")
 	}
 
