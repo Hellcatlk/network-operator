@@ -82,8 +82,8 @@ func (c *ssh) SetPortAttr(ctx context.Context, name string, configuration *v1alp
 		return nil
 	}
 
-	if len(configuration.Spec.Vlans) != 1 {
-		return fmt.Errorf("vlans's len port of openvswitch is 1")
+	if configuration.Spec.UntaggedVLAN == nil {
+		return nil
 	}
 
 	output, err := ussh.Output(c.Host, c.username, c.password, exec.Command(
@@ -111,8 +111,8 @@ func (c *ssh) ResetPort(ctx context.Context, name string, configuration *v1alpha
 		return nil
 	}
 
-	if len(configuration.Spec.Vlans) != 1 {
-		return fmt.Errorf("vlans's len port of openvswitch is 1")
+	if configuration.Spec.UntaggedVLAN == nil {
+		return nil
 	}
 
 	output, err := ussh.Output(c.Host, c.username, c.password, exec.Command(
