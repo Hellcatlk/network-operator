@@ -25,6 +25,18 @@ jobs:
         run: make manifests && ./hack/gitdiff.sh
       - name: unit
         run: ./tools/install_kubebuilder.sh && make unit
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: install kubernetes
+        uses: helm/kind-action@v1.1.0
+      - name: install CRDs
+        run: make install
+      - name: deploy controller
+        run: make deploy
+      - name: apply CRs
+        run: kubectl get all
   build:
     runs-on: ubuntu-latest
     steps:
