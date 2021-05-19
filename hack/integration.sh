@@ -72,4 +72,6 @@ spec:
     name: switchportconfiguration-example
 " | kubectl apply -n network-operator-system -f -
 
+kubectl get all -n network-operator-system
+sleep 10
 kubectl get switchport -n network-operator-system
