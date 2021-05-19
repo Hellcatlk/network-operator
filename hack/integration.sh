@@ -75,7 +75,6 @@ spec:
 # Wait for controller up
 echo "Wait for controller up..."
 while kubectl get deployment network-operator-controller-manager -n network-operator-system | grep -w "0/1" >/dev/null; do
-  kubectl get all -n network-operator-system
   sleep 10
 done
 
