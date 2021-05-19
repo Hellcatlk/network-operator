@@ -26,9 +26,9 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	metal3iov1alpha1 "github.com/Hellcatlk/network-operator/api/v1alpha1"
-	"github.com/Hellcatlk/network-operator/controllers"
-	"github.com/Hellcatlk/network-operator/pkg/utils/trace"
+	metal3iov1alpha1 "github.com/Hellcatlk/networkconfiguration-operator/api/v1alpha1"
+	"github.com/Hellcatlk/networkconfiguration-operator/controllers"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/trace"
 	// +kubebuilder:scaffold:imports
 )
 

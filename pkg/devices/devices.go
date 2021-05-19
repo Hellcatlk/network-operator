@@ -3,7 +3,7 @@ package devices
 import (
 	"context"
 
-	"github.com/Hellcatlk/network-operator/api/v1alpha1"
+	"github.com/Hellcatlk/networkconfiguration-operator/api/v1alpha1"
 )
 
 // Switch is a interface for different protocol

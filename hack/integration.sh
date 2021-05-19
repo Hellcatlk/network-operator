@@ -2,8 +2,6 @@
 
 set -ue
 
-env
-
 # Create bridge and port
 sudo ovs-vsctl add-br br-test
 sudo ovs-vsctl add-port br-test test
@@ -17,7 +15,7 @@ metadata:
   name: switch-example-secret
 type: Opaque
 data:
-  username: cnVubmVy
+  username: $(echo -n $USER | base64 -)
   password: cnVubmVy
 
 ---

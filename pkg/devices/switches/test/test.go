@@ -3,9 +3,9 @@ package test
 import (
 	"context"
 
-	"github.com/Hellcatlk/network-operator/api/v1alpha1"
-	"github.com/Hellcatlk/network-operator/pkg/devices"
-	"github.com/Hellcatlk/network-operator/pkg/utils/certificate"
+	"github.com/Hellcatlk/networkconfiguration-operator/api/v1alpha1"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/devices"
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/certificate"
 )
 
 // NewTest return test backend
