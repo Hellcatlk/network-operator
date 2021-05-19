@@ -26,7 +26,7 @@ jobs:
       - name: unit
         run: ./tools/install_kubebuilder.sh && make unit
   integration:
-    timeout-minutes: 5
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
