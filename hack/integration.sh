@@ -72,8 +72,9 @@ spec:
     name: switchportconfiguration-example
 " | kubectl apply -f -
 
-# Wait network operator up
-while kubectl get deployment network-operator-controller-manager -n network-operator-system | grep -w "0/1"; do
+# Wait for controller up
+echo "Wait for controller up..."
+while kubectl get deployment network-operator-controller-manager -n network-operator-system | grep -w "0/1" >/dev/null; do
   sleep 2
 done
 
