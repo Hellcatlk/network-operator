@@ -34,7 +34,7 @@ jobs:
         uses: helm/kind-action@v1.1.0
       - name: install openvswitch
         run: sudo apt-get install openvswitch-switch
-      - name: install CRDs
+      - name: apply CRDs
         run: make install
       - name: deploy controller
         run: make deploy
