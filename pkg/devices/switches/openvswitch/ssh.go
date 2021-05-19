@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Hellcatlk/networkconfiguration-operator/api/v1alpha1"
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/devices"
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/certificate"
-	ussh "github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/ssh"
+	"github.com/Hellcatlk/network-operator/api/v1alpha1"
+	"github.com/Hellcatlk/network-operator/pkg/devices"
+	"github.com/Hellcatlk/network-operator/pkg/utils/certificate"
+	ussh "github.com/Hellcatlk/network-operator/pkg/utils/ssh"
 )
 
 // NewSSH return openvswitch ssh backend

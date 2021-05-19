@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/devices"
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/devices/switches/openvswitch"
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/devices/switches/test"
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/provider"
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/certificate"
+	"github.com/Hellcatlk/network-operator/pkg/devices"
+	"github.com/Hellcatlk/network-operator/pkg/devices/switches/openvswitch"
+	"github.com/Hellcatlk/network-operator/pkg/devices/switches/test"
+	"github.com/Hellcatlk/network-operator/pkg/provider"
+	"github.com/Hellcatlk/network-operator/pkg/utils/certificate"
 )
 
 type newType func(ctx context.Context, Host string, cert *certificate.Certificate, options map[string]string) (sw devices.Switch, err error)

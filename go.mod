@@ -1,4 +1,4 @@
-module github.com/Hellcatlk/networkconfiguration-operator
+module github.com/Hellcatlk/network-operator
 
 go 1.13
 

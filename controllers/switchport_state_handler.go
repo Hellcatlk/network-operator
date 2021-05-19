@@ -5,11 +5,11 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/Hellcatlk/networkconfiguration-operator/api/v1alpha1"
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/devices/switches"
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/machine"
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/provider"
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/finalizer"
+	"github.com/Hellcatlk/network-operator/api/v1alpha1"
+	"github.com/Hellcatlk/network-operator/pkg/devices/switches"
+	"github.com/Hellcatlk/network-operator/pkg/machine"
+	"github.com/Hellcatlk/network-operator/pkg/provider"
+	"github.com/Hellcatlk/network-operator/pkg/utils/finalizer"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )

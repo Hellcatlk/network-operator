@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/Hellcatlk/networkconfiguration-operator/api/v1alpha1"
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/machine"
+	"github.com/Hellcatlk/network-operator/api/v1alpha1"
+	"github.com/Hellcatlk/network-operator/pkg/machine"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
