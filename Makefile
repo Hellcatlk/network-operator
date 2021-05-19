@@ -1,5 +1,5 @@
 # Image URL to use all building/pushing image targets
-IMG ?= controller:dev
+IMG ?= network-operator:dev
 
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true"
@@ -38,7 +38,7 @@ uninstall: manifests bin/kustomize
 	./bin/kustomize build config/crd | kubectl delete -f -
 
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
-deploy: docker manifests bin/kustomize
+deploy: manifests bin/kustomize
 	cd config/manager && ../../bin/kustomize edit set image controller=${IMG}
 	./bin/kustomize build config/default | kubectl apply -f -
 
