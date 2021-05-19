@@ -42,7 +42,7 @@ spec:
   ports:
     \"switchport-example\":
       name: \"test\"
-" | kubectl apply -n network-operator-system -f -
+" | kubectl apply -f -
 
 
 # Apply switchportconifguration
@@ -53,10 +53,10 @@ metadata:
   name: switchportconfiguration-example
 spec:
   untaggedVLAN: 10
-" | kubectl apply -n network-operator-system -f -
+" | kubectl apply -f -
 
 # Apply switchport
-switchUID=$(kubectl get switch switch-example -n network-operator-system -o yaml | grep "uid" | awk '{print $2}')
+switchUID=$(kubectl get switch switch-example -o yaml | grep "uid" | awk '{print $2}')
 echo "
 apiVersion: metal3.io/v1alpha1
 kind: SwitchPort
@@ -70,8 +70,11 @@ metadata:
 spec:
   configuration:
     name: switchportconfiguration-example
-" | kubectl apply -n network-operator-system -f -
+" | kubectl apply -f -
 
-kubectl get all -n network-operator-system
-sleep 10
-kubectl get switchport -n network-operator-system
+# Wait network operator up
+while kubectl get deployment network-operator-controller-manager -n network-operator-system | grep -w "0/1"; do
+  sleep 2
+done
+
+kubectl get switchport
