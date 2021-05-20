@@ -36,8 +36,8 @@ type Switch interface {
 	GetOptions() map[string]string
 }
 
-// FromSwitch get config from provider switch
-func FromSwitch(ctx context.Context, client client.Client, sw Switch) (*Config, error) {
+// GetSwitchConfiguration get configuration of provider switch
+func GetSwitchConfiguration(ctx context.Context, client client.Client, sw Switch) (*Config, error) {
 	if sw == nil {
 		return nil, fmt.Errorf("provider switch is nil")
 	}

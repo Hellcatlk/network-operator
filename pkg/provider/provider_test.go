@@ -38,7 +38,7 @@ func TestFromSwitch(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			_, err := FromSwitch(context.Background(), &fakeClient{}, c.providerSwitch)
+			_, err := GetSwitchConfiguration(context.Background(), &fakeClient{}, c.providerSwitch)
 			if (err != nil) != c.expectedError {
 				t.Errorf("Got unexpected error: %v", err)
 			}
