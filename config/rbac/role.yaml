@@ -11,25 +11,49 @@ rules:
   resources:
   - secrets
   verbs:
+  - create
+  - delete
   - get
+  - list
+  - patch
+  - update
+  - watch
 - apiGroups:
   - metal3.io
   resources:
   - ovsswitches
   verbs:
+  - create
+  - delete
   - get
+  - list
+  - patch
+  - update
+  - watch
 - apiGroups:
   - metal3.io
   resources:
   - switches
   verbs:
+  - create
+  - delete
   - get
+  - list
+  - patch
+  - update
+  - watch
 - apiGroups:
   - metal3.io
   resources:
   - switchportconfigurations
   verbs:
+  - create
+  - delete
   - get
+  - list
+  - patch
+  - update
+  - watch
 - apiGroups:
   - metal3.io
   resources:
