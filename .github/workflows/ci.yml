@@ -25,21 +25,6 @@ jobs:
         run: make manifests && ./hack/gitdiff.sh
       - name: unit
         run: ./tools/install_kubebuilder.sh && make unit
-  integration:
-    timeout-minutes: 10
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: install kubernetes
-        uses: helm/kind-action@v1.1.0
-      - name: install openvswitch
-        run: sudo apt-get install openvswitch-switch
-      - name: apply CRDs
-        run: make install
-      - name: deploy controller
-        run: make deploy
-      - name: integration test
-        run: ./hack/integration.sh
   build:
     runs-on: ubuntu-latest
     steps:
