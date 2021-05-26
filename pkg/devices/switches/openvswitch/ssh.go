@@ -39,7 +39,7 @@ type ssh struct {
 // PowerOn enable openvswitch
 func (c *ssh) PowerOn(ctx context.Context) (err error) {
 	err = ussh.Run(c.Host, c.username, c.password, exec.Command(
-		"ovs-vsctl", "list", "br", c.bridge,
+		"sudo", "ovs-vsctl", "list", "br", c.bridge,
 	)) // #nosec
 	if err != nil {
 		return fmt.Errorf("check birdge failed: %s", err)
@@ -56,7 +56,7 @@ func (c *ssh) PowerOff(ctx context.Context) (err error) {
 // GetPortAttr get the port's configure
 func (c *ssh) GetPortAttr(ctx context.Context, name string) (configuration *v1alpha1.SwitchPortConfiguration, err error) {
 	output, err := ussh.Output(c.Host, c.username, c.password, exec.Command(
-		"ovs-vsctl", "list", "port", name,
+		"sudo", "ovs-vsctl", "list", "port", name,
 		"|", "grep", "-E", "-w", "^tag",
 		"|", "grep", "-o", "[0-9]*",
 	)) // #nosec
@@ -87,7 +87,7 @@ func (c *ssh) SetPortAttr(ctx context.Context, name string, configuration *v1alp
 	}
 
 	output, err := ussh.Output(c.Host, c.username, c.password, exec.Command(
-		"ovs-vsctl", "set", "port", name, "tag="+strconv.Itoa(*configuration.Spec.UntaggedVLAN),
+		"sudo", "ovs-vsctl", "set", "port", name, "tag="+strconv.Itoa(*configuration.Spec.UntaggedVLAN),
 	)) // #nosec
 	if err != nil {
 		return fmt.Errorf("set port failed: %s[%s]", output, err)
@@ -116,7 +116,7 @@ func (c *ssh) ResetPort(ctx context.Context, name string, configuration *v1alpha
 	}
 
 	output, err := ussh.Output(c.Host, c.username, c.password, exec.Command(
-		"ovs-vsctl", "remove ", "port", name, "tag", strconv.Itoa(*configuration.Spec.UntaggedVLAN),
+		"sudo", "ovs-vsctl", "remove ", "port", name, "tag", strconv.Itoa(*configuration.Spec.UntaggedVLAN),
 	)) // #nosec
 	if err != nil {
 		return fmt.Errorf("set port failed: %s[%s]", output, err)
