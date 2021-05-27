@@ -91,10 +91,6 @@ func (m *Machine) Reconcile(ctx context.Context) (dirty bool, result ctrl.Result
 		}
 	}()
 
-	result = ctrl.Result{
-		Requeue: false,
-	}
-
 	// There are any handler in handlers?
 	if m.handlers == nil {
 		return dirty, result, &Error{
