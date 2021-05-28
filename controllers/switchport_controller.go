@@ -44,7 +44,7 @@ type SwitchPortReconciler struct {
 // +kubebuilder:rbac:groups=metal3.io,resources=switchportconfigurations,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=metal3.io,resources=ovsswitches,verbs=get;list;watch;create;update;patch;delete
 
-// Reconcile ...
+// Reconcile switch port resources
 func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, err error) {
 	ctx := context.Background()
 	logger := r.Log.WithValues("switchport", req.NamespacedName)
@@ -103,7 +103,7 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (result ctrl.Result, 
 	return result, err
 }
 
-// SetupWithManager ...
+// SetupWithManager register reconciler
 func (r *SwitchPortReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&v1alpha1.SwitchPort{}).
