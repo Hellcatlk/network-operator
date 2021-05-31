@@ -15,7 +15,7 @@ metadata:
   name: ovsswitch-sample
 spec:
   host: <host-ip>
-  bridge: "<bridge-name>"
+  bridge: <bridge-name>
   secret:
     name: switch-example-secret
     namespace: default
@@ -31,4 +31,4 @@ spec:
     name: ovsswitch-sample
   ports:
     "switchport-example":
-      name: "vnet0"
+      name: <port-name>
