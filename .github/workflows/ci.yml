@@ -24,7 +24,7 @@ jobs:
       - name: manifests
         run: make manifests && ./hack/gitdiff.sh
       - name: unit
-        run: ./tools/install_kubebuilder.sh && make unit
+        run: make unit
   build:
     runs-on: ubuntu-latest
     steps:

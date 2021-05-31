@@ -107,6 +107,9 @@ const (
 	// SwitchPortIdle means we are wait for configuration for the port
 	SwitchPortIdle machine.StateType = "Idle"
 
+	// SwitchPortVerifying means we are verify the configuration for the port
+	SwitchPortVerifying machine.StateType = "Verifying"
+
 	// SwitchPortConfiguring means we are removing configuration from the port
 	SwitchPortConfiguring machine.StateType = "Configuring"
 

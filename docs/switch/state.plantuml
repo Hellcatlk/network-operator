@@ -4,13 +4,18 @@
 
 "<none>" --> "Idle"
 
-"Idle" --> [ spec.configurationRef != nil\n (with exponential backoff)] "Configuring*"
+"Idle" --> [ spec.configurationRef != nil\n (with exponential backoff)] "Verifying*"
 "Idle" --> [ !instance.DeletionTimestamp.IsZero() ] "Deleting"
 
-"Configuring*" --> [ Configuration finished ] "Active*"
 
-"Active*" --> [ Configuration mismatch ] "Configuring*"
-"Active*" --> [ spec.configurationRef is nil ] "Cleaning*"
+"Verifying*" --> [ spec.configurationRef is nil ||\n !instance.DeletionTimestamp.IsZero() ] "Idle"
+"Verifying*" --> [ The configuration meets the\n requirements of the switch ] "Configuring*"
+
+"Configuring*" --> [ Configuration finished ] "Active*"
+"Configuring*" --> [ spec.configurationRef is nil ||\n !instance.DeletionTimestamp.IsZero() ] "Cleaning*"
+
+"Active*" --> [ Saved configuration and\n actual configuration mismatch ] "Configuring*"
+"Active*" --> [ spec.configurationRef is nil ||\n !instance.DeletionTimestamp.IsZero() ] "Cleaning*"
 
 "Cleaning*" --> [ Clean finished ] "Idle"
 

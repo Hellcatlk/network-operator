@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"time"
 
@@ -43,13 +44,39 @@ func (r *SwitchPortReconciler) idleHandler(ctx context.Context, info *machine.Re
 		return v1alpha1.SwitchPortIdle, ctrl.Result{}, nil
 	}
 
-	// Copy configuration to Status.Configuration
+	return v1alpha1.SwitchPortVerifying, ctrl.Result{Requeue: true}, nil
+}
+
+// verifyingHandler verify the configuration meets the requirements of the switch or not
+func (r *SwitchPortReconciler) verifyingHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
+	info.Logger.Info("verifying")
+
+	i := instance.(*v1alpha1.SwitchPort)
+
+	if !i.DeletionTimestamp.IsZero() || i.Spec.Configuration == nil {
+		return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true}, nil
+	}
+
+	owner, err := i.FetchOwnerReference(ctx, info.Client)
+	if err != nil {
+		return v1alpha1.SwitchPortVerifying, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+	}
+
 	configuration, err := i.Spec.Configuration.Fetch(ctx, info.Client)
 	if err != nil {
-		return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+		return v1alpha1.SwitchPortVerifying, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
-	i.Status.Configuration = configuration
 
+	if owner.Spec.Ports[i.Name].Disabled {
+		return v1alpha1.SwitchPortVerifying, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, fmt.Errorf("the port is disabled")
+	}
+
+	if owner.Spec.Ports[i.Name].TrunkDisabled && len(configuration.Spec.Vlans) != 0 {
+		return v1alpha1.SwitchPortVerifying, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, fmt.Errorf("set the port to trunk mode is disabled")
+	}
+
+	// Copy configuration to Status.Configuration
+	i.Status.Configuration = configuration
 	return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true}, nil
 }
 
@@ -103,12 +130,11 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true}, nil
 	}
 
+	// Check spec.ConfigurationRef as same as status.Configuration or not
 	configuration, err := i.Spec.Configuration.Fetch(ctx, info.Client)
 	if err != nil {
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
-
-	// Check spec.ConfigurationRef as same as status.Configuration or not
 	if !reflect.DeepEqual(configuration.Spec, i.Status.Configuration.Spec) {
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true}, nil
 	}
