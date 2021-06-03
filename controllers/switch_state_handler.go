@@ -18,7 +18,7 @@ func (r *SwitchReconciler) noneHandler(ctx context.Context, info *machine.Reconc
 	i := instance.(*v1alpha1.SwitchPort)
 
 	// Add finalizer
-	finalizer.Add(&i.Finalizers, switchPortFinalizerKey)
+	finalizer.Add(&i.Finalizers, switchFinalizerKey)
 
 	return v1alpha1.SwitchNone, ctrl.Result{}, nil
 }

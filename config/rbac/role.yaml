@@ -45,6 +45,14 @@ rules:
 - apiGroups:
   - metal3.io
   resources:
+  - switches/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - metal3.io
+  resources:
   - switchportconfigurations
   verbs:
   - create
