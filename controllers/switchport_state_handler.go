@@ -12,10 +12,9 @@ import (
 	"github.com/Hellcatlk/networkconfiguration-operator/pkg/provider"
 	"github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/finalizer"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
-const finalizerKey string = "metal3.io.switchport"
+const switchPortFinalizerKey string = "metal3.io.switchport"
 const requeueAfterTime time.Duration = time.Second * 10
 
 // noneHandler add finalizers to CR
@@ -25,7 +24,7 @@ func (r *SwitchPortReconciler) noneHandler(ctx context.Context, info *machine.Re
 	i := instance.(*v1alpha1.SwitchPort)
 
 	// Add finalizer
-	finalizer.Add(&i.Finalizers, finalizerKey)
+	finalizer.Add(&i.Finalizers, switchPortFinalizerKey)
 
 	return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true}, nil
 }
@@ -212,7 +211,7 @@ func (r *SwitchPortReconciler) deletingHandler(ctx context.Context, info *machin
 	i := instance.(*v1alpha1.SwitchPort)
 
 	// Remove finalizer
-	finalizer.Remove(&i.Finalizers, finalizerKey)
+	finalizer.Remove(&i.Finalizers, switchPortFinalizerKey)
 
-	return v1alpha1.SwitchPortNone, reconcile.Result{}, nil
+	return v1alpha1.SwitchPortNone, ctrl.Result{}, nil
 }
