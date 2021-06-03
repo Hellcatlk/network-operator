@@ -15,7 +15,7 @@ const switchFinalizerKey string = "foregroundDeletion"
 func (r *SwitchReconciler) noneHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	info.Logger.Info("none")
 
-	i := instance.(*v1alpha1.SwitchPort)
+	i := instance.(*v1alpha1.Switch)
 
 	// Add finalizer
 	finalizer.Add(&i.Finalizers, switchFinalizerKey)
