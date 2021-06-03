@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Hellcatlk/networkconfiguration-operator/pkg/machine"
 	"github.com/Hellcatlk/networkconfiguration-operator/pkg/provider"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -91,11 +92,31 @@ type SwitchSpec struct {
 
 // SwitchStatus defines the observed state of Switch
 type SwitchStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// The current configuration status of the switch.
+	State machine.StateType `json:"state,omitempty"`
+
+	// The error message of the port
+	Error string `json:"error,omitempty"`
+}
+
+const (
+	// SwitchNone means the CR has just been created
+	SwitchNone machine.StateType = ""
+)
+
+// GetState gets the current state of the port
+func (sp *Switch) GetState() machine.StateType {
+	return sp.Status.State
+}
+
+// SetState sets the state of the port
+func (sp *Switch) SetState(state machine.StateType) {
+	sp.Status.State = state
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:printcolumn:name="STATE",type="string",JSONPath=".status.state",description="state"
+// +kubebuilder:printcolumn:name="ERROR",type="string",JSONPath=".status.error",description="error"
 
 // Switch is the Schema for the switches API
 type Switch struct {

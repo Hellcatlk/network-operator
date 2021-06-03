@@ -101,7 +101,7 @@ type SwitchPortStatus struct {
 }
 
 const (
-	// SwitchPortNone means the port can be configured
+	// SwitchPortNone means the CR has just been created
 	SwitchPortNone machine.StateType = ""
 
 	// SwitchPortIdle means we are wait for configuration for the port
