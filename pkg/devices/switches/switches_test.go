@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/provider"
+	"github.com/Hellcatlk/network-operator/pkg/provider"
 )
 
 func TestNew(t *testing.T) {
