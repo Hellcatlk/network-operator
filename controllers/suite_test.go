@@ -30,7 +30,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	metal3iov1alpha1 "github.com/Hellcatlk/networkconfiguration-operator/api/v1alpha1"
+	metal3iov1alpha1 "github.com/Hellcatlk/network-operator/api/v1alpha1"
 	// +kubebuilder:scaffold:imports
 )
 

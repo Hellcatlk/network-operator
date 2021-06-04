@@ -26,9 +26,9 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/Hellcatlk/networkconfiguration-operator/api/v1alpha1"
-	metal3iov1alpha1 "github.com/Hellcatlk/networkconfiguration-operator/api/v1alpha1"
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/machine"
+	"github.com/Hellcatlk/network-operator/api/v1alpha1"
+	metal3iov1alpha1 "github.com/Hellcatlk/network-operator/api/v1alpha1"
+	"github.com/Hellcatlk/network-operator/pkg/machine"
 )
 
 // SwitchReconciler reconciles a Switch object

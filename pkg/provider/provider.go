@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Hellcatlk/networkconfiguration-operator/pkg/utils/certificate"
+	"github.com/Hellcatlk/network-operator/pkg/utils/certificate"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
