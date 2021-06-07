@@ -534,7 +534,7 @@ each state has its own corresponding function.
     2. Prepares for deletion.
     3. The state handler will remove finalizers.
 
-<!-- state-machine.svg -->
+![](./switch/state.png)
 
 #### SmartNIC
 
