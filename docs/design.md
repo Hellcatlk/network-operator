@@ -797,5 +797,6 @@ NONE
 ## References
 
 - [Issue](https://github.com/metal3-io/baremetal-operator/issues/570)
-- [physical-network-api-prototype](https://github.com/metal3-io/metal3-docs/blob/master/design/physical-network-api-prototype.md)
-- [contracts](https://github.com/Hellcatlk/network-operator/docs)
+- [Physical-network-api-prototype](https://github.com/metal3-io/metal3-docs/blob/master/design/physical-network-api-prototype.md)
+- [Contracts](https://github.com/Hellcatlk/network-operator/tree/master/docs)
+- [Demo](https://github.com/Hellcatlk/network-operator)
