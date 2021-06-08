@@ -180,17 +180,17 @@ referencing the `SwitchPortConfiguration`.
 according to the original method.
 6. Before provisioning, if the machine's `networkConfiguration` field is not
 empty, CAPM3 will call the configureNetwork() method to fill
-networkConfiguration into the appropriate SwitchPort spec.
+networkConfiguration into the appropriate BMH spec.
     1. CAPM3 filters the interfaces of BMH based on the NicHint provided
     for the network configuration.
     2. CAPM3 identifies the port in the BMH spec that maps to the interface
     selected based on the NicHint.
     3. CAPM3 sets the configurationRef field.
-7. BMO configures the port.
+7. BMO edit the SwitchPort.
     1. BMO fetches the SwitchPort object referred to in the BMH spec.
     2. BMO sets the SwitchPortConfig in the port specs, and applies it.
     3. BMO waits for the port to be configured.
-8. The Switch controller detects that Port.spec.configurationRef changed,
+8. The SwitchPort controller detects that SwitchPort.spec.configurationRef changed,
 then carry out the corresponding processing:
     1. Verify the user configuration to match the switch configuration
     (allowed vlans etc.) (Validating step).
@@ -224,7 +224,7 @@ corresponding to the BMO network cards, and clear their
 3. BMO deconfigures the ports.
     1. BMO fetches all SwitchPorts referenced by the BMH.
     2. BMO removes any SwitchPortConfig that might be set on the port.
-4. Switch controller starts to deconfigure the network by calling
+4. SwitchPort controller starts to deconfigure the network by calling
 `device.DeConfigurePort()`. Return the port to a `cleaning` state.
     1. Verify the switch credentials (Cleaning Step).
     2. Configure the port on the switch (Cleaning Step).
