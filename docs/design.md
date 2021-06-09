@@ -612,7 +612,7 @@ Multi-tenancy models:
 - None
 
 Roles:
-- Operator: Full control
+- Operator: Full control  
 Scope: Cluster
 
 Operations Allowed:
@@ -633,7 +633,7 @@ Multi-tenancy models:
 - Full
 
 Roles:
-- Operator: Full control
+- Operator: Full control  
 Scope: Cluster
 
 Operations Allowed:
@@ -662,9 +662,9 @@ Multi-tenancy models:
 - Limited
 
 Roles:
-- User: Configuration of existing ports
+- User: Configuration of existing ports  
 Scope: Namespaced
-- Operator: Definition of the infra
+- Operator: Definition of the infra  
 Scope: Namespaced
 
 Operations Allowed:
