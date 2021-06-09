@@ -245,6 +245,8 @@ the deletion of the Provider Switch because of OwnerRefs).
 5. Once no ports are left for the Switch, then remove the finalizer on
 the ProviderSwitch and on the Switch.
 
+![](./switch/sequence.png)
+
 ### Changes to Current API
 
 #### Metal3Machine CRD
@@ -610,7 +612,7 @@ Multi-tenancy models:
 - None
 
 Roles:
-- Operator: Full control  
+- Operator: Full control
 Scope: Cluster
 
 Operations Allowed:
@@ -631,7 +633,7 @@ Multi-tenancy models:
 - Full
 
 Roles:
-- Operator: Full control  
+- Operator: Full control
 Scope: Cluster
 
 Operations Allowed:
@@ -660,9 +662,9 @@ Multi-tenancy models:
 - Limited
 
 Roles:
-- User: Configuration of existing ports  
+- User: Configuration of existing ports
 Scope: Namespaced
-- Operator: Definition of the infra  
+- Operator: Definition of the infra
 Scope: Namespaced
 
 Operations Allowed:
