@@ -764,7 +764,7 @@ with a boolean on each port to indicate if it needs the PXE config.
 #### Integration tests
 
 ProviderSwitch needs extensive testing (ansible playbooks with
-[Molecule](https://molecule.readthedocs.io/en/latest/ for example)).
+[Molecule](https://molecule.readthedocs.io/en/latest/e) for exampl).
 https://github.com/internap/fake-switches could be used to mock hardware.
 
 #### E2E tests:
@@ -777,7 +777,7 @@ https://github.com/internap/fake-switches could be used to mock hardware.
 Upgrade would be supported directly as the changes are API additions.
 If not defined, the behaviour of upgraded BMO or CAPM3 does not change.
 This provides some compatibility for objects deployed without the networking
-support. Backwards compatible (BMH ports not provided)
+support. Backwards compatible (BMH ports not provided).
 
 To start using the network configuration tools, the user will need to create
 the switchPort with a SwitchPortConfiguration already associated, otherwise
