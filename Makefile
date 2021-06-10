@@ -38,9 +38,14 @@ uninstall: manifests bin/kustomize
 	./bin/kustomize build config/crd | kubectl delete -f -
 
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
-deploy: manifests bin/kustomize
+deploy: docker manifests bin/kustomize
 	cd config/manager && ../../bin/kustomize edit set image controller=${IMG}
 	./bin/kustomize build config/default | kubectl apply -f -
+
+# Undeploy controller in the configured Kubernetes cluster in ~/.kube/config
+undeploy: manifests bin/kustomize
+	cd config/manager && ../../bin/kustomize edit set image controller=${IMG}
+	./bin/kustomize build config/default | kubectl delete -f -
 
 # Generate code
 generate: bin/controller-gen
