@@ -536,7 +536,7 @@ each state has its own corresponding function.
     2. Prepares for deletion.
     3. The state handler will remove finalizers.
 
-![](./switch/state.png)
+![](./switch/switch-port-state.png)
 
 #### SmartNIC
 

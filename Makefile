@@ -58,7 +58,7 @@ manifests: bin/controller-gen
 # Generate docs
 .PHONY: docs
 docs:
-	./hack/plantuml.sh docs/*/*.plantuml
+	find ./docs -name "*.plantuml" | xargs ./hack/plantuml.sh
 
 # Run tests
 test: generate gofmt golint govet gosec unit manifests

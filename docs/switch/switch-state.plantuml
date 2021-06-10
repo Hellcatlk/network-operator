@@ -1,0 +1,18 @@
+.
+@startuml switch-state
+
+(*) --> [ User create CR ] "<none>"
+
+"<none>" --> "Verifying*"
+
+"Verifying*" --> [ switch power on success ] "Configuring*"
+
+"Configuring*" --> [ Configuration finished ] "Running*"
+"Configuring*" --> [ spec.configurationRef is nil ||\n !instance.DeletionTimestamp.IsZero() ] "Deleting*"
+
+"Running*" --> [ SwitchPort's has been deleted ] "Configuring*"
+"Running*" --> [ spec.configurationRef is nil ||\n !instance.DeletionTimestamp.IsZero() ] "Deleting*"
+
+"Deleting*" --> [ CR have been removed ] (*)
+
+@enduml

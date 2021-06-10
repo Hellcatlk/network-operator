@@ -33,6 +33,10 @@ func (r *SwitchReconciler) verifyingHandler(ctx context.Context, info *machine.R
 
 	i := instance.(*v1alpha1.Switch)
 
+	if !i.DeletionTimestamp.IsZero() {
+		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true}, nil
+	}
+
 	providerSwitch, err := i.Spec.ProviderSwitch.Fetch(ctx, info.Client)
 	if err != nil {
 		return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
@@ -62,6 +66,10 @@ func (r *SwitchReconciler) configuringHandler(ctx context.Context, info *machine
 	info.Logger.Info("configuring")
 
 	i := instance.(*v1alpha1.Switch)
+
+	if !i.DeletionTimestamp.IsZero() {
+		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true}, nil
+	}
 
 	// Create SwitchPorts
 	for name := range i.Status.Ports {
