@@ -33,6 +33,7 @@ type Instance interface {
 	runtime.Object
 	GetState() StateType
 	SetState(state StateType)
+	SetError(err error)
 }
 
 // Handlers includes a lot of handler
@@ -68,6 +69,7 @@ func (m *Machine) Reconcile(ctx context.Context) (bool, ctrl.Result, error) {
 	instanceDeepCopy := m.instance.DeepCopyObject()
 	nextState, result, err := handler(ctx, m.info, m.instance)
 	m.instance.SetState(nextState)
+	m.instance.SetError(err)
 
 	// Check instance is dirty or not
 	if reflect.DeepEqual(m.instance, instanceDeepCopy) {

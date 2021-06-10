@@ -22,6 +22,10 @@ func (t *testInstance) SetState(state StateType) {
 	t.state = state
 }
 
+func (t *testInstance) SetError(err error) {
+
+}
+
 func handlerTest0(ctx context.Context, info *ReconcileInfo, instance interface{}) (StateType, ctrl.Result, error) {
 	instance.(*testInstance).out = "Hello"
 	return "test1", ctrl.Result{}, nil

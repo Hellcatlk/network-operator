@@ -81,9 +81,8 @@ func (r *SwitchReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	dirty, result, err := m.Reconcile(ctx)
 
 	// Only update switch port when it dirty
-	if dirty || instance.Status.Error != err.Error() {
+	if dirty {
 		logger.Info("updating switch")
-		instance.Status.Error = err.Error()
 		err = r.Update(ctx, instance)
 		if err != nil {
 			logger.Error(err, "update switch failed")

@@ -135,14 +135,23 @@ const (
 	SwitchDeleting machine.StateType = "Deleting"
 )
 
-// GetState gets the current state of the port
+// GetState gets the current state of the switch
 func (s *Switch) GetState() machine.StateType {
 	return s.Status.State
 }
 
-// SetState sets the state of the port
+// SetState sets the state of the switch
 func (s *Switch) SetState(state machine.StateType) {
 	s.Status.State = state
+}
+
+// SetError sets the error of the switch
+func (s *Switch) SetError(err error) {
+	if err == nil {
+		s.Status.Error = ""
+	} else {
+		s.Status.Error = err.Error()
+	}
 }
 
 // +kubebuilder:object:root=true

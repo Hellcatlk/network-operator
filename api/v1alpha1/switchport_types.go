@@ -133,6 +133,15 @@ func (sp *SwitchPort) SetState(state machine.StateType) {
 	sp.Status.State = state
 }
 
+// SetError sets the error of the port
+func (sp *SwitchPort) SetError(err error) {
+	if err == nil {
+		sp.Status.Error = ""
+	} else {
+		sp.Status.Error = err.Error()
+	}
+}
+
 // FetchOwnerReference fetch OwnerReference[0]
 func (sp *SwitchPort) FetchOwnerReference(ctx context.Context, client client.Client) (*Switch, error) {
 	if sp == nil || len(sp.OwnerReferences) == 0 {
