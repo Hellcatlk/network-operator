@@ -23,13 +23,12 @@ similar API.
 
 ## Goals
 
-- Define a Kubernetes API for configuring network switches.
+- Define a Kubernetes API for configuring network device.
 - Automatically configure the network infrastructure for a host when
 adding it to a cluster.
 - Do network configuration when deprovisioning the hosts.
 - Design a network abstraction that can represent any of the target networking
 configuration, independently of the controller used.
-
 
 ## Non-Goals
 
@@ -92,11 +91,6 @@ The ACL setting:
 
 In the network operator, we abstract the following roles:
 
-#### ProviderDevice
-
-ProviderDevice represents different ways to connect to the device.
-It contains all the information required to connect the device.
-
 #### Device
 
 Abstract all devices in the cluster (such as Switch, SmartNic).
@@ -128,9 +122,14 @@ type Switch interface {
 }
 ```
 
+#### ProviderDevice
+
+ProviderDevice represents different ways to connect to the device.
+It contains all the information required to connect the device.
+
 #### DevicePort
 
-Indicates the specific port of the switch. Each type of Port must
+Indicates the specific port. Each type of Port must
 have its own CRD.
 
 #### Configuration
@@ -152,6 +151,12 @@ Each Port controller must implement the method of configuring `Device` specified
 by the `ProviderDevice`.
 
 ### Workflow
+
+The next image shows the workflow of the network operator itself, not integrated with Metal3:
+
+![](./switch/sequence.png)
+
+If integrated with Metal3, the workflow is:
 
 #### Create CR related to BMH's network: Switch, ProviderSwitch and Switchport
 
@@ -244,8 +249,6 @@ the deletion of the Provider Switch because of OwnerRefs).
 4. If switchPort is idle, then remove the finalizer.
 5. Once no ports are left for the Switch, then remove the finalizer on
 the ProviderSwitch and on the Switch.
-
-![](./switch/sequence.png)
 
 ### Changes to Current API
 
@@ -437,14 +440,6 @@ spec:
     "switchport-example":
       # The port name in the switch
       name: <port-name>
-      # pxe refers to a SwitchPortConfiguration used for pxe boot.
-      # If not nil, this configuration will be set after the SwitchPort is
-      # created or deconfigured.
-      pxe:
-        name: pxeConfig
-        namespace: default
-      # portName is the SwitchPort’s actual name in the Switch
-      portName: Geth1-1
       # True if this port is not available, false otherwise
       disabled: false
       # Indicates the range of VLANs allowed by this port in the switch
