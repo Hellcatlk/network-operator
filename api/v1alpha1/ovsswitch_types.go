@@ -17,8 +17,13 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
+	"github.com/Hellcatlk/network-operator/pkg/provider"
+	"github.com/Hellcatlk/network-operator/pkg/utils/certificate"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // OVSSwitchSpec defines the desired state of OVSSwitch
@@ -45,31 +50,22 @@ type OVSSwitch struct {
 	Status OVSSwitchStatus `json:"status,omitempty"`
 }
 
-// GetOS  return switch's os
-func (s *OVSSwitch) GetOS() string {
-	return "openvswitch"
-}
-
-// GetProtocol return switch's protocol
-func (s *OVSSwitch) GetProtocol() string {
-	return "ssh"
-}
-
-// GetHost return switch's host
-func (s *OVSSwitch) GetHost() string {
-	return s.Spec.Host
-}
-
-// GetSecret return switch's certificate secret reference
-func (s *OVSSwitch) GetSecret() *corev1.SecretReference {
-	return s.Spec.Secret
-}
-
-// GetOptions return switch's options
-func (s *OVSSwitch) GetOptions() map[string]string {
-	return map[string]string{
-		"bridge": s.Spec.Bridge,
+// GetConfiguration generate configuration from openvswitch switch
+func (s *OVSSwitch) GetConfiguration(ctx context.Context, client client.Client) (*provider.Config, error) {
+	cert, err := certificate.Fetch(ctx, client, s.Spec.Secret)
+	if err != nil {
+		return nil, err
 	}
+
+	return &provider.Config{
+		OS:       "openvswitch",
+		Protocol: "ssh",
+		Host:     s.Spec.Host,
+		Cert:     cert,
+		Options: map[string]string{
+			"bridge": s.Spec.Bridge,
+		},
+	}, nil
 }
 
 // +kubebuilder:object:root=true

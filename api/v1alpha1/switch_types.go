@@ -62,7 +62,17 @@ func (ref *ProviderSwitchRef) Fetch(ctx context.Context, client client.Client) (
 
 	switch ref.Kind {
 	case "TestSwitch":
-		instance = &provider.TestSwitch{}
+		ps := &TestSwitch{}
+		err = client.Get(
+			ctx,
+			types.NamespacedName{
+				Name:      ref.Name,
+				Namespace: ref.Namespace,
+			},
+			ps,
+		)
+		instance = ps
+
 	case "OVSSwitch":
 		ps := &OVSSwitch{}
 		err = client.Get(
@@ -95,6 +105,12 @@ type SwitchStatus struct {
 	// The current configuration status of the switch.
 	State machine.StateType `json:"state,omitempty"`
 
+	// The reference of provider switch
+	ProviderSwitch *ProviderSwitchRef `json:"providerSwitch,omitempty"`
+
+	// Restricted ports in the switch
+	Ports map[string]Port `json:"ports,omitempty"`
+
 	// The error message of the port
 	Error string `json:"error,omitempty"`
 }
@@ -102,6 +118,18 @@ type SwitchStatus struct {
 const (
 	// SwitchNone means the CR has just been created
 	SwitchNone machine.StateType = ""
+
+	// SwitchVerify means we are verifying the connection of switch
+	SwitchVerify machine.StateType = "Verifying"
+
+	// SwitchCreating means we are creating SwitchPort
+	SwitchCreating machine.StateType = "Creating"
+
+	// SwitchActive means all of SwitchPort have been created
+	SwitchActive machine.StateType = "Active"
+
+	// SwitchDeleting means we are deleting SwitchPort
+	SwitchDeleting machine.StateType = "Deleting"
 )
 
 // GetState gets the current state of the port

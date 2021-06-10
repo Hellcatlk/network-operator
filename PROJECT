@@ -12,4 +12,7 @@ resources:
 - group: metal3.io
   kind: OVSSwitch
   version: v1alpha1
+- group: metal3.io
+  kind: TestSwitch
+  version: v1alpha1
 version: "2"

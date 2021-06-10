@@ -1,0 +1,24 @@
+# permissions for end users to edit testswitches.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: testswitch-editor-role
+rules:
+- apiGroups:
+  - metal3.io
+  resources:
+  - testswitches
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - metal3.io
+  resources:
+  - testswitches/status
+  verbs:
+  - get

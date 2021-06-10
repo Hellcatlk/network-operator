@@ -24,12 +24,15 @@ func (c *fakeClient) Get(ctx context.Context, key types.NamespacedName, obj runt
 	switch key.Name {
 	case "Switch":
 		*obj.(*v1alpha1.Switch) = v1alpha1.Switch{
-			Spec: v1alpha1.SwitchSpec{
+			Status: v1alpha1.SwitchStatus{
 				ProviderSwitch: &v1alpha1.ProviderSwitchRef{
 					Kind: "TestSwitch",
+					Name: "TestSwitch",
 				},
 			},
 		}
+	case "TestSwitch":
+		*obj.(*v1alpha1.TestSwitch) = v1alpha1.TestSwitch{}
 	case "SwitchPortConfiguration":
 		*obj.(*v1alpha1.SwitchPortConfiguration) = v1alpha1.SwitchPortConfiguration{}
 	case "Secret":

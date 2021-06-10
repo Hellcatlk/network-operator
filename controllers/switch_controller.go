@@ -40,6 +40,7 @@ type SwitchReconciler struct {
 
 // +kubebuilder:rbac:groups=metal3.io,resources=switches,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=metal3.io,resources=switches/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=metal3.io,resources=switchports,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=metal3.io,resources=switchports/status,verbs=get;update;patch
 
@@ -68,7 +69,11 @@ func (r *SwitchReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		},
 		instance,
 		&machine.Handlers{
-			metal3iov1alpha1.SwitchNone: r.noneHandler,
+			metal3iov1alpha1.SwitchNone:     r.noneHandler,
+			metal3iov1alpha1.SwitchVerify:   r.verifyingHandler,
+			metal3iov1alpha1.SwitchCreating: r.creatingHandler,
+			metal3iov1alpha1.SwitchActive:   r.activeHandler,
+			metal3iov1alpha1.SwitchDeleting: r.deletingHandler,
 		},
 	)
 
