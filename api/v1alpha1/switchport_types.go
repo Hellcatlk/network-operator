@@ -36,13 +36,13 @@ type SwitchPortReference struct {
 }
 
 // Fetch the instance
-func (ref *SwitchPortReference) Fetch(ctx context.Context, client client.Client) (instance *SwitchPort, err error) {
+func (ref *SwitchPortReference) Fetch(ctx context.Context, client client.Client) (*SwitchPort, error) {
 	if ref == nil {
 		return nil, fmt.Errorf("switch port configuration reference is nil")
 	}
 
-	instance = &SwitchPort{}
-	err = client.Get(
+	instance := &SwitchPort{}
+	err := client.Get(
 		ctx,
 		types.NamespacedName{
 			Name:      ref.Name,
@@ -51,7 +51,7 @@ func (ref *SwitchPortReference) Fetch(ctx context.Context, client client.Client)
 		instance,
 	)
 
-	return
+	return instance, err
 }
 
 // SwitchPortConfigurationReference is the reference for SwitchPortConfiguration CR
@@ -64,13 +64,13 @@ type SwitchPortConfigurationReference struct {
 }
 
 // Fetch the instance
-func (ref *SwitchPortConfigurationReference) Fetch(ctx context.Context, client client.Client) (instance *SwitchPortConfiguration, err error) {
+func (ref *SwitchPortConfigurationReference) Fetch(ctx context.Context, client client.Client) (*SwitchPortConfiguration, error) {
 	if ref == nil {
 		return nil, fmt.Errorf("switch port configuration reference is nil")
 	}
 
-	instance = &SwitchPortConfiguration{}
-	err = client.Get(
+	instance := &SwitchPortConfiguration{}
+	err := client.Get(
 		ctx,
 		types.NamespacedName{
 			Name:      ref.Name,
@@ -79,7 +79,7 @@ func (ref *SwitchPortConfigurationReference) Fetch(ctx context.Context, client c
 		instance,
 	)
 
-	return
+	return instance, err
 }
 
 // SwitchPortSpec defines the desired state of SwitchPort
@@ -134,13 +134,13 @@ func (sp *SwitchPort) SetState(state machine.StateType) {
 }
 
 // FetchOwnerReference fetch OwnerReference[0]
-func (sp *SwitchPort) FetchOwnerReference(ctx context.Context, client client.Client) (instance *Switch, err error) {
+func (sp *SwitchPort) FetchOwnerReference(ctx context.Context, client client.Client) (*Switch, error) {
 	if sp == nil || len(sp.OwnerReferences) == 0 {
 		return nil, fmt.Errorf("switch port reference is nil")
 	}
 
-	instance = &Switch{}
-	err = client.Get(
+	instance := &Switch{}
+	err := client.Get(
 		ctx,
 		types.NamespacedName{
 			Name:      sp.OwnerReferences[0].Name,

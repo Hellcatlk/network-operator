@@ -39,7 +39,7 @@ type Instance interface {
 type Handlers map[StateType]Handler
 
 // Handler is a state handle function
-type Handler func(ctx context.Context, info *ReconcileInfo, instance interface{}) (nextState StateType, result ctrl.Result, err error)
+type Handler func(ctx context.Context, info *ReconcileInfo, instance interface{}) (StateType, ctrl.Result, error)
 
 // ErrorType is the error when reconcile state machine
 type ErrorType string

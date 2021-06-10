@@ -37,8 +37,8 @@ type ssh struct {
 }
 
 // PowerOn enable openvswitch
-func (c *ssh) PowerOn(ctx context.Context) (err error) {
-	err = ussh.Run(c.Host, c.username, c.password, exec.Command(
+func (c *ssh) PowerOn(ctx context.Context) error {
+	err := ussh.Run(c.Host, c.username, c.password, exec.Command(
 		"sudo", "ovs-vsctl", "list", "br", c.bridge,
 	)) // #nosec
 	if err != nil {
@@ -54,7 +54,7 @@ func (c *ssh) PowerOff(ctx context.Context) (err error) {
 }
 
 // GetPortAttr get the port's configure
-func (c *ssh) GetPortAttr(ctx context.Context, name string) (configuration *v1alpha1.SwitchPortConfiguration, err error) {
+func (c *ssh) GetPortAttr(ctx context.Context, name string) (*v1alpha1.SwitchPortConfiguration, error) {
 	output, err := ussh.Output(c.Host, c.username, c.password, exec.Command(
 		"sudo", "ovs-vsctl", "list", "port", name,
 		"|", "grep", "-E", "-w", "^tag",
@@ -77,7 +77,7 @@ func (c *ssh) GetPortAttr(ctx context.Context, name string) (configuration *v1al
 }
 
 // SetPortAttr set configure to the port
-func (c *ssh) SetPortAttr(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
+func (c *ssh) SetPortAttr(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) error {
 	if configuration == nil {
 		return nil
 	}
@@ -106,7 +106,7 @@ func (c *ssh) SetPortAttr(ctx context.Context, name string, configuration *v1alp
 }
 
 // ResetPort remove all configure of the port
-func (c *ssh) ResetPort(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) (err error) {
+func (c *ssh) ResetPort(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) error {
 	if configuration == nil {
 		return nil
 	}

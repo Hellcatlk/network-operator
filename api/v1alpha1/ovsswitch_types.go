@@ -51,8 +51,8 @@ type OVSSwitch struct {
 }
 
 // GetConfiguration generate configuration from openvswitch switch
-func (s *OVSSwitch) GetConfiguration(ctx context.Context, client client.Client) (*provider.Config, error) {
-	cert, err := certificate.Fetch(ctx, client, s.Spec.Secret)
+func (ovss *OVSSwitch) GetConfiguration(ctx context.Context, client client.Client) (*provider.Config, error) {
+	cert, err := certificate.Fetch(ctx, client, ovss.Spec.Secret)
 	if err != nil {
 		return nil, err
 	}
@@ -60,10 +60,10 @@ func (s *OVSSwitch) GetConfiguration(ctx context.Context, client client.Client) 
 	return &provider.Config{
 		OS:       "openvswitch",
 		Protocol: "ssh",
-		Host:     s.Spec.Host,
+		Host:     ovss.Spec.Host,
 		Cert:     cert,
 		Options: map[string]string{
-			"bridge": s.Spec.Bridge,
+			"bridge": ovss.Spec.Bridge,
 		},
 	}, nil
 }

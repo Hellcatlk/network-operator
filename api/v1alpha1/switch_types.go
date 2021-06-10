@@ -55,10 +55,13 @@ type ProviderSwitchRef struct {
 }
 
 // Fetch the instance
-func (ref *ProviderSwitchRef) Fetch(ctx context.Context, client client.Client) (instance provider.Switch, err error) {
+func (ref *ProviderSwitchRef) Fetch(ctx context.Context, client client.Client) (provider.Switch, error) {
 	if ref == nil {
 		return nil, fmt.Errorf("provider switch reference is nil")
 	}
+
+	var instance provider.Switch
+	var err error
 
 	switch ref.Kind {
 	case "TestSwitch":
@@ -122,24 +125,24 @@ const (
 	// SwitchVerify means we are verifying the connection of switch
 	SwitchVerify machine.StateType = "Verifying"
 
-	// SwitchCreating means we are creating SwitchPort
-	SwitchCreating machine.StateType = "Creating"
+	// SwitchConfiguring means we are creating SwitchPort
+	SwitchConfiguring machine.StateType = "Configuring"
 
-	// SwitchActive means all of SwitchPort have been created
-	SwitchActive machine.StateType = "Active"
+	// SwitchRunning means all of SwitchPort have been created
+	SwitchRunning machine.StateType = "Running"
 
 	// SwitchDeleting means we are deleting SwitchPort
 	SwitchDeleting machine.StateType = "Deleting"
 )
 
 // GetState gets the current state of the port
-func (sp *Switch) GetState() machine.StateType {
-	return sp.Status.State
+func (s *Switch) GetState() machine.StateType {
+	return s.Status.State
 }
 
 // SetState sets the state of the port
-func (sp *Switch) SetState(state machine.StateType) {
-	sp.Status.State = state
+func (s *Switch) SetState(state machine.StateType) {
+	s.Status.State = state
 }
 
 // +kubebuilder:object:root=true

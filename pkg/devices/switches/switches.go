@@ -11,7 +11,7 @@ import (
 	"github.com/Hellcatlk/network-operator/pkg/utils/certificate"
 )
 
-type newType func(ctx context.Context, Host string, cert *certificate.Certificate, options map[string]string) (sw devices.Switch, err error)
+type newType func(ctx context.Context, Host string, cert *certificate.Certificate, options map[string]string) (devices.Switch, error)
 
 var news map[string]map[string]newType
 
@@ -33,7 +33,7 @@ func Register(os string, protocolType string, new newType) {
 }
 
 // New return a implementation of switch interface
-func New(ctx context.Context, config *provider.Config) (sw devices.Switch, err error) {
+func New(ctx context.Context, config *provider.Config) (devices.Switch, error) {
 
 	if news[config.OS] == nil {
 		return nil, fmt.Errorf("invalid OS %s", config.OS)
