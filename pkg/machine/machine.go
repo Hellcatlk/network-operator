@@ -53,14 +53,6 @@ func New(info *ReconcileInfo, instance Instance, handlers *Handlers) Machine {
 
 // Reconcile state machine. If dirty is true, it means the instance has changed.
 func (m *Machine) Reconcile(ctx context.Context) (bool, ctrl.Result, error) {
-	// Deal possible panic
-	defer func() {
-		err := recover()
-		if err != nil {
-			err = fmt.Errorf("handler panic on %s state: %s", m.instance.GetState(), err)
-		}
-	}()
-
 	// There are any handler in handlers?
 	if m.handlers == nil {
 		return false, ctrl.Result{}, fmt.Errorf("haven't any handler")

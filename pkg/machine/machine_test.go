@@ -48,15 +48,15 @@ func TestMachine(t *testing.T) {
 			"test2": handlerTest2,
 		},
 	)
-	m.Reconcile(context.TODO())
+	_, _, _ = m.Reconcile(context.TODO())
 	if instance.out != "Hello" {
 		t.Fatal(instance.out)
 	}
-	m.Reconcile(context.TODO())
+	_, _, _ = m.Reconcile(context.TODO())
 	if instance.out != "Hello world" {
 		t.Fatal(instance.out)
 	}
-	m.Reconcile(context.TODO())
+	_, _, _ = m.Reconcile(context.TODO())
 	if instance.out != "Hello world!" {
 		t.Fatal(instance.out)
 	}
@@ -75,7 +75,7 @@ func BenchmarkMachine(b *testing.B) {
 	)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		m.Reconcile(context.TODO())
+		_, _, _ = m.Reconcile(context.TODO())
 	}
 }
 
@@ -108,6 +108,6 @@ func BenchmarkMachineNoAssert(b *testing.B) {
 	)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		m.Reconcile(context.TODO())
+		_, _, _ = m.Reconcile(context.TODO())
 	}
 }
