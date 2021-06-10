@@ -152,15 +152,15 @@ func TestSwitchPortStateMachine(t *testing.T) {
 				instance.DeletionTimestamp = nil
 			}
 
-			dirty, _, merr := m.Reconcile(context.TODO())
+			dirty, _, err := m.Reconcile(context.TODO())
 			if c.expectedDirty != dirty {
 				t.Errorf("Expected dirty: %v, got: %v", c.expectedDirty, dirty)
 			}
 			if c.expectedState != instance.GetState() {
 				t.Errorf("Expected state: %s, got: %s", c.expectedState, instance.GetState())
 			}
-			if merr != nil {
-				t.Errorf("Error type: %v, error message: %v", merr.Type(), merr.Error())
+			if err != nil {
+				t.Errorf("Got unexpected error: %v", err)
 			}
 		})
 	}

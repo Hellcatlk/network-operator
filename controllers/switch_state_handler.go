@@ -82,7 +82,7 @@ func (r *SwitchReconciler) configuringHandler(ctx context.Context, info *machine
 		}
 	}
 
-	return v1alpha1.SwitchRunning, ctrl.Result{}, nil
+	return v1alpha1.SwitchRunning, ctrl.Result{Requeue: true}, nil
 }
 
 func (r *SwitchReconciler) runningHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
