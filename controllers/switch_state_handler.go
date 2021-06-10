@@ -7,10 +7,13 @@ import (
 	"github.com/Hellcatlk/network-operator/pkg/devices/switches"
 	"github.com/Hellcatlk/network-operator/pkg/machine"
 	"github.com/Hellcatlk/network-operator/pkg/utils/finalizer"
+	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-const switchFinalizerKey string = "foregroundDeletion"
+const foregroundDeletionFinalizerKey string = "foregroundDeletion"
 
 // noneHandler add finalizers to CR
 func (r *SwitchReconciler) noneHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
@@ -19,7 +22,7 @@ func (r *SwitchReconciler) noneHandler(ctx context.Context, info *machine.Reconc
 	i := instance.(*v1alpha1.Switch)
 
 	// Add finalizer
-	finalizer.Add(&i.Finalizers, switchFinalizerKey)
+	finalizer.Add(&i.Finalizers, foregroundDeletionFinalizerKey)
 
 	return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true}, nil
 }
@@ -51,25 +54,64 @@ func (r *SwitchReconciler) verifyingHandler(ctx context.Context, info *machine.R
 
 	i.Status.ProviderSwitch = i.Spec.ProviderSwitch.DeepCopy()
 	i.Status.Ports = i.Spec.Ports
-	return v1alpha1.SwitchCreating, ctrl.Result{Requeue: true}, nil
+	return v1alpha1.SwitchConfiguring, ctrl.Result{Requeue: true}, nil
 }
 
-func (r *SwitchReconciler) creatingHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
+func (r *SwitchReconciler) configuringHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
+	info.Logger.Info("configuring")
 
-	return v1alpha1.SwitchActive, ctrl.Result{}, nil
+	i := instance.(*v1alpha1.Switch)
+
+	for name := range i.Status.Ports {
+		switchPort := &v1alpha1.SwitchPort{}
+		switchPort.Name = name
+		switchPort.Namespace = i.Namespace
+		switchPort.OwnerReferences = []metav1.OwnerReference{
+			{
+				APIVersion: i.APIVersion,
+				Kind:       i.Kind,
+				Name:       i.Name,
+				UID:        i.UID,
+			},
+		}
+
+		// Create SwitchPort
+		err := info.Client.Create(ctx, switchPort)
+		if !errors.IsAlreadyExists(err) {
+			return v1alpha1.SwitchConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, nil
+		}
+	}
+
+	return v1alpha1.SwitchRunning, ctrl.Result{}, nil
 }
 
-func (r *SwitchReconciler) activeHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
+func (r *SwitchReconciler) runningHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
+	info.Logger.Info("running")
+
 	i := instance.(*v1alpha1.Switch)
 
 	if !i.DeletionTimestamp.IsZero() {
-		return v1alpha1.SwitchDeleting, ctrl.Result{}, nil
+		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true}, nil
 	}
 
-	return v1alpha1.SwitchActive, ctrl.Result{}, nil
+	for name := range i.Status.Ports {
+		err := info.Client.Get(
+			ctx, types.NamespacedName{
+				Name:      name,
+				Namespace: i.Namespace,
+			},
+			&v1alpha1.SwitchPort{},
+		)
+		if errors.IsNotFound(err) {
+			return v1alpha1.SwitchConfiguring, ctrl.Result{Requeue: true}, nil
+		}
+	}
+
+	return v1alpha1.SwitchRunning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, nil
 }
 
 func (r *SwitchReconciler) deletingHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
+	info.Logger.Info("deleting")
 
-	return v1alpha1.SwitchDeleting, ctrl.Result{}, nil
+	return v1alpha1.SwitchNone, ctrl.Result{}, nil
 }
