@@ -79,6 +79,9 @@ func (r *SwitchReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	// Reconcile state machine
 	dirty, result, err := m.Reconcile(ctx)
+	if err != nil {
+		logger.Error(err, "state machine error")
+	}
 
 	// Only update switch port when it dirty
 	if dirty {
