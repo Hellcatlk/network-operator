@@ -83,6 +83,41 @@ spec:
               error:
                 description: The error message of the port
                 type: string
+              ports:
+                additionalProperties:
+                  description: Port indicates the specific restriction on the port
+                  properties:
+                    disabled:
+                      description: True if this port is not available, false otherwise
+                      type: boolean
+                    name:
+                      description: Describes the port name on the device
+                      type: string
+                    trunkDisable:
+                      description: True if this port can be used as a trunk port, false otherwise
+                      type: boolean
+                    vlanRange:
+                      description: Indicates the range of VLANs allowed by this port in the switch
+                      pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
+                      type: string
+                  type: object
+                description: Restricted ports in the switch
+                type: object
+              providerSwitch:
+                description: The reference of provider switch
+                properties:
+                  kind:
+                    type: string
+                  name:
+                    type: string
+                  namespace:
+                    default: default
+                    description: If empty use default namespace.
+                    type: string
+                required:
+                - kind
+                - name
+                type: object
               state:
                 description: The current configuration status of the switch.
                 type: string
