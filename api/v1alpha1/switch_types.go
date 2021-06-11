@@ -65,16 +65,7 @@ func (ref *ProviderSwitchRef) Fetch(ctx context.Context, client client.Client) (
 
 	switch ref.Kind {
 	case "TestSwitch":
-		ps := &TestSwitch{}
-		err = client.Get(
-			ctx,
-			types.NamespacedName{
-				Name:      ref.Name,
-				Namespace: ref.Namespace,
-			},
-			ps,
-		)
-		instance = ps
+		instance = &provider.Test{}
 
 	case "OVSSwitch":
 		ps := &OVSSwitch{}
@@ -96,6 +87,9 @@ func (ref *ProviderSwitchRef) Fetch(ctx context.Context, client client.Client) (
 
 // SwitchSpec defines the desired state of Switch
 type SwitchSpec struct {
+	// +kubebuilder:validation:Enum=ansible;
+	Backend string `json:"backend"`
+
 	// The reference of provider switch
 	ProviderSwitch *ProviderSwitchRef `json:"providerSwitch,omitempty"`
 

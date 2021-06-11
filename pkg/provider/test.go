@@ -1,0 +1,16 @@
+package provider
+
+import (
+	"context"
+
+	"sigs.k8s.io/controller-runtime/pkg/client"
+)
+
+// Test is a instance of provider switch
+type Test struct {
+}
+
+// GetConfiguration generate configuration from provider switch
+func (t *Test) GetConfiguration(ctx context.Context, client client.Client) (*Config, error) {
+	return nil, nil
+}

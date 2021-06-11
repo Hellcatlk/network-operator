@@ -9,11 +9,10 @@ import (
 
 // Config is configuration of provider device
 type Config struct {
-	OS       string
-	Protocol string
-	Host     string
-	Cert     *certificate.Certificate
-	Options  map[string]string
+	OS      string
+	Host    string
+	Cert    *certificate.Certificate
+	Options map[string]string
 }
 
 // Switch is a interface of provider switch

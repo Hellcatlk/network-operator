@@ -58,10 +58,9 @@ func (ovss *OVSSwitch) GetConfiguration(ctx context.Context, client client.Clien
 	}
 
 	return &provider.Config{
-		OS:       "openvswitch",
-		Protocol: "ssh",
-		Host:     ovss.Spec.Host,
-		Cert:     cert,
+		OS:   "openvswitch",
+		Host: ovss.Spec.Host,
+		Cert: cert,
 		Options: map[string]string{
 			"bridge": ovss.Spec.Bridge,
 		},
