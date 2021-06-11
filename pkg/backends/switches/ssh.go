@@ -28,6 +28,10 @@ type ssh struct {
 
 // New return ssh backend
 func (s *ssh) New(ctx context.Context, config *provider.Config) (backends.Switch, error) {
+	if config.OS != "openvswitch" {
+		return nil, fmt.Errorf("currently the ssh backend only supports openvswitch")
+	}
+
 	if config.Cert == nil {
 		return nil, fmt.Errorf("certificate of switch(%s) is nil", config.OS)
 	}
