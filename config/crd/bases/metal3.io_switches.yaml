@@ -43,6 +43,7 @@ spec:
             properties:
               backend:
                 enum:
+                - ssh
                 - ansible
                 type: string
               ports:
