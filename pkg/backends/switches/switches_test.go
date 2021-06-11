@@ -10,35 +10,24 @@ import (
 func TestNew(t *testing.T) {
 	cases := []struct {
 		name        string
-		OS          string
-		Protocol    string
+		backend     string
+		os          string
 		expectError bool
 	}{
 		{
-			name:        "new test switch",
-			OS:          "test",
-			Protocol:    "test",
-			expectError: false,
-		},
-		{
 			name:        "new not existed switch",
-			OS:          "notExisted",
-			Protocol:    "test",
+			backend:     "notExisted",
 			expectError: true,
 		},
 		{
-			name:        "input invalid url",
-			OS:          "test",
-			Protocol:    "invalid protocol",
-			expectError: true,
+			name:        "new test switch",
+			backend:     "test",
+			expectError: false,
 		},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			_, err := New(context.Background(), &provider.Config{
-				OS:       c.OS,
-				Protocol: c.Protocol,
-			})
+			_, err := New(context.Background(), c.backend, &provider.Config{})
 			if (err != nil) != c.expectError {
 				t.Errorf("Got unexpected error: %v", err)
 			}

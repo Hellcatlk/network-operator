@@ -11,13 +11,14 @@
 
 **NOTE**: If you execute `make deploy` in a multi-node cluster environment, you need to upload the image to the image repository.
 
-**NOTE**: In most cases you don't need to manually apply SwitchPort. 
+**NOTE**: In most cases you don't need to manually apply SwitchPort.
 
 ## Supported backend
 
-|provider switch|os|protocol|
-|:-|:-|:-|
-|OVSSwitch|openvswitch|ssh|
+|backend|provider switch|
+|:-|:-|
+|ssh|OVSSwitch|
+|ansible|\<None>|
 
 ## Notes
 

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Hellcatlk/network-operator/api/v1alpha1"
-	"github.com/Hellcatlk/network-operator/pkg/devices/switches"
+	"github.com/Hellcatlk/network-operator/pkg/backends/switches"
 	"github.com/Hellcatlk/network-operator/pkg/machine"
 	"github.com/Hellcatlk/network-operator/pkg/utils/finalizer"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -47,7 +47,7 @@ func (r *SwitchReconciler) verifyingHandler(ctx context.Context, info *machine.R
 		return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	sw, err := switches.New(ctx, config)
+	sw, err := switches.New(ctx, i.Spec.Backend, config)
 	if err != nil {
 		return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
@@ -150,7 +150,7 @@ func (r *SwitchReconciler) deletingHandler(ctx context.Context, info *machine.Re
 		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	sw, err := switches.New(ctx, config)
+	sw, err := switches.New(ctx, i.Spec.Backend, config)
 	if err != nil {
 		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}

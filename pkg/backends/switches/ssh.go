@@ -1,4 +1,4 @@
-package openvswitch
+package switches
 
 import (
 	"context"
@@ -9,23 +9,13 @@ import (
 	"strings"
 
 	"github.com/Hellcatlk/network-operator/api/v1alpha1"
-	"github.com/Hellcatlk/network-operator/pkg/devices"
-	"github.com/Hellcatlk/network-operator/pkg/utils/certificate"
+	"github.com/Hellcatlk/network-operator/pkg/backends"
+	"github.com/Hellcatlk/network-operator/pkg/provider"
 	ussh "github.com/Hellcatlk/network-operator/pkg/utils/ssh"
 )
 
-// NewSSH return openvswitch ssh backend
-func NewSSH(ctx context.Context, Host string, cert *certificate.Certificate, options map[string]string) (sw devices.Switch, err error) {
-	if len(options) == 0 || options["bridge"] == "" {
-		return nil, fmt.Errorf("bridge of openvswitch cli backend is required")
-	}
-
-	return &ssh{
-		Host:     Host,
-		username: cert.Username,
-		password: cert.Password,
-		bridge:   options["bridge"],
-	}, nil
+func init() {
+	Register("ssh", &ssh{})
 }
 
 // SSH control openvswitch by ssh and cli
@@ -36,10 +26,24 @@ type ssh struct {
 	bridge   string
 }
 
+// New return ssh backend
+func (s *ssh) New(ctx context.Context, config *provider.Config) (backends.Switch, error) {
+	if config.Cert == nil {
+		return nil, fmt.Errorf("certificate of switch(%s) is nil", config.OS)
+	}
+
+	return &ssh{
+		Host:     config.Host,
+		username: config.Cert.Username,
+		password: config.Cert.Password,
+		bridge:   config.Options["bridge"],
+	}, nil
+}
+
 // PowerOn enable openvswitch
-func (c *ssh) PowerOn(ctx context.Context) error {
-	err := ussh.Run(c.Host, c.username, c.password, exec.Command(
-		"sudo", "ovs-vsctl", "list", "br", c.bridge,
+func (s *ssh) PowerOn(ctx context.Context) error {
+	err := ussh.Run(s.Host, s.username, s.password, exec.Command(
+		"sudo", "ovs-vsctl", "list", "br", s.bridge,
 	)) // #nosec
 	if err != nil {
 		return fmt.Errorf("check birdge failed: %s", err)
@@ -49,13 +53,13 @@ func (c *ssh) PowerOn(ctx context.Context) error {
 }
 
 // PowerOff disable openvswitch
-func (c *ssh) PowerOff(ctx context.Context) (err error) {
+func (s *ssh) PowerOff(ctx context.Context) (err error) {
 	return
 }
 
 // GetPortAttr get the port's configure
-func (c *ssh) GetPortAttr(ctx context.Context, name string) (*v1alpha1.SwitchPortConfiguration, error) {
-	output, err := ussh.Output(c.Host, c.username, c.password, exec.Command(
+func (s *ssh) GetPortAttr(ctx context.Context, name string) (*v1alpha1.SwitchPortConfiguration, error) {
+	output, err := ussh.Output(s.Host, s.username, s.password, exec.Command(
 		"sudo", "ovs-vsctl", "list", "port", name,
 		"|", "grep", "-E", "-w", "^tag",
 		"|", "grep", "-o", "[0-9]*",
@@ -77,7 +81,7 @@ func (c *ssh) GetPortAttr(ctx context.Context, name string) (*v1alpha1.SwitchPor
 }
 
 // SetPortAttr set configure to the port
-func (c *ssh) SetPortAttr(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) error {
+func (s *ssh) SetPortAttr(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) error {
 	if configuration == nil {
 		return nil
 	}
@@ -86,14 +90,14 @@ func (c *ssh) SetPortAttr(ctx context.Context, name string, configuration *v1alp
 		return nil
 	}
 
-	output, err := ussh.Output(c.Host, c.username, c.password, exec.Command(
+	output, err := ussh.Output(s.Host, s.username, s.password, exec.Command(
 		"sudo", "ovs-vsctl", "set", "port", name, "tag="+strconv.Itoa(*configuration.Spec.UntaggedVLAN),
 	)) // #nosec
 	if err != nil {
 		return fmt.Errorf("set port failed: %s[%s]", output, err)
 	}
 
-	actualConfiguration, err := c.GetPortAttr(ctx, name)
+	actualConfiguration, err := s.GetPortAttr(ctx, name)
 	if err != nil {
 		return fmt.Errorf("get port failed: %s", err)
 	}
@@ -106,7 +110,7 @@ func (c *ssh) SetPortAttr(ctx context.Context, name string, configuration *v1alp
 }
 
 // ResetPort remove all configure of the port
-func (c *ssh) ResetPort(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) error {
+func (s *ssh) ResetPort(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) error {
 	if configuration == nil {
 		return nil
 	}
@@ -115,7 +119,7 @@ func (c *ssh) ResetPort(ctx context.Context, name string, configuration *v1alpha
 		return nil
 	}
 
-	output, err := ussh.Output(c.Host, c.username, c.password, exec.Command(
+	output, err := ussh.Output(s.Host, s.username, s.password, exec.Command(
 		"sudo", "ovs-vsctl", "remove ", "port", name, "tag", strconv.Itoa(*configuration.Spec.UntaggedVLAN),
 	)) // #nosec
 	if err != nil {

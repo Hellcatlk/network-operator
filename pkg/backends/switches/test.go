@@ -1,20 +1,24 @@
-package test
+package switches
 
 import (
 	"context"
 
 	"github.com/Hellcatlk/network-operator/api/v1alpha1"
-	"github.com/Hellcatlk/network-operator/pkg/devices"
-	"github.com/Hellcatlk/network-operator/pkg/utils/certificate"
+	"github.com/Hellcatlk/network-operator/pkg/backends"
+	"github.com/Hellcatlk/network-operator/pkg/provider"
 )
 
-// NewTest return test backend
-func NewTest(ctx context.Context, Host string, cert *certificate.Certificate, options map[string]string) (devices.Switch, error) {
-	return &test{}, nil
+func init() {
+	Register("test", &test{})
 }
 
 // Test just for test
 type test struct {
+}
+
+// New return test backend
+func (t *test) New(ctx context.Context, config *provider.Config) (backends.Switch, error) {
+	return &test{}, nil
 }
 
 // PowerOn just for test
