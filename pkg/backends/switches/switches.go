@@ -5,10 +5,17 @@ import (
 	"fmt"
 
 	"github.com/Hellcatlk/network-operator/pkg/backends"
+	"github.com/Hellcatlk/network-operator/pkg/backends/switches/ansible"
+	"github.com/Hellcatlk/network-operator/pkg/backends/switches/ssh"
 	"github.com/Hellcatlk/network-operator/pkg/provider"
 )
 
 var switchBackends map[string]backends.Switch = make(map[string]backends.Switch)
+
+func init() {
+	Register("ssh", &ssh.SSH{})
+	Register("ansible", &ansible.Ansible{})
+}
 
 // Register switch backend
 func Register(backendType string, backend backends.Switch) {
