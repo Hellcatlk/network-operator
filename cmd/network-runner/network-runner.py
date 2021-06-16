@@ -38,11 +38,6 @@ if data.Operator == "CreateVlan":
     # TODO: Check return value
     exit(0)
 
-if data.Operator == "DeleteVlan":
-    network_runner.delete_vlan('network-operator', data.Vlan)
-    # TODO: Check return value
-    exit(0)
-
 if data.Operator == "ConfigAccessPort":
     network_runner.conf_access_port('network-operator', data.Port, data.Vlan)
     # TODO: Check return value

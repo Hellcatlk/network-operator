@@ -50,27 +50,6 @@ func (a *Ansible) createVlan(vlan int) error {
 	return nil
 }
 
-func (a *Ansible) deleteVlan(vlan int) error {
-	data, err := json.Marshal(networkRunnerData{
-		Host:     a.host,
-		Cert:     a.cert,
-		OS:       a.os,
-		Operator: "DeleteVlan",
-		Vlan:     vlan,
-	})
-	if err != nil {
-		return err
-	}
-
-	cmd := exec.Command("network-runner", string(data))
-	output, err := cmd.Output()
-	if err != nil {
-		return fmt.Errorf("%s[%s]", output, err)
-	}
-
-	return nil
-}
-
 func (a *Ansible) configureAccessPort(port string, vlan int) error {
 	data, err := json.Marshal(networkRunnerData{
 		Host:     a.host,
@@ -170,7 +149,21 @@ func (a *Ansible) GetPortAttr(ctx context.Context, port string) (*v1alpha1.Switc
 
 // SetPortAttr just for test
 func (a *Ansible) SetPortAttr(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfiguration) error {
-	return nil
+	if configuration.Spec.UntaggedVLAN != nil {
+		err := a.createVlan(*configuration.Spec.UntaggedVLAN)
+		if err != nil {
+			return err
+		}
+		return a.configureAccessPort(port, *configuration.Spec.UntaggedVLAN)
+	}
+
+	for _, vlan := range configuration.Spec.Vlans {
+		err := a.createVlan(vlan)
+		if err != nil {
+			return err
+		}
+	}
+	return a.configureTrunkPort(port, configuration.Spec.Vlans)
 }
 
 // ResetPort just for test

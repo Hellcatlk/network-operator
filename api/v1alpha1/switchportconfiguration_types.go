@@ -42,16 +42,6 @@ type ACL struct {
 	DesPortRange string `json:"desPortRange,omitempty"`
 }
 
-// VLAN represents the name and ID of a VLAN
-type VLAN struct {
-	// VLANID is a 12-bit 802.1Q VLAN identifier
-	// +kubebuilder:validation:Minimum=0
-	// +kubebuilder:validation:Maximum=4094
-	ID int `json:"id"`
-
-	Name string `json:"name,omitempty"`
-}
-
 // SwitchPortConfigurationSpec defines the desired state of SwitchPortConfiguration
 type SwitchPortConfigurationSpec struct {
 	// +kubebuilder:validation:MaxItems=10
@@ -64,7 +54,7 @@ type SwitchPortConfigurationSpec struct {
 
 	// The vlans to which the trunk port belongs, conflicts with `untaggedVLAN`
 	// Vlans to which the port belongs
-	Vlans []VLAN `json:"vlans,omitempty"`
+	Vlans []int `json:"vlans,omitempty"`
 
 	// Disable port
 	Disable bool `json:"disable,omitempty"`

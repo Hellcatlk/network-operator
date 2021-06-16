@@ -116,18 +116,7 @@ spec:
                       vlans:
                         description: The vlans to which the trunk port belongs, conflicts with `untaggedVLAN` Vlans to which the port belongs
                         items:
-                          description: VLAN represents the name and ID of a VLAN
-                          properties:
-                            id:
-                              description: VLANID is a 12-bit 802.1Q VLAN identifier
-                              maximum: 4094
-                              minimum: 0
-                              type: integer
-                            name:
-                              type: string
-                          required:
-                          - id
-                          type: object
+                          type: integer
                         type: array
                     type: object
                   status:
