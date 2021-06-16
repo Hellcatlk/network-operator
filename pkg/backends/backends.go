@@ -19,11 +19,11 @@ type Switch interface {
 	PowerOff(ctx context.Context) error
 
 	// GetPortAttr get the port's configure
-	GetPortAttr(ctx context.Context, name string) (*v1alpha1.SwitchPortConfiguration, error)
+	GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPortConfiguration, error)
 
 	// SetPortAttr set configure to the port
-	SetPortAttr(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) error
+	SetPortAttr(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfiguration) error
 
 	// ResetPort remove all configure of the port
-	ResetPort(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) error
+	ResetPort(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfiguration) error
 }

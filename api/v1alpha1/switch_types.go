@@ -78,6 +78,7 @@ func (ref *ProviderSwitchRef) Fetch(ctx context.Context, client client.Client) (
 			ps,
 		)
 		instance = ps
+
 	default:
 		err = fmt.Errorf("unknown provider switch kind")
 	}

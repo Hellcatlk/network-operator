@@ -2,95 +2,130 @@ package ansible
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"os/exec"
 
 	"github.com/Hellcatlk/network-operator/api/v1alpha1"
 	"github.com/Hellcatlk/network-operator/pkg/backends"
 	"github.com/Hellcatlk/network-operator/pkg/provider"
-	"github.com/sbinet/go-python"
+	"github.com/Hellcatlk/network-operator/pkg/utils/certificate"
 )
-
-func init() {
-	err := python.Initialize()
-	if err != nil {
-		panic(err.Error())
-	}
-}
 
 // Ansible backend
 type Ansible struct {
-	networkRunner *python.PyObject
+	host string
+	os   string
+	cert *certificate.Certificate
+}
+
+type networkRunnerData struct {
+	Host     string
+	Cert     *certificate.Certificate
+	OS       string
+	Operator string
+	Port     string
+	Vlan     int
+	Vlans    []int
 }
 
 func (a *Ansible) createVlan(vlan int) error {
-	a.networkRunner.CallMethod("create_vlan", "ansibleHost", vlan)
-	return nil
+	data, err := json.Marshal(networkRunnerData{
+		Host:     a.host,
+		Cert:     a.cert,
+		OS:       a.os,
+		Operator: "CreateVlan",
+		Vlan:     vlan,
+	})
+	if err != nil {
+		return err
+	}
+
+	cmd := exec.Command("./cmd/network_runner/main.py", string(data))
+	return cmd.Run()
 }
 
 func (a *Ansible) deleteVlan(vlan int) error {
-	a.networkRunner.CallMethod("delete_vlan", "ansibleHost", vlan)
-	return nil
+	data, err := json.Marshal(networkRunnerData{
+		Host:     a.host,
+		Cert:     a.cert,
+		OS:       a.os,
+		Operator: "DeleteVlan",
+		Vlan:     vlan,
+	})
+	if err != nil {
+		return err
+	}
+
+	cmd := exec.Command("./cmd/network_runner/main.py", string(data))
+	return cmd.Run()
 }
 
 func (a *Ansible) configureAccessPort(port string, vlan int) error {
-	a.networkRunner.CallMethod("conf_access_port", "ansibleHost", "port", vlan)
-	return nil
+	data, err := json.Marshal(networkRunnerData{
+		Host:     a.host,
+		Cert:     a.cert,
+		OS:       a.os,
+		Operator: "ConfigAccessPort",
+		Port:     port,
+		Vlan:     vlan,
+	})
+	if err != nil {
+		return err
+	}
+
+	cmd := exec.Command("./cmd/network_runner/main.py", string(data))
+	return cmd.Run()
 }
 
 func (a *Ansible) configureTrunkPort(port string, vlans []int) error {
-	a.networkRunner.CallMethod("conf_trunk_port", "ansibleHost", "port", vlans)
-	return nil
+	data, err := json.Marshal(networkRunnerData{
+		Host:     a.host,
+		Cert:     a.cert,
+		OS:       a.os,
+		Operator: "ConfigAccessPort",
+		Port:     port,
+		Vlans:    vlans,
+	})
+	if err != nil {
+		return err
+	}
+
+	cmd := exec.Command("./cmd/network_runner/main.py", string(data))
+	return cmd.Run()
 }
 
 func (a *Ansible) deletePort(port string) error {
-	a.networkRunner.CallMethod("delete_port", "ansibleHost", "port")
-	return nil
+	data, err := json.Marshal(networkRunnerData{
+		Host:     a.host,
+		Cert:     a.cert,
+		OS:       a.os,
+		Operator: "DeletePort",
+		Port:     port,
+	})
+	if err != nil {
+		return err
+	}
+
+	cmd := exec.Command("./cmd/network_runner/main.py", string(data))
+	return cmd.Run()
 }
 
 // New return test backend
 func (a *Ansible) New(ctx context.Context, config *provider.Config) (backends.Switch, error) {
-	// Import modules
-	ModuleInventory := python.PyImport_ImportModule("network_runner.models.inventory")
-	if ModuleInventory == nil {
-		return nil, fmt.Errorf("import python module network_runner.models.inventory failed")
-	}
-	ModuleAPI := python.PyImport_ImportModule("network_runner.api")
-	if ModuleAPI == nil {
-		return nil, fmt.Errorf("import python module network_runner.api failed")
+	if config == nil {
+		return nil, fmt.Errorf("configure of switch(%s) is nil", config.OS)
 	}
 
-	// Get python classes
-	classHost := ModuleInventory.GetAttrString("Host")
-	if classHost == nil {
-		return nil, fmt.Errorf("get python class Host failed")
-	}
-	classInventory := ModuleInventory.GetAttrString("Inventory")
-	if classInventory == nil {
-		return nil, fmt.Errorf("get python class Inventory failed")
-	}
-	classNetworkRunner := ModuleAPI.GetAttrString("NetworkRunner")
-	if classNetworkRunner == nil {
-		return nil, fmt.Errorf("get python class NetworkRunner failed")
-	}
-
-	// Network runner initial
-	host := python.PyInstance_New(classHost, nil, nil)
-	if host == nil {
-		return nil, fmt.Errorf("initital python object Host failed")
-	}
-	inventory := python.PyInstance_New(classInventory, nil, nil)
-	if inventory == nil {
-		return nil, fmt.Errorf("initital python object Inventory failed")
-	}
-	inventory.GetAttrString("hosts").CallMethodObjArgs("add", host)
-	networkRunner := python.PyInstance_New(classNetworkRunner, inventory, nil)
-	if networkRunner == nil {
-		return nil, fmt.Errorf("initital python object NetworkRunner failed")
+	if config.Cert == nil {
+		return nil, fmt.Errorf("certificate of switch(%s) is nil", config.OS)
 	}
 
 	return &Ansible{
-		networkRunner: networkRunner,
-	}, nil
+		host: config.Host,
+		cert: config.Cert,
+		os:   config.OS,
+	}, a.deletePort("11")
 }
 
 // PowerOn just for test
@@ -104,16 +139,16 @@ func (a *Ansible) PowerOff(ctx context.Context) (err error) {
 }
 
 // GetPortAttr just for test
-func (a *Ansible) GetPortAttr(ctx context.Context, name string) (*v1alpha1.SwitchPortConfiguration, error) {
+func (a *Ansible) GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPortConfiguration, error) {
 	return &v1alpha1.SwitchPortConfiguration{}, nil
 }
 
 // SetPortAttr just for test
-func (a *Ansible) SetPortAttr(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) error {
+func (a *Ansible) SetPortAttr(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfiguration) error {
 	return nil
 }
 
 // ResetPort just for test
-func (a *Ansible) ResetPort(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) error {
-	return nil
+func (a *Ansible) ResetPort(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfiguration) error {
+	return a.deletePort(port)
 }

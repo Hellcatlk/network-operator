@@ -34,7 +34,10 @@ func TestNew(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			_, err := New(context.Background(), c.backend, &provider.Config{
-				Cert: &certificate.Certificate{},
+				Cert: &certificate.Certificate{
+					Username: "test",
+					Password: "test",
+				},
 			})
 			if (err != nil) != c.expectError {
 				t.Errorf("Got unexpected error: %v", err)
