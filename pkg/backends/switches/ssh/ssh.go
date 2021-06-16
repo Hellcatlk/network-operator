@@ -56,8 +56,8 @@ func (s *SSH) PowerOn(ctx context.Context) error {
 }
 
 // PowerOff disable openvswitch
-func (s *SSH) PowerOff(ctx context.Context) (err error) {
-	return
+func (s *SSH) PowerOff(ctx context.Context) error {
+	return nil
 }
 
 // GetPortAttr get the port's configure

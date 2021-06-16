@@ -27,8 +27,8 @@ func (t *test) PowerOn(ctx context.Context) error {
 }
 
 // PowerOff just for test
-func (t *test) PowerOff(ctx context.Context) (err error) {
-	return
+func (t *test) PowerOff(ctx context.Context) error {
+	return nil
 }
 
 // GetPortAttr just for test

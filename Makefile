@@ -13,14 +13,15 @@ endif
 
 GOOS=$(shell go env GOOS)
 GOARCH=$(shell go env GOARCH)
+PATH := $(shell pwd)/bin:$(PATH)
 
 # Build manager binary
 .PHONY: build
-build: generate
+build: generate bin/network-runner
 	CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} GO111MODULE=on go build -a -o bin/manager main.go
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
-run: generate
+run: generate bin/network-runner
 	go run ./main.go
 
 # Build the docker image
@@ -31,29 +32,29 @@ docker: generate build
 
 # Install CRDs into a cluster
 install: manifests bin/kustomize
-	./bin/kustomize build config/crd | kubectl apply -f -
+	kustomize build config/crd | kubectl apply -f -
 
 # Uninstall CRDs from a cluster
 uninstall: manifests bin/kustomize
-	./bin/kustomize build config/crd | kubectl delete -f -
+	kustomize build config/crd | kubectl delete -f -
 
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
 deploy: manifests bin/kustomize
-	cd config/manager && ../../bin/kustomize edit set image controller=${IMG}
-	./bin/kustomize build config/default | kubectl apply -f -
+	cd config/manager && kustomize edit set image controller=${IMG}
+	kustomize build config/default | kubectl apply -f -
 
 # Undeploy controller in the configured Kubernetes cluster in ~/.kube/config
 undeploy: manifests bin/kustomize
-	cd config/manager && ../../bin/kustomize edit set image controller=${IMG}
-	./bin/kustomize build config/default | kubectl delete -f -
+	cd config/manager && kustomize edit set image controller=${IMG}
+	kustomize build config/default | kubectl delete -f -
 
 # Generate code
 generate: bin/controller-gen
-	./bin/controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
+	controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: bin/controller-gen
-	./bin/controller-gen $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+	controller-gen $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 
 # Generate docs
 .PHONY: docs
@@ -69,7 +70,7 @@ gofmt:
 
 # Run go lint against code
 golint: bin/golangci-lint
-	./bin/golangci-lint run ./... --timeout=10m
+	golangci-lint run ./... --timeout=10m
 
 # Run go vet against code
 govet:
@@ -77,10 +78,10 @@ govet:
 
 # Run go sec against code
 gosec: bin/gosec
-	./bin/gosec -quiet ./...
+	gosec -quiet ./...
 
 # Run go test against code
-unit:
+unit: bin/network-runner
 	./tools/install_kubebuilder.sh
 	go test ./... -coverprofile=cover.out
 	go tool cover -html=cover.out -o coverage.html
@@ -95,6 +96,10 @@ clean:
 mod:
 	go mod tidy
 	go mod verify
+
+.PHONY: bin/network-runner
+bin/network-runner:
+	cp ./cmd/network-runner/network-runner.py ./bin/network-runner
 
 # Install kustomize
 bin/kustomize:

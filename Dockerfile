@@ -3,6 +3,7 @@
 FROM gcr.io/distroless/static:nonroot
 WORKDIR /
 COPY bin/manager .
+COPY bin/network-runner /usr/bin
 USER nonroot:nonroot
 
 ENTRYPOINT ["/manager"]

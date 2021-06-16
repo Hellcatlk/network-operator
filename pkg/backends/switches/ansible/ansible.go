@@ -41,8 +41,13 @@ func (a *Ansible) createVlan(vlan int) error {
 		return err
 	}
 
-	cmd := exec.Command("./cmd/network_runner/main.py", string(data))
-	return cmd.Run()
+	cmd := exec.Command("network-runner", string(data))
+	output, err := cmd.Output()
+	if err != nil {
+		return fmt.Errorf("%s[%s]", output, err)
+	}
+
+	return nil
 }
 
 func (a *Ansible) deleteVlan(vlan int) error {
@@ -57,8 +62,13 @@ func (a *Ansible) deleteVlan(vlan int) error {
 		return err
 	}
 
-	cmd := exec.Command("./cmd/network_runner/main.py", string(data))
-	return cmd.Run()
+	cmd := exec.Command("network-runner", string(data))
+	output, err := cmd.Output()
+	if err != nil {
+		return fmt.Errorf("%s[%s]", output, err)
+	}
+
+	return nil
 }
 
 func (a *Ansible) configureAccessPort(port string, vlan int) error {
@@ -74,8 +84,13 @@ func (a *Ansible) configureAccessPort(port string, vlan int) error {
 		return err
 	}
 
-	cmd := exec.Command("./cmd/network_runner/main.py", string(data))
-	return cmd.Run()
+	cmd := exec.Command("network-runner", string(data))
+	output, err := cmd.Output()
+	if err != nil {
+		return fmt.Errorf("%s[%s]", output, err)
+	}
+
+	return nil
 }
 
 func (a *Ansible) configureTrunkPort(port string, vlans []int) error {
@@ -91,8 +106,13 @@ func (a *Ansible) configureTrunkPort(port string, vlans []int) error {
 		return err
 	}
 
-	cmd := exec.Command("./cmd/network_runner/main.py", string(data))
-	return cmd.Run()
+	cmd := exec.Command("network-runner", string(data))
+	output, err := cmd.Output()
+	if err != nil {
+		return fmt.Errorf("%s[%s]", output, err)
+	}
+
+	return nil
 }
 
 func (a *Ansible) deletePort(port string) error {
@@ -107,8 +127,13 @@ func (a *Ansible) deletePort(port string) error {
 		return err
 	}
 
-	cmd := exec.Command("./cmd/network_runner/main.py", string(data))
-	return cmd.Run()
+	cmd := exec.Command("network-runner", string(data))
+	output, err := cmd.Output()
+	if err != nil {
+		return fmt.Errorf("%s[%s]", output, err)
+	}
+
+	return nil
 }
 
 // New return test backend
@@ -125,7 +150,7 @@ func (a *Ansible) New(ctx context.Context, config *provider.Config) (backends.Sw
 		host: config.Host,
 		cert: config.Cert,
 		os:   config.OS,
-	}, a.deletePort("11")
+	}, nil
 }
 
 // PowerOn just for test
@@ -134,8 +159,8 @@ func (a *Ansible) PowerOn(ctx context.Context) error {
 }
 
 // PowerOff just for test
-func (a *Ansible) PowerOff(ctx context.Context) (err error) {
-	return
+func (a *Ansible) PowerOff(ctx context.Context) error {
+	return nil
 }
 
 // GetPortAttr just for test
