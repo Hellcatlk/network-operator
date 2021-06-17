@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/Hellcatlk/network-operator/api/v1alpha1"
-	"github.com/Hellcatlk/network-operator/pkg/backends/switches"
 	"github.com/Hellcatlk/network-operator/pkg/machine"
 	"github.com/Hellcatlk/network-operator/pkg/utils/finalizer"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -35,26 +34,6 @@ func (r *SwitchReconciler) verifyingHandler(ctx context.Context, info *machine.R
 
 	if !i.DeletionTimestamp.IsZero() {
 		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true}, nil
-	}
-
-	providerSwitch, err := i.Spec.ProviderSwitch.Fetch(ctx, info.Client)
-	if err != nil {
-		return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
-	}
-
-	config, err := providerSwitch.GetConfiguration(ctx, info.Client)
-	if err != nil {
-		return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
-	}
-
-	sw, err := switches.New(ctx, i.Spec.Backend, config)
-	if err != nil {
-		return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
-	}
-
-	err = sw.PowerOn(ctx)
-	if err != nil {
-		return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
 	i.Status.ProviderSwitch = i.Spec.ProviderSwitch.DeepCopy()
@@ -138,26 +117,6 @@ func (r *SwitchReconciler) deletingHandler(ctx context.Context, info *machine.Re
 		if err == nil || !errors.IsNotFound(err) {
 			return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, nil
 		}
-	}
-
-	providerSwitch, err := i.Spec.ProviderSwitch.Fetch(ctx, info.Client)
-	if err != nil {
-		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
-	}
-
-	config, err := providerSwitch.GetConfiguration(ctx, info.Client)
-	if err != nil {
-		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
-	}
-
-	sw, err := switches.New(ctx, i.Spec.Backend, config)
-	if err != nil {
-		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
-	}
-
-	err = sw.PowerOff(ctx)
-	if err != nil {
-		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
 	finalizer.Remove(&i.Finalizers, finalizerKey)

@@ -69,7 +69,7 @@ func (r *SwitchPortReconciler) verifyingHandler(ctx context.Context, info *machi
 		return v1alpha1.SwitchPortVerifying, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, fmt.Errorf("the port is disabled")
 	}
 
-	if owner.Status.Ports[i.Name].TrunkDisabled && len(configuration.Spec.Vlans) != 0 {
+	if owner.Status.Ports[i.Name].TrunkDisabled && len(configuration.Spec.VLANs) != 0 {
 		return v1alpha1.SwitchPortVerifying, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, fmt.Errorf("set the port to trunk mode is disabled")
 	}
 

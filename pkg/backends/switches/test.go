@@ -21,16 +21,6 @@ func (t *test) New(ctx context.Context, config *provider.Config) (backends.Switc
 	return &test{}, nil
 }
 
-// PowerOn just for test
-func (t *test) PowerOn(ctx context.Context) error {
-	return nil
-}
-
-// PowerOff just for test
-func (t *test) PowerOff(ctx context.Context) error {
-	return nil
-}
-
 // GetPortAttr just for test
 func (t *test) GetPortAttr(ctx context.Context, name string) (*v1alpha1.SwitchPortConfiguration, error) {
 	return &v1alpha1.SwitchPortConfiguration{}, nil

@@ -43,23 +43,6 @@ func (s *SSH) New(ctx context.Context, config *provider.Config) (backends.Switch
 	}, nil
 }
 
-// PowerOn enable openvswitch
-func (s *SSH) PowerOn(ctx context.Context) error {
-	err := ussh.Run(s.Host, s.cert.Username, s.cert.Password, exec.Command(
-		"sudo", "ovs-vsctl", "list", "br", s.bridge,
-	)) // #nosec
-	if err != nil {
-		return fmt.Errorf("check birdge failed: %s", err)
-	}
-
-	return nil
-}
-
-// PowerOff disable openvswitch
-func (s *SSH) PowerOff(ctx context.Context) error {
-	return nil
-}
-
 // GetPortAttr get the port's configure
 func (s *SSH) GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPortConfiguration, error) {
 	output, err := ussh.Output(s.Host, s.cert.Username, s.cert.Password, exec.Command(
@@ -78,7 +61,9 @@ func (s *SSH) GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPor
 
 	return &v1alpha1.SwitchPortConfiguration{
 		Spec: v1alpha1.SwitchPortConfigurationSpec{
-			UntaggedVLAN: &id,
+			UntaggedVLAN: &v1alpha1.VLAN{
+				ID: id,
+			},
 		},
 	}, nil
 }
@@ -93,8 +78,12 @@ func (s *SSH) SetPortAttr(ctx context.Context, port string, configuration *v1alp
 		return nil
 	}
 
+	if len(configuration.Spec.UntaggedVLAN.Name) != 0 {
+		return fmt.Errorf("openvswitch isn't support set vlan name")
+	}
+
 	output, err := ussh.Output(s.Host, s.cert.Username, s.cert.Password, exec.Command(
-		"sudo", "ovs-vsctl", "set", "port", port, "tag="+strconv.Itoa(*configuration.Spec.UntaggedVLAN),
+		"sudo", "ovs-vsctl", "set", "port", port, "tag="+strconv.Itoa(configuration.Spec.UntaggedVLAN.ID),
 	)) // #nosec
 	if err != nil {
 		return fmt.Errorf("set port failed: %s[%s]", output, err)
@@ -123,7 +112,7 @@ func (s *SSH) ResetPort(ctx context.Context, port string, configuration *v1alpha
 	}
 
 	output, err := ussh.Output(s.Host, s.cert.Username, s.cert.Password, exec.Command(
-		"sudo", "ovs-vsctl", "remove ", "port", port, "tag", strconv.Itoa(*configuration.Spec.UntaggedVLAN),
+		"sudo", "ovs-vsctl", "remove ", "port", port, "tag", strconv.Itoa(configuration.Spec.UntaggedVLAN.ID),
 	)) // #nosec
 	if err != nil {
 		return fmt.Errorf("set port failed: %s[%s]", output, err)

@@ -16,8 +16,16 @@ from network_runner.models.inventory import Host, Inventory
 #     OS: "",
 #     Operator: "",
 #     Port: "",
-#     Vlan: 0,
-#     Vlans: [],
+#     UntaggedVLAN: {
+#         Name: "",
+#         ID: 0,
+#     },
+#     VLANs: [
+#         {
+#             Name: "",
+#             ID: 0,
+#         },
+#     ],
 # }
 data = json.loads(sys.argv[1])
 
@@ -31,21 +39,28 @@ inventory = Inventory()
 inventory.hosts.add(host)
 network_runner = api.NetworkRunner(inventory)
 
-
-# Check operator
-if data.Operator == "CreateVlan":
-    network_runner.create_vlan('network-operator', data.Vlan)
-    # TODO: Check return value
-    exit(0)
-
 if data.Operator == "ConfigAccessPort":
-    network_runner.conf_access_port('network-operator', data.Port, data.Vlan)
+    # Create vlan
+    network_runner.create_vlan(
+        'network-operator', data.VLAN.ID, data.VLAN.Name)
+
+    # Configure access port
+    network_runner.conf_access_port(
+        'network-operator', data.Port, data.VLAN.ID)
     # TODO: Check return value
     exit(0)
 
 if data.Operator == "ConfigTrunkPort":
+    vlans = []
+    for VLAN in data.VLANs:
+        # Create vlan
+        network_runner.create_vlan(
+            'network-operator', VLAN.ID, VLAN.Name)
+        vlans.append(VLAN.ID)
+
+    # Configure trunk port
     network_runner.conf_trunk_port(
-        'network-operator', data.Port, data.Vlan, data.Vlans)
+        'network-operator', data.Port, data.VLAN.ID, vlans)
     # TODO: Check return value
     exit(0)
 

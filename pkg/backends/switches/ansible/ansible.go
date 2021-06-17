@@ -20,22 +20,23 @@ type Ansible struct {
 }
 
 type networkRunnerData struct {
-	Host     string
-	Cert     *certificate.Certificate
-	OS       string
-	Operator string
-	Port     string
-	Vlan     int
-	Vlans    []int
+	Host         string
+	Cert         *certificate.Certificate
+	OS           string
+	Operator     string
+	Port         string
+	UntaggedVLAN v1alpha1.VLAN
+	VLANs        []v1alpha1.VLAN
 }
 
-func (a *Ansible) createVlan(vlan int) error {
+func (a *Ansible) configureAccessPort(port string, vlan v1alpha1.VLAN) error {
 	data, err := json.Marshal(networkRunnerData{
-		Host:     a.host,
-		Cert:     a.cert,
-		OS:       a.os,
-		Operator: "CreateVlan",
-		Vlan:     vlan,
+		Host:         a.host,
+		Cert:         a.cert,
+		OS:           a.os,
+		Operator:     "ConfigAccessPort",
+		Port:         port,
+		UntaggedVLAN: vlan,
 	})
 	if err != nil {
 		return err
@@ -50,36 +51,14 @@ func (a *Ansible) createVlan(vlan int) error {
 	return nil
 }
 
-func (a *Ansible) configureAccessPort(port string, vlan int) error {
+func (a *Ansible) configureTrunkPort(port string, vlans []v1alpha1.VLAN) error {
 	data, err := json.Marshal(networkRunnerData{
 		Host:     a.host,
 		Cert:     a.cert,
 		OS:       a.os,
 		Operator: "ConfigAccessPort",
 		Port:     port,
-		Vlan:     vlan,
-	})
-	if err != nil {
-		return err
-	}
-
-	cmd := exec.Command("network-runner", string(data)) // #nosec
-	output, err := cmd.Output()
-	if err != nil {
-		return fmt.Errorf("%s[%s]", output, err)
-	}
-
-	return nil
-}
-
-func (a *Ansible) configureTrunkPort(port string, vlans []int) error {
-	data, err := json.Marshal(networkRunnerData{
-		Host:     a.host,
-		Cert:     a.cert,
-		OS:       a.os,
-		Operator: "ConfigAccessPort",
-		Port:     port,
-		Vlans:    vlans,
+		VLANs:    vlans,
 	})
 	if err != nil {
 		return err
@@ -132,16 +111,6 @@ func (a *Ansible) New(ctx context.Context, config *provider.Config) (backends.Sw
 	}, nil
 }
 
-// PowerOn just for test
-func (a *Ansible) PowerOn(ctx context.Context) error {
-	return nil
-}
-
-// PowerOff just for test
-func (a *Ansible) PowerOff(ctx context.Context) error {
-	return nil
-}
-
 // GetPortAttr just for test
 func (a *Ansible) GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPortConfiguration, error) {
 	return &v1alpha1.SwitchPortConfiguration{}, nil
@@ -150,20 +119,10 @@ func (a *Ansible) GetPortAttr(ctx context.Context, port string) (*v1alpha1.Switc
 // SetPortAttr just for test
 func (a *Ansible) SetPortAttr(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfiguration) error {
 	if configuration.Spec.UntaggedVLAN != nil {
-		err := a.createVlan(*configuration.Spec.UntaggedVLAN)
-		if err != nil {
-			return err
-		}
 		return a.configureAccessPort(port, *configuration.Spec.UntaggedVLAN)
 	}
 
-	for _, vlan := range configuration.Spec.Vlans {
-		err := a.createVlan(vlan)
-		if err != nil {
-			return err
-		}
-	}
-	return a.configureTrunkPort(port, configuration.Spec.Vlans)
+	return a.configureTrunkPort(port, configuration.Spec.VLANs)
 }
 
 // ResetPort just for test

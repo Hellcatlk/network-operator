@@ -109,14 +109,31 @@ spec:
                         description: Disable port
                         type: boolean
                       untaggedVLAN:
-                        description: Untagged vlan's vlan id. If untaggedVLAN isn't nil, the port's mode is `access`
-                        maximum: 4094
-                        minimum: 0
-                        type: integer
+                        description: VLAN is tagged vlan
+                        properties:
+                          id:
+                            maximum: 4094
+                            minimum: 0
+                            type: integer
+                          name:
+                            type: string
+                        required:
+                        - id
+                        type: object
                       vlans:
-                        description: The vlans to which the trunk port belongs, conflicts with `untaggedVLAN` Vlans to which the port belongs
+                        description: The vlans to which the trunk port belongs, conflicts with `untaggedVLAN` VLANs to which the port belongs
                         items:
-                          type: integer
+                          description: VLAN is tagged vlan
+                          properties:
+                            id:
+                              maximum: 4094
+                              minimum: 0
+                              type: integer
+                            name:
+                              type: string
+                          required:
+                          - id
+                          type: object
                         type: array
                     type: object
                   status:

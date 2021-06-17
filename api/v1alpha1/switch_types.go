@@ -40,7 +40,7 @@ type Port struct {
 
 	// Indicates the range of VLANs allowed by this port in the switch
 	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
-	VlanRange string `json:"vlanRange,omitempty"`
+	VLANRange string `json:"vlanRange,omitempty"`
 }
 
 // ProviderSwitchRef is the reference for ProviderSwitch CR
