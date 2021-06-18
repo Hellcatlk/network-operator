@@ -30,7 +30,7 @@ import (
 type SwitchPortReference struct {
 	Name string `json:"name"`
 
-	// If empty use default namespace.
+	// If empty use default namespace
 	// +kubebuilder:default:="default"
 	Namespace string `json:"namespace,omitempty"`
 }
@@ -58,7 +58,7 @@ func (ref *SwitchPortReference) Fetch(ctx context.Context, client client.Client)
 type SwitchPortConfigurationReference struct {
 	Name string `json:"name"`
 
-	// If empty use default namespace.
+	// If empty use default namespace
 	// +kubebuilder:default:="default"
 	Namespace string `json:"namespace,omitempty"`
 }
@@ -84,19 +84,19 @@ func (ref *SwitchPortConfigurationReference) Fetch(ctx context.Context, client c
 
 // SwitchPortSpec defines the desired state of SwitchPort
 type SwitchPortSpec struct {
-	// The reference of PortConfiguration CR.
+	// The reference of PortConfiguration CR
 	Configuration *SwitchPortConfigurationReference `json:"configuration,omitempty"`
 }
 
 // SwitchPortStatus defines the observed state of SwitchPort
 type SwitchPortStatus struct {
-	// The current configuration status of the port.
+	// The current configuration status of the port
 	State machine.StateType `json:"state,omitempty"`
 
 	// The error message of the port
 	Error string `json:"error,omitempty"`
 
-	// The current Configuration of the port.
+	// The current Configuration of the port
 	Configuration *SwitchPortConfiguration `json:"configuration,omitempty"`
 }
 

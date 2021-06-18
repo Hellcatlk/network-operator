@@ -28,7 +28,8 @@ import (
 
 // OVSSwitchSpec defines the desired state of OVSSwitch
 type OVSSwitchSpec struct {
-	Host   string `json:"host"`
+	Host string `json:"host"`
+
 	Bridge string `json:"bridge"`
 
 	// The secret containing the switch credentials

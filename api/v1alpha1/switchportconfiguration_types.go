@@ -56,12 +56,8 @@ type SwitchPortConfigurationSpec struct {
 	// +kubebuilder:validation:MaxItems=10
 	ACLs []ACL `json:"acls,omitempty"`
 
-	// Untagged vlan's vlan id. If untaggedVLAN isn't nil, the port's mode is `access`
-
 	UntaggedVLAN *VLAN `json:"untaggedVLAN,omitempty"`
 
-	// The vlans to which the trunk port belongs, conflicts with `untaggedVLAN`
-	// VLANs to which the port belongs
 	VLANs []VLAN `json:"vlans,omitempty"`
 
 	// Disable port

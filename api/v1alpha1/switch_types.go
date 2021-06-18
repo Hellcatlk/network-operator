@@ -88,6 +88,7 @@ func (ref *ProviderSwitchRef) Fetch(ctx context.Context, client client.Client) (
 
 // SwitchSpec defines the desired state of Switch
 type SwitchSpec struct {
+	// Which backend to use to configure switch
 	// +kubebuilder:validation:Enum=ssh;ansible
 	Backend string `json:"backend"`
 
@@ -100,7 +101,7 @@ type SwitchSpec struct {
 
 // SwitchStatus defines the observed state of Switch
 type SwitchStatus struct {
-	// The current configuration status of the switch.
+	// The current configuration status of the switch
 	State machine.StateType `json:"state,omitempty"`
 
 	// The reference of provider switch
