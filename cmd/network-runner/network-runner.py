@@ -40,7 +40,7 @@ inventory.hosts.add(host)
 network_runner = api.NetworkRunner(inventory)
 
 if data.Operator == "ConfigAccessPort":
-    # Create vlan
+    # Create untagged vlan
     network_runner.create_vlan(
         'network-operator', data.VLAN.ID, data.VLAN.Name)
 
@@ -51,9 +51,13 @@ if data.Operator == "ConfigAccessPort":
     exit(0)
 
 if data.Operator == "ConfigTrunkPort":
+    # Create untagged vlan
+    network_runner.create_vlan(
+        'network-operator', data.VLAN.ID, data.VLAN.Name)
+
     vlans = []
     for VLAN in data.VLANs:
-        # Create vlan
+        # Create tagged vlan
         network_runner.create_vlan(
             'network-operator', VLAN.ID, VLAN.Name)
         vlans.append(VLAN.ID)

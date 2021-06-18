@@ -25,18 +25,18 @@ type networkRunnerData struct {
 	OS           string
 	Operator     string
 	Port         string
-	UntaggedVLAN v1alpha1.VLAN
+	UntaggedVLAN *v1alpha1.VLAN
 	VLANs        []v1alpha1.VLAN
 }
 
-func (a *Ansible) configureAccessPort(port string, vlan v1alpha1.VLAN) error {
+func (a *Ansible) configureAccessPort(port string, untaggedVLAN *v1alpha1.VLAN) error {
 	data, err := json.Marshal(networkRunnerData{
 		Host:         a.host,
 		Cert:         a.cert,
 		OS:           a.os,
 		Operator:     "ConfigAccessPort",
 		Port:         port,
-		UntaggedVLAN: vlan,
+		UntaggedVLAN: untaggedVLAN,
 	})
 	if err != nil {
 		return err
@@ -51,14 +51,15 @@ func (a *Ansible) configureAccessPort(port string, vlan v1alpha1.VLAN) error {
 	return nil
 }
 
-func (a *Ansible) configureTrunkPort(port string, vlans []v1alpha1.VLAN) error {
+func (a *Ansible) configureTrunkPort(port string, untaggedVLAN *v1alpha1.VLAN, vlans []v1alpha1.VLAN) error {
 	data, err := json.Marshal(networkRunnerData{
-		Host:     a.host,
-		Cert:     a.cert,
-		OS:       a.os,
-		Operator: "ConfigAccessPort",
-		Port:     port,
-		VLANs:    vlans,
+		Host:         a.host,
+		Cert:         a.cert,
+		OS:           a.os,
+		Operator:     "ConfigTrunkPort",
+		Port:         port,
+		UntaggedVLAN: untaggedVLAN,
+		VLANs:        vlans,
 	})
 	if err != nil {
 		return err
@@ -118,11 +119,11 @@ func (a *Ansible) GetPortAttr(ctx context.Context, port string) (*v1alpha1.Switc
 
 // SetPortAttr just for test
 func (a *Ansible) SetPortAttr(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfiguration) error {
-	if configuration.Spec.UntaggedVLAN != nil {
-		return a.configureAccessPort(port, *configuration.Spec.UntaggedVLAN)
+	if len(configuration.Spec.VLANs) == 0 {
+		return a.configureAccessPort(port, configuration.Spec.UntaggedVLAN)
 	}
 
-	return a.configureTrunkPort(port, configuration.Spec.VLANs)
+	return a.configureTrunkPort(port, configuration.Spec.UntaggedVLAN, configuration.Spec.VLANs)
 }
 
 // ResetPort just for test
