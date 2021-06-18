@@ -212,5 +212,5 @@ func (r *SwitchPortReconciler) deletingHandler(ctx context.Context, info *machin
 	// Remove finalizer
 	finalizer.Remove(&i.Finalizers, finalizerKey)
 
-	return v1alpha1.SwitchPortNone, ctrl.Result{}, nil
+	return v1alpha1.SwitchPortDeleting, ctrl.Result{}, nil
 }
