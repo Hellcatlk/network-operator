@@ -42,13 +42,13 @@ spec:
             description: SwitchPortSpec defines the desired state of SwitchPort
             properties:
               configuration:
-                description: The reference of PortConfiguration CR.
+                description: The reference of PortConfiguration CR
                 properties:
                   name:
                     type: string
                   namespace:
                     default: default
-                    description: If empty use default namespace.
+                    description: If empty use default namespace
                     type: string
                 required:
                 - name
@@ -58,7 +58,7 @@ spec:
             description: SwitchPortStatus defines the observed state of SwitchPort
             properties:
               configuration:
-                description: The current Configuration of the port.
+                description: The current Configuration of the port
                 properties:
                   apiVersion:
                     description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
@@ -121,7 +121,6 @@ spec:
                         - id
                         type: object
                       vlans:
-                        description: The vlans to which the trunk port belongs, conflicts with `untaggedVLAN` VLANs to which the port belongs
                         items:
                           description: VLAN is tagged vlan
                           properties:
@@ -144,7 +143,7 @@ spec:
                 description: The error message of the port
                 type: string
               state:
-                description: The current configuration status of the port.
+                description: The current configuration status of the port
                 type: string
             type: object
         type: object

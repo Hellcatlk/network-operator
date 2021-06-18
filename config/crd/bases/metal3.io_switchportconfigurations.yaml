@@ -82,7 +82,6 @@ spec:
                 - id
                 type: object
               vlans:
-                description: The vlans to which the trunk port belongs, conflicts with `untaggedVLAN` VLANs to which the port belongs
                 items:
                   description: VLAN is tagged vlan
                   properties:
