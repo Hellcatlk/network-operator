@@ -129,10 +129,10 @@ func TestSwitchPortStateMachine(t *testing.T) {
 			expectedState:          v1alpha1.SwitchPortDeleting,
 		},
 		{
-			name:                   "Deleting -> <None>",
+			name:                   "Deleting -> Deleting",
 			deletionTimestampExist: true,
 			expectedDirty:          true,
-			expectedState:          v1alpha1.SwitchPortNone,
+			expectedState:          v1alpha1.SwitchPortDeleting,
 		},
 	}
 
