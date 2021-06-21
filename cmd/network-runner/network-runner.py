@@ -40,31 +40,38 @@ inventory.hosts.add(host)
 network_runner = api.NetworkRunner(inventory)
 
 if data["operator"] == "ConfigAccessPort":
+    if data.get("untaggedVLAN") == None:
+        print("miss required parameter(untaggedVLAN) for ConfigAccessPort")
+        exit(1)
+
     # Create untagged vlan
     network_runner.create_vlan(
-        "network-operator", data["vlan"]["id"], data["vlan"]["name"])
+        "network-operator", data["untaggedVLAN"]["id"], data["untaggedVLAN"].get("name"))
 
     # Configure access port
     network_runner.conf_access_port(
-        "network-operator", data["port"], data["vlan"]["id"])
+        "network-operator", data["port"], data["untaggedVLAN"]["id"])
     exit(0)
 
 if data["operator"] == "ConfigTrunkPort":
     # Create untagged vlan
-    network_runner.create_vlan(
-        "network-operator", data["vlan"]["id"], data["vlan"]["name"])
+    untaggedVLAN = None
+    if data.get("untaggedVLAN") != None:
+        network_runner.create_vlan(
+            "network-operator", data["untaggedVLAN"]["id"], data["untaggedVLAN"].get("name"))
+        untaggedVLAN = data["untaggedVLAN"]["id"]
 
     # Create tagged vlans
     vlans = []
     for vlan in data["vlans"]:
         # Create tagged vlan
         network_runner.create_vlan(
-            "network-operator", vlan["id"], vlan["name"])
+            "network-operator", vlan["id"], vlan.get("name"))
         vlans.append(vlan["id"])
 
     # Configure trunk port
     network_runner.conf_trunk_port(
-        "network-operator", data["port"], data["vlan"]["id"], vlans)
+        "network-operator", data["port"], untaggedVLAN, vlans)
     exit(0)
 
 if data["operator"] == "DeletePort":
