@@ -14,19 +14,22 @@ import (
 
 // Ansible backend
 type Ansible struct {
-	host string
-	os   string
-	cert *certificate.Certificate
+	host    string
+	os      string
+	cert    *certificate.Certificate
+	options map[string]string
 }
 
 type networkRunnerData struct {
-	Host         string                   `json:"host"`
-	Cert         *certificate.Certificate `json:"cert"`
-	OS           string                   `json:"os"`
-	Operator     string                   `json:"operator"`
-	Port         string                   `json:"port"`
-	UntaggedVLAN *v1alpha1.VLAN           `json:"untaggedVLAN,omitempty"`
-	VLANs        []v1alpha1.VLAN          `json:"vlans,omitempty"`
+	Host string                   `json:"host"`
+	Cert *certificate.Certificate `json:"cert"`
+	OS   string                   `json:"os"`
+	// Bridge just use for openvswitch
+	Bridge       string          `json:"bridge,omitempty"`
+	Operator     string          `json:"operator"`
+	Port         string          `json:"port"`
+	UntaggedVLAN *v1alpha1.VLAN  `json:"untaggedVLAN,omitempty"`
+	VLANs        []v1alpha1.VLAN `json:"vlans,omitempty"`
 }
 
 func (a *Ansible) configureAccessPort(port string, untaggedVLAN *v1alpha1.VLAN) error {
@@ -79,6 +82,7 @@ func (a *Ansible) deletePort(port string) error {
 		Host:     a.host,
 		Cert:     a.cert,
 		OS:       a.os,
+		Bridge:   a.options["bridge"],
 		Operator: "DeletePort",
 		Port:     port,
 	})
@@ -106,9 +110,10 @@ func (a *Ansible) New(ctx context.Context, config *provider.Config) (backends.Sw
 	}
 
 	return &Ansible{
-		host: config.Host,
-		cert: config.Cert,
-		os:   config.OS,
+		host:    config.Host,
+		cert:    config.Cert,
+		os:      config.OS,
+		options: config.Options,
 	}, nil
 }
 

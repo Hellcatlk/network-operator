@@ -14,6 +14,7 @@ from network_runner.models.inventory import Host, Inventory
 #         password: "",
 #     },
 #     os: "",
+#     bridge: "",
 #     operator: "",
 #     port: "",
 #     untaggedVLAN: {
@@ -79,7 +80,8 @@ if data["operator"] == "ConfigTrunkPort":
     exit(0)
 
 if data["operator"] == "DeletePort":
-    network_runner.delete_port("network-operator", data["port"])
+    network_runner.delete_port(
+        "network-operator", data["port"], {"bridge_name": data["bridge"]})
     exit(0)
 
 print("invalid operator")

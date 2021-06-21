@@ -57,6 +57,7 @@ func (r *SwitchReconciler) configuringHandler(ctx context.Context, info *machine
 		switchPort.OwnerReferences = []metav1.OwnerReference{
 			{
 				BlockOwnerDeletion: new(bool),
+				Controller:         new(bool),
 				APIVersion:         i.APIVersion,
 				Kind:               i.Kind,
 				Name:               i.Name,
@@ -64,6 +65,7 @@ func (r *SwitchReconciler) configuringHandler(ctx context.Context, info *machine
 			},
 		}
 		*switchPort.OwnerReferences[0].BlockOwnerDeletion = true
+		*switchPort.OwnerReferences[0].Controller = true
 
 		// Create SwitchPort
 		err := info.Client.Create(ctx, switchPort)
