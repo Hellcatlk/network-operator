@@ -81,7 +81,7 @@ if data["operator"] == "ConfigTrunkPort":
 
 if data["operator"] == "DeletePort":
     network_runner.delete_port(
-        "network-operator", data["port"], {"bridge_name": data["bridge"]})
+        "network-operator", data["port"], bridge_name=data["bridge"])
     exit(0)
 
 print("invalid operator")
