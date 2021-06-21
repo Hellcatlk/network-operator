@@ -8,19 +8,19 @@ from network_runner.models.inventory import Host, Inventory
 # Parse json data
 # format:
 # {
-#     Host: "",
-#     Cert: {
-#         Username: "",
-#         Password: "",
+#     host: "",
+#     cert: {
+#         username: "",
+#         password: "",
 #     },
-#     OS: "",
-#     Operator: "",
-#     Port: "",
-#     UntaggedVLAN: {
-#         Name: "",
-#         ID: 0,
+#     os: "",
+#     operator: "",
+#     port: "",
+#     untaggedVLAN: {
+#         name: "",
+#         id: 0,
 #     },
-#     VLANs: [
+#     vlans: [
 #         {
 #             Name: "",
 #             ID: 0,
@@ -30,47 +30,45 @@ from network_runner.models.inventory import Host, Inventory
 data = json.loads(sys.argv[1])
 
 # Initial network runner
-host = Host(name='network-operator',
-            ansible_host=data.Host,
-            ansible_user=data.Cert.Username,
-            ansible_ssh_pass=data.Cert.Password,
-            ansible_network_os=data.OS)
+host = Host(name="network-operator",
+            ansible_host=data["host"],
+            ansible_user=data["cert"]["username"],
+            ansible_ssh_pass=data["cert"]["password"],
+            ansible_network_os=data["os"])
 inventory = Inventory()
 inventory.hosts.add(host)
 network_runner = api.NetworkRunner(inventory)
 
-if data.Operator == "ConfigAccessPort":
+if data["operator"] == "ConfigAccessPort":
     # Create untagged vlan
     network_runner.create_vlan(
-        'network-operator', data.VLAN.ID, data.VLAN.Name)
+        "network-operator", data["vlan"]["id"], data["vlan"]["name"])
 
     # Configure access port
     network_runner.conf_access_port(
-        'network-operator', data.Port, data.VLAN.ID)
-    # TODO: Check return value
+        "network-operator", data["port"], data["vlan"]["id"])
     exit(0)
 
-if data.Operator == "ConfigTrunkPort":
+if data["operator"] == "ConfigTrunkPort":
     # Create untagged vlan
     network_runner.create_vlan(
-        'network-operator', data.VLAN.ID, data.VLAN.Name)
+        "network-operator", data["vlan"]["id"], data["vlan"]["name"])
 
+    # Create tagged vlans
     vlans = []
-    for VLAN in data.VLANs:
+    for vlan in data["vlans"]:
         # Create tagged vlan
         network_runner.create_vlan(
-            'network-operator', VLAN.ID, VLAN.Name)
-        vlans.append(VLAN.ID)
+            "network-operator", vlan["id"], vlan["name"])
+        vlans.append(vlan["id"])
 
     # Configure trunk port
     network_runner.conf_trunk_port(
-        'network-operator', data.Port, data.VLAN.ID, vlans)
-    # TODO: Check return value
+        "network-operator", data["port"], data["vlan"]["id"], vlans)
     exit(0)
 
-if data.Operator == "DeletePort":
-    network_runner.delete_port('network-operator', data.Port)
-    # TODO: Check return value
+if data["operator"] == "DeletePort":
+    network_runner.delete_port("network-operator", data["port"])
     exit(0)
 
 print("invalid operator")

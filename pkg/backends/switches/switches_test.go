@@ -34,6 +34,8 @@ func TestNew(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			_, err := New(context.Background(), c.backend, &provider.Config{
+				OS:   "openvswitch",
+				Host: "test",
 				Cert: &certificate.Certificate{
 					Username: "test",
 					Password: "test",

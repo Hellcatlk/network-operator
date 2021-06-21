@@ -11,8 +11,8 @@ import (
 
 // Certificate include username and password
 type Certificate struct {
-	Username string
-	Password string
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 // Fetch secret

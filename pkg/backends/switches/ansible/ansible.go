@@ -20,13 +20,13 @@ type Ansible struct {
 }
 
 type networkRunnerData struct {
-	Host         string
-	Cert         *certificate.Certificate
-	OS           string
-	Operator     string
-	Port         string
-	UntaggedVLAN *v1alpha1.VLAN
-	VLANs        []v1alpha1.VLAN
+	Host         string                   `json:"host"`
+	Cert         *certificate.Certificate `json:"cert"`
+	OS           string                   `json:"os"`
+	Operator     string                   `json:"operator"`
+	Port         string                   `json:"port"`
+	UntaggedVLAN *v1alpha1.VLAN           `json:"untaggedVLAN,omitempty"`
+	VLANs        []v1alpha1.VLAN          `json:"vlans,omitempty"`
 }
 
 func (a *Ansible) configureAccessPort(port string, untaggedVLAN *v1alpha1.VLAN) error {
