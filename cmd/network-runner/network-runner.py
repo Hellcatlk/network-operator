@@ -54,6 +54,10 @@ if data["operator"] == "ConfigAccessPort":
     exit(0)
 
 if data["operator"] == "ConfigTrunkPort":
+    if data.get("untaggedVLAN") == None and data.get("vlans") == None:
+        print("miss required parameter(untaggedVLAN or vlans) for ConfigTrunkPort")
+        exit(1)
+
     # Create untagged vlan
     untaggedVLAN = None
     if data.get("untaggedVLAN") != None:
@@ -63,7 +67,7 @@ if data["operator"] == "ConfigTrunkPort":
 
     # Create tagged vlans
     vlans = []
-    for vlan in data["vlans"]:
+    for vlan in data.get("vlans"):
         # Create tagged vlan
         network_runner.create_vlan(
             "network-operator", vlan["id"], vlan.get("name"))
