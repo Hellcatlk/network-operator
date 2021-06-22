@@ -10,6 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // noneHandler add finalizers to CR
@@ -106,6 +107,10 @@ func (r *SwitchReconciler) deletingHandler(ctx context.Context, info *machine.Re
 
 	// Remove finalizer
 	finalizer.Remove(&i.Finalizers, finalizerKey)
+
+	// Set foreground delete policy
+	propagationPolicy := metav1.DeletePropagationForeground
+	info.Client.Delete(ctx, i, &client.DeleteOptions{PropagationPolicy: &propagationPolicy})
 
 	return v1alpha1.SwitchDeleting, ctrl.Result{}, nil
 }
