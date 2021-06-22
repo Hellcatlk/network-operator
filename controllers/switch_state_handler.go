@@ -110,7 +110,10 @@ func (r *SwitchReconciler) deletingHandler(ctx context.Context, info *machine.Re
 
 	// Set foreground delete policy
 	propagationPolicy := metav1.DeletePropagationForeground
-	info.Client.Delete(ctx, i, &client.DeleteOptions{PropagationPolicy: &propagationPolicy})
+	err := info.Client.Delete(ctx, i, &client.DeleteOptions{PropagationPolicy: &propagationPolicy})
+	if err != nil {
+		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+	}
 
 	return v1alpha1.SwitchDeleting, ctrl.Result{}, nil
 }
