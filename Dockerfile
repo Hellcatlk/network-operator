@@ -8,5 +8,3 @@ COPY ./bin/network-runner /usr/bin
 
 # Prepare running environment
 RUN ./install_ansible.sh
-
-ENTRYPOINT ["/manager"]
