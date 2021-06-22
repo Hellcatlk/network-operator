@@ -12,8 +12,6 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-const foregroundDeletionFinalizerKey string = "foregroundDeletion"
-
 // noneHandler add finalizers to CR
 func (r *SwitchReconciler) noneHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	info.Logger.Info("none")
@@ -21,7 +19,7 @@ func (r *SwitchReconciler) noneHandler(ctx context.Context, info *machine.Reconc
 	i := instance.(*v1alpha1.Switch)
 
 	// Add finalizer
-	finalizer.Add(&i.Finalizers, foregroundDeletionFinalizerKey)
+	finalizer.Add(&i.Finalizers, finalizerKey)
 
 	return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true}, nil
 }
@@ -57,7 +55,6 @@ func (r *SwitchReconciler) configuringHandler(ctx context.Context, info *machine
 		switchPort.OwnerReferences = []metav1.OwnerReference{
 			{
 				BlockOwnerDeletion: new(bool),
-				Controller:         new(bool),
 				APIVersion:         i.APIVersion,
 				Kind:               i.Kind,
 				Name:               i.Name,
@@ -65,7 +62,6 @@ func (r *SwitchReconciler) configuringHandler(ctx context.Context, info *machine
 			},
 		}
 		*switchPort.OwnerReferences[0].BlockOwnerDeletion = true
-		*switchPort.OwnerReferences[0].Controller = true
 
 		// Create SwitchPort
 		err := info.Client.Create(ctx, switchPort)
@@ -105,6 +101,11 @@ func (r *SwitchReconciler) runningHandler(ctx context.Context, info *machine.Rec
 
 func (r *SwitchReconciler) deletingHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	info.Logger.Info("deleting")
+
+	i := instance.(*v1alpha1.Switch)
+
+	// Remove finalizer
+	finalizer.Remove(&i.Finalizers, finalizerKey)
 
 	return v1alpha1.SwitchDeleting, ctrl.Result{}, nil
 }
