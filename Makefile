@@ -26,8 +26,8 @@ run: generate bin/network-runner
 
 # Build the docker image
 docker: generate build
-	docker rmi -f ${IMG}
-	docker build -f Dockerfile -t ${IMG} .
+	sudo docker rmi -f ${IMG}
+	sudo docker build -f Dockerfile -t ${IMG} .
 
 # Install CRDs into a cluster
 install: manifests bin/kustomize
