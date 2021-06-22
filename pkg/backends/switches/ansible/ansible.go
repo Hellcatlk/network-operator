@@ -99,7 +99,7 @@ func (a *Ansible) deletePort(port string) error {
 	return nil
 }
 
-// New return test backend
+// New return ansible backend
 func (a *Ansible) New(ctx context.Context, config *provider.Config) (backends.Switch, error) {
 	if config == nil {
 		return nil, fmt.Errorf("configure of switch(%s) is nil", config.OS)
@@ -117,12 +117,12 @@ func (a *Ansible) New(ctx context.Context, config *provider.Config) (backends.Sw
 	}, nil
 }
 
-// GetPortAttr just for test
+// GetPortAttr return the port's configuration
 func (a *Ansible) GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPortConfiguration, error) {
 	return &v1alpha1.SwitchPortConfiguration{}, nil
 }
 
-// SetPortAttr just for test
+// SetPortAttr set the configuration to the port
 func (a *Ansible) SetPortAttr(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfiguration) error {
 	if len(configuration.Spec.VLANs) == 0 {
 		return a.configureAccessPort(port, configuration.Spec.UntaggedVLAN)
@@ -131,7 +131,7 @@ func (a *Ansible) SetPortAttr(ctx context.Context, port string, configuration *v
 	return a.configureTrunkPort(port, configuration.Spec.UntaggedVLAN, configuration.Spec.VLANs)
 }
 
-// ResetPort just for test
+// ResetPort clean the configuration in the port
 func (a *Ansible) ResetPort(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfiguration) error {
 	return a.deletePort(port)
 }
