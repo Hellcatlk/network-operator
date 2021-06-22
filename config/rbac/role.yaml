@@ -35,7 +35,6 @@ rules:
   resources:
   - ovsswitches/finalizers
   verbs:
-  - delete
   - update
 - apiGroups:
   - metal3.io
@@ -62,7 +61,6 @@ rules:
   resources:
   - switches/finalizers
   verbs:
-  - delete
   - update
 - apiGroups:
   - metal3.io
@@ -89,7 +87,6 @@ rules:
   resources:
   - switchportconfigurations/finalizers
   verbs:
-  - delete
   - update
 - apiGroups:
   - metal3.io
@@ -116,7 +113,6 @@ rules:
   resources:
   - switchports/finalizers
   verbs:
-  - delete
   - update
 - apiGroups:
   - metal3.io
