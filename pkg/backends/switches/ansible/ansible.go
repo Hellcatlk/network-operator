@@ -119,7 +119,7 @@ func (a *Ansible) New(ctx context.Context, config *provider.Config) (backends.Sw
 
 // GetPortAttr return the port's configuration
 func (a *Ansible) GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPortConfiguration, error) {
-	return nil, fmt.Errorf("ansible backend support GetPortAttr")
+	return nil, fmt.Errorf("ansible backend isn't support GetPortAttr")
 }
 
 // SetPortAttr set the configuration to the port
