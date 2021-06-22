@@ -6,10 +6,13 @@ COPY ./bin/manager .
 COPY ./bin/network-runner /usr/bin
 
 # Prepare network runner environment
-RUN dnf install epel-release -y
-RUN dnf install sshpass python3-pip gcc python3-devel rust cargo openssl-devel openssh-clients.x86_64 -y
-RUN pip3 install wheel setuptools-rust && python3 -c 'from setuptools_rust import RustExtension'
-RUN pip3 install ansible networking-ansible
-RUN cp -rf /usr/local/lib/python3.6/site-packages/etc/ansible /etc/
+RUN dnf install epel-release gcc python38-devel openssl-devel openssh-clients.x86_64 -y
+RUN dnf install sshpass -y
+RUN python3.8 -m pip install ansible networking-ansible
+RUN cp -rf /usr/local/lib/python3.8/site-packages/etc/ansible /etc/
+
+# Clean image
+RUN dnf autoremove
+RUN dnf clean all
 
 ENTRYPOINT ["/manager"]
