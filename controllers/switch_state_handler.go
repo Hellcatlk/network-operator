@@ -105,15 +105,15 @@ func (r *SwitchReconciler) deletingHandler(ctx context.Context, info *machine.Re
 
 	i := instance.(*v1alpha1.Switch)
 
-	// Remove finalizer
-	finalizer.Remove(&i.Finalizers, finalizerKey)
-
 	// Set foreground delete policy
 	propagationPolicy := metav1.DeletePropagationForeground
 	err := info.Client.Delete(ctx, i, &client.DeleteOptions{PropagationPolicy: &propagationPolicy})
 	if err != nil {
 		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
+
+	// Remove finalizer
+	finalizer.Remove(&i.Finalizers, finalizerKey)
 
 	return v1alpha1.SwitchDeleting, ctrl.Result{}, nil
 }
