@@ -23,8 +23,8 @@ from network_runner.models.inventory import Host, Inventory
 #     },
 #     vlans: [
 #         {
-#             Name: "",
-#             ID: 0,
+#             name: "",
+#             id: 0,
 #         },
 #     ],
 # }
