@@ -103,7 +103,7 @@ func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *mac
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	sw, err := switches.New(ctx, owner.Spec.Backend, config)
+	sw, err := switches.New(ctx, config)
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
@@ -152,7 +152,7 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	sw, err := switches.New(ctx, owner.Spec.Backend, config)
+	sw, err := switches.New(ctx, config)
 	if err != nil {
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
@@ -188,7 +188,7 @@ func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machin
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	sw, err := switches.New(ctx, owner.Spec.Backend, config)
+	sw, err := switches.New(ctx, config)
 	if err != nil {
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}

@@ -26,7 +26,6 @@ kind: Switch
 metadata:
   name: switch-example
 spec:
-  backend: ssh
   providerSwitch:
     kind: OVSSwitch
     name: ovsswitch-example

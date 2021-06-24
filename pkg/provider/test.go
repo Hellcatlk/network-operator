@@ -12,5 +12,7 @@ type Test struct {
 
 // GetConfiguration generate configuration from provider switch
 func (t *Test) GetConfiguration(ctx context.Context, client client.Client) (*Config, error) {
-	return nil, nil
+	return &Config{
+		Backend: "test",
+	}, nil
 }

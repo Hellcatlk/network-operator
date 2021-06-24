@@ -1,3 +1,4 @@
+// Package provider convert the content of ProviderSwitch to configuration
 package provider
 
 import (
@@ -9,10 +10,15 @@ import (
 
 // Config is configuration of provider device
 type Config struct {
-	OS      string
-	Host    string
-	Cert    *certificate.Certificate
-	Options map[string]string
+	// which os this provider switch used
+	OS string
+	// Switch's host
+	Host string
+	// Certificate of switch
+	Cert *certificate.Certificate
+	// Which backend to use
+	Backend string
+	Options map[string]interface{}
 }
 
 // Switch is a interface of provider switch

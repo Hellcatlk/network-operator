@@ -59,10 +59,11 @@ func (ovss *OVSSwitch) GetConfiguration(ctx context.Context, client client.Clien
 	}
 
 	return &provider.Config{
-		OS:   "openvswitch",
-		Host: ovss.Spec.Host,
-		Cert: cert,
-		Options: map[string]string{
+		OS:      "openvswitch",
+		Host:    ovss.Spec.Host,
+		Cert:    cert,
+		Backend: "ansible",
+		Options: map[string]interface{}{
 			"bridge": ovss.Spec.Bridge,
 		},
 	}, nil

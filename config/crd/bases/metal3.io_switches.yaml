@@ -41,12 +41,6 @@ spec:
           spec:
             description: SwitchSpec defines the desired state of Switch
             properties:
-              backend:
-                description: Which backend to use to configure switch
-                enum:
-                - ssh
-                - ansible
-                type: string
               ports:
                 additionalProperties:
                   description: Port indicates the specific restriction on the port
@@ -82,8 +76,6 @@ spec:
                 - kind
                 - name
                 type: object
-            required:
-            - backend
             type: object
           status:
             description: SwitchStatus defines the observed state of Switch
