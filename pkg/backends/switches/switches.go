@@ -10,23 +10,25 @@ import (
 	"github.com/Hellcatlk/network-operator/pkg/provider"
 )
 
-var switchBackends map[string]backends.Switch = make(map[string]backends.Switch)
+type newFuncType func(context.Context, *provider.Config) (backends.Switch, error)
+
+var backendNews map[string]newFuncType = make(map[string]newFuncType, 0)
 
 func init() {
-	Register("ssh", &ssh.SSH{})
-	Register("ansible", &ansible.Ansible{})
+	Register("ssh", ssh.New)
+	Register("ansible", ansible.New)
 }
 
 // Register switch backend
-func Register(backendType string, backend backends.Switch) {
-	switchBackends[backendType] = backend
+func Register(backend string, new newFuncType) {
+	backendNews[backend] = new
 }
 
 // New return a implementation of SwitchBackend interface
-func New(ctx context.Context, backendType string, config *provider.Config) (backends.Switch, error) {
-	if switchBackends[backendType] == nil {
-		return nil, fmt.Errorf("the type of backend(%s) is invalid", backendType)
+func New(ctx context.Context, config *provider.Config) (backends.Switch, error) {
+	if backendNews[config.Backend] == nil {
+		return nil, fmt.Errorf("the type of backend(%s) is invalid", config.Backend)
 	}
 
-	return switchBackends[backendType].New(ctx, config)
+	return backendNews[config.Backend](ctx, config)
 }

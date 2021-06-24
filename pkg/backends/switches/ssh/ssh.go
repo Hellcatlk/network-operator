@@ -15,15 +15,8 @@ import (
 	ussh "github.com/Hellcatlk/network-operator/pkg/utils/ssh"
 )
 
-// SSH control openvswitch by ssh and cli
-type SSH struct {
-	Host   string
-	cert   *certificate.Certificate
-	bridge string
-}
-
 // New return ssh backend
-func (s *SSH) New(ctx context.Context, config *provider.Config) (backends.Switch, error) {
+func New(ctx context.Context, config *provider.Config) (backends.Switch, error) {
 	if config == nil {
 		return nil, fmt.Errorf("configure of switch(%s) is nil", config.OS)
 	}
@@ -36,15 +29,22 @@ func (s *SSH) New(ctx context.Context, config *provider.Config) (backends.Switch
 		return nil, fmt.Errorf("certificate of switch(%s) is nil", config.OS)
 	}
 
-	return &SSH{
+	return &ssh{
 		Host:   config.Host,
 		cert:   config.Cert,
-		bridge: config.Options["bridge"],
+		bridge: config.Options["bridge"].(string),
 	}, nil
 }
 
+// ssh control openvswitch by ssh and cli
+type ssh struct {
+	Host   string
+	cert   *certificate.Certificate
+	bridge string
+}
+
 // GetPortAttr get the port's configure
-func (s *SSH) GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPortConfiguration, error) {
+func (s *ssh) GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPortConfiguration, error) {
 	output, err := ussh.Output(s.Host, s.cert.Username, s.cert.Password, exec.Command(
 		"sudo", "ovs-vsctl", "list", "port", port,
 		"|", "grep", "-E", "-w", "^tag",
@@ -69,7 +69,7 @@ func (s *SSH) GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPor
 }
 
 // SetPortAttr set configure to the port
-func (s *SSH) SetPortAttr(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfiguration) error {
+func (s *ssh) SetPortAttr(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfiguration) error {
 	if configuration == nil {
 		return nil
 	}
@@ -102,7 +102,7 @@ func (s *SSH) SetPortAttr(ctx context.Context, port string, configuration *v1alp
 }
 
 // ResetPort remove all configure of the port
-func (s *SSH) ResetPort(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfiguration) error {
+func (s *ssh) ResetPort(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfiguration) error {
 	if configuration == nil {
 		return nil
 	}

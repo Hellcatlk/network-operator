@@ -9,16 +9,16 @@ import (
 )
 
 func init() {
-	Register("test", &test{})
+	Register("test", new)
+}
+
+// New return test backend
+func new(ctx context.Context, config *provider.Config) (backends.Switch, error) {
+	return &test{}, nil
 }
 
 // Test just for test
 type test struct {
-}
-
-// New return test backend
-func (t *test) New(ctx context.Context, config *provider.Config) (backends.Switch, error) {
-	return &test{}, nil
 }
 
 // GetPortAttr just for test

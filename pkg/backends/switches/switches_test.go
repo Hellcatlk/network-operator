@@ -33,12 +33,16 @@ func TestNew(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			_, err := New(context.Background(), c.backend, &provider.Config{
-				OS:   "openvswitch",
-				Host: "test",
+			_, err := New(context.Background(), &provider.Config{
+				OS:      "openvswitch",
+				Host:    "test",
+				Backend: c.backend,
 				Cert: &certificate.Certificate{
 					Username: "test",
 					Password: "test",
+				},
+				Options: map[string]interface{}{
+					"bridge": "test",
 				},
 			})
 			if (err != nil) != c.expectError {
