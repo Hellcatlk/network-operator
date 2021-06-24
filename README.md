@@ -17,7 +17,6 @@
 
 |backend|provider switch|
 |:-|:-|
-|ssh|\<None>|
 |ansible|OVSSwitch|
 
 ## Notes
