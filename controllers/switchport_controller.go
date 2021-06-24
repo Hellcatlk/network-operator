@@ -58,7 +58,7 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		if errors.IsNotFound(err) {
 			return ctrl.Result{}, nil
 		}
-		// Error reading the object - requeue the request
+		// Requeue when other error
 		return ctrl.Result{}, err
 	}
 
@@ -90,7 +90,7 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 		logger.Error(err, "state machine error")
 	}
 
-	// Only update switch port when it dirty
+	// Only need to update switch port when it dirty
 	if dirty {
 		logger.Info("updating switch port")
 		err = r.Update(ctx, instance)
