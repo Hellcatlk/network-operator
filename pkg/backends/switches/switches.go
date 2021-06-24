@@ -12,7 +12,7 @@ import (
 
 type newFuncType func(context.Context, *provider.Config) (backends.Switch, error)
 
-var backendNews map[string]newFuncType = make(map[string]newFuncType, 0)
+var backendNews map[string]newFuncType = make(map[string]newFuncType)
 
 func init() {
 	Register("ssh", ssh.New)
