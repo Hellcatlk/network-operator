@@ -16,7 +16,6 @@ GOARCH=$(shell go env GOARCH)
 PATH := $(shell pwd)/bin:$(PATH)
 
 # Build manager binary
-.PHONY: build
 build: generate bin/network-runner
 	CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} GO111MODULE=on go build -a -o bin/manager main.go
 
@@ -45,7 +44,12 @@ deploy: manifests bin/kustomize
 # Undeploy controller in the configured Kubernetes cluster in ~/.kube/config
 undeploy: manifests bin/kustomize
 	cd config/manager && kustomize edit set image controller=${IMG}
-	kustomize build config/default | kubectl delete -f -
+	kustomize build config/default | kubectl delete -f -`
+
+# Generate docs
+.PHONY: docs
+docs:
+	find ./docs -name "*.plantuml" | xargs ./hack/plantuml.sh
 
 # Generate code
 generate: bin/controller-gen
@@ -54,11 +58,6 @@ generate: bin/controller-gen
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: bin/controller-gen
 	controller-gen $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
-
-# Generate docs
-.PHONY: docs
-docs:
-	find ./docs -name "*.plantuml" | xargs ./hack/plantuml.sh
 
 # Run tests
 test: generate gofmt golint govet gosec unit manifests
@@ -91,14 +90,9 @@ clean:
 	rm -f ./coverage.html
 	rm -rf ./bin/*
 
-# Clean up go module settings
-mod:
-	go mod tidy
-	go mod verify
-
 .PHONY: bin/network-runner
 bin/network-runner:
-	cp ./cmd/network-runner/network-runner.py ./bin/network-runner
+	cp ./cmd/network-runner/main.py ./bin/network-runner
 
 # Install kustomize
 bin/kustomize:
