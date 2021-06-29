@@ -51,6 +51,8 @@ func New(info *ReconcileInfo, instance Instance, handlers map[StateType]Handler)
 
 // Reconcile state machine. If dirty is true, it means the instance has changed.
 func (m *Machine) Reconcile(ctx context.Context) (bool, ctrl.Result, error) {
+	m.info.Logger.Info(string(m.instance.GetState()))
+
 	// There are any handler in handlers?
 	if m.handlers == nil {
 		return false, ctrl.Result{}, fmt.Errorf("haven't any handler")

@@ -15,8 +15,6 @@ import (
 
 // noneHandler add finalizers to CR
 func (r *SwitchReconciler) noneHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
-	info.Logger.Info("none")
-
 	i := instance.(*v1alpha1.Switch)
 
 	// Add finalizer
@@ -26,8 +24,6 @@ func (r *SwitchReconciler) noneHandler(ctx context.Context, info *machine.Reconc
 }
 
 func (r *SwitchReconciler) verifyingHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
-	info.Logger.Info("verifying")
-
 	i := instance.(*v1alpha1.Switch)
 
 	if !i.DeletionTimestamp.IsZero() {
@@ -40,8 +36,6 @@ func (r *SwitchReconciler) verifyingHandler(ctx context.Context, info *machine.R
 }
 
 func (r *SwitchReconciler) configuringHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
-	info.Logger.Info("configuring")
-
 	i := instance.(*v1alpha1.Switch)
 
 	if !i.DeletionTimestamp.IsZero() {
@@ -79,8 +73,6 @@ func (r *SwitchReconciler) configuringHandler(ctx context.Context, info *machine
 }
 
 func (r *SwitchReconciler) runningHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
-	info.Logger.Info("running")
-
 	i := instance.(*v1alpha1.Switch)
 
 	if !i.DeletionTimestamp.IsZero() {
@@ -110,8 +102,6 @@ func (r *SwitchReconciler) runningHandler(ctx context.Context, info *machine.Rec
 }
 
 func (r *SwitchReconciler) deletingHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
-	info.Logger.Info("deleting")
-
 	i := instance.(*v1alpha1.Switch)
 
 	// Foreground delete

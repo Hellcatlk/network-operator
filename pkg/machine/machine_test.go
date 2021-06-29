@@ -6,6 +6,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 type testInstance struct {
@@ -44,7 +45,9 @@ func handlerTest2(ctx context.Context, info *ReconcileInfo, instance interface{}
 func TestMachine(t *testing.T) {
 	var instance testInstance
 	m := New(
-		nil,
+		&ReconcileInfo{
+			Logger: &log.NullLogger{},
+		},
 		&instance,
 		map[StateType]Handler{
 			"":      handlerTest0,
