@@ -66,7 +66,11 @@ func (r *SwitchReconciler) configuringHandler(ctx context.Context, info *machine
 
 		// Create SwitchPort
 		err := info.Client.Create(ctx, switchPort)
-		if !errors.IsAlreadyExists(err) {
+		if err != nil {
+			// If SwitchPort is existed, skip it
+			if errors.IsAlreadyExists(err) {
+				continue
+			}
 			return v1alpha1.SwitchConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 		}
 	}
@@ -85,6 +89,7 @@ func (r *SwitchReconciler) runningHandler(ctx context.Context, info *machine.Rec
 
 	// Check SwitchPorts are existed
 	for name := range i.Status.Ports {
+		// Get SwitchPort
 		err := info.Client.Get(
 			ctx, types.NamespacedName{
 				Name:      name,
@@ -92,8 +97,12 @@ func (r *SwitchReconciler) runningHandler(ctx context.Context, info *machine.Rec
 			},
 			&v1alpha1.SwitchPort{},
 		)
-		if errors.IsNotFound(err) {
-			return v1alpha1.SwitchConfiguring, ctrl.Result{Requeue: true}, nil
+		if err != nil {
+			// If SwitchPort isn't find, return configuring state and create it
+			if errors.IsNotFound(err) {
+				return v1alpha1.SwitchConfiguring, ctrl.Result{Requeue: true}, nil
+			}
+			return v1alpha1.SwitchRunning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 		}
 	}
 
@@ -105,7 +114,7 @@ func (r *SwitchReconciler) deletingHandler(ctx context.Context, info *machine.Re
 
 	i := instance.(*v1alpha1.Switch)
 
-	// Set foreground delete policy
+	// Foreground delete
 	propagationPolicy := metav1.DeletePropagationForeground
 	err := info.Client.Delete(ctx, i, &client.DeleteOptions{PropagationPolicy: &propagationPolicy})
 	if err != nil {
