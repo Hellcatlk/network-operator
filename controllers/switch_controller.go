@@ -71,7 +71,7 @@ func (r *SwitchReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 			Logger: logger,
 		},
 		instance,
-		&machine.Handlers{
+		map[machine.StateType]machine.Handler{
 			metal3iov1alpha1.SwitchNone:        r.noneHandler,
 			metal3iov1alpha1.SwitchVerify:      r.verifyingHandler,
 			metal3iov1alpha1.SwitchConfiguring: r.configuringHandler,
@@ -95,7 +95,7 @@ func (r *SwitchReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		}
 	}
 
-	return result, nil
+	return result, err
 }
 
 // SetupWithManager register reconciler

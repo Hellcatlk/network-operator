@@ -137,9 +137,10 @@ func (sp *SwitchPort) SetState(state machine.StateType) {
 func (sp *SwitchPort) SetError(err error) {
 	if err == nil {
 		sp.Status.Error = ""
-	} else {
-		sp.Status.Error = err.Error()
+		return
 	}
+
+	sp.Status.Error = err.Error()
 }
 
 // FetchOwnerReference fetch OwnerReference[0]

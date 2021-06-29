@@ -55,7 +55,7 @@ func TestSwitchPortStateMachine(t *testing.T) {
 			Logger: log.NullLogger{},
 		},
 		&instance,
-		&machine.Handlers{
+		map[machine.StateType]machine.Handler{
 			v1alpha1.SwitchPortNone:        r.noneHandler,
 			v1alpha1.SwitchPortIdle:        r.idleHandler,
 			v1alpha1.SwitchPortVerifying:   r.verifyingHandler,
@@ -72,6 +72,7 @@ func TestSwitchPortStateMachine(t *testing.T) {
 		deletionTimestampExist bool
 		expectedDirty          bool
 		expectedState          machine.StateType
+		expectedError          bool
 	}{
 		// Delete when `Idle` state
 		{
@@ -157,7 +158,7 @@ func TestSwitchPortStateMachine(t *testing.T) {
 			if c.expectedState != instance.GetState() {
 				t.Errorf("Expected state: %s, got: %s", c.expectedState, instance.GetState())
 			}
-			if err != nil {
+			if c.expectedError != (err != nil) {
 				t.Errorf("Got unexpected error: %v", err)
 			}
 		})

@@ -46,7 +46,7 @@ func TestMachine(t *testing.T) {
 	m := New(
 		nil,
 		&instance,
-		&Handlers{
+		map[StateType]Handler{
 			"":      handlerTest0,
 			"test1": handlerTest1,
 			"test2": handlerTest2,
@@ -71,7 +71,7 @@ func BenchmarkMachine(b *testing.B) {
 	m := New(
 		nil,
 		&instance,
-		&Handlers{
+		map[StateType]Handler{
 			"":      handlerTest0,
 			"test1": handlerTest1,
 			"test2": handlerTest2,
@@ -104,7 +104,7 @@ func BenchmarkMachineNoAssert(b *testing.B) {
 	m := New(
 		nil,
 		&tInstance,
-		&Handlers{
+		map[StateType]Handler{
 			"":      handlerTest00,
 			"test1": handlerTest11,
 			"test2": handlerTest22,

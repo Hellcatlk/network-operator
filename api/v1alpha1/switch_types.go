@@ -139,11 +139,12 @@ func (s *Switch) SetState(state machine.StateType) {
 
 // SetError sets the error of the switch
 func (s *Switch) SetError(err error) {
-	if err == nil {
+	if err != nil {
 		s.Status.Error = ""
-	} else {
-		s.Status.Error = err.Error()
+		return
 	}
+
+	s.Status.Error = err.Error()
 }
 
 // +kubebuilder:object:root=true

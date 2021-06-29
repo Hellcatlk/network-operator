@@ -18,7 +18,7 @@ type StateType string
 type Machine struct {
 	info     *ReconcileInfo
 	instance Instance
-	handlers *Handlers
+	handlers map[StateType]Handler
 }
 
 // ReconcileInfo is the information need by reconcile
@@ -36,15 +36,12 @@ type Instance interface {
 	SetError(err error)
 }
 
-// Handlers includes a lot of handler
-type Handlers map[StateType]Handler
-
 // Handler is a state handle function
 type Handler func(ctx context.Context, info *ReconcileInfo, instance interface{}) (StateType, ctrl.Result, error)
 
 // New a state machine
 // NOTE: The paramater of instance must be a pointer
-func New(info *ReconcileInfo, instance Instance, handlers *Handlers) Machine {
+func New(info *ReconcileInfo, instance Instance, handlers map[StateType]Handler) Machine {
 	return Machine{
 		info:     info,
 		instance: instance,
@@ -60,7 +57,7 @@ func (m *Machine) Reconcile(ctx context.Context) (bool, ctrl.Result, error) {
 	}
 
 	// Check the state's handler exist or not
-	handler, exist := (*m.handlers)[m.instance.GetState()]
+	handler, exist := m.handlers[m.instance.GetState()]
 	if !exist {
 		return false, ctrl.Result{}, fmt.Errorf("no handler for the state(%s)", m.instance.GetState())
 	}
@@ -68,6 +65,9 @@ func (m *Machine) Reconcile(ctx context.Context) (bool, ctrl.Result, error) {
 	// Call handler
 	instanceDeepCopy := m.instance.DeepCopyObject()
 	nextState, result, err := handler(ctx, m.info, m.instance)
+	if err != nil {
+		err = fmt.Errorf("%s state handler error: %s", m.instance.GetState(), err)
+	}
 	m.instance.SetState(nextState)
 	m.instance.SetError(err)
 

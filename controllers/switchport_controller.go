@@ -73,7 +73,7 @@ func (r *SwitchPortReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) 
 			Logger: logger,
 		},
 		instance,
-		&machine.Handlers{
+		map[machine.StateType]machine.Handler{
 			metal3iov1alpha1.SwitchPortNone:        r.noneHandler,
 			metal3iov1alpha1.SwitchPortIdle:        r.idleHandler,
 			metal3iov1alpha1.SwitchPortVerifying:   r.verifyingHandler,
