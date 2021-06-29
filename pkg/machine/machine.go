@@ -72,8 +72,5 @@ func (m *Machine) Reconcile(ctx context.Context) (bool, ctrl.Result, error) {
 	m.instance.SetError(err)
 
 	// Check instance is dirty or not
-	if reflect.DeepEqual(m.instance, instanceDeepCopy) {
-		return false, result, err
-	}
-	return true, result, err
+	return !reflect.DeepEqual(m.instance, instanceDeepCopy), result, err
 }
