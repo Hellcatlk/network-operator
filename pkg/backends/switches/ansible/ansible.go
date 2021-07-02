@@ -129,7 +129,7 @@ func (a *ansible) SetPortAttr(ctx context.Context, port string, configuration *v
 		return a.configureAccessPort(port, configuration.Spec.UntaggedVLAN)
 	}
 
-	vlans, err := strings.ToSlice(configuration.Spec.VLANs)
+	vlans, err := strings.RangeToSlice(configuration.Spec.VLANs)
 	if err != nil {
 		return err
 	}

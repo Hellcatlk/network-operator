@@ -6,8 +6,8 @@ import (
 	"strings"
 )
 
-// ToSlice transform "1-5,7" to [1,2,3,4,5,7]
-func ToSlice(formatStr string) ([]int, error) {
+// RangeToSlice transform "1-5,7" to [1,2,3,4,5,7]
+func RangeToSlice(formatStr string) ([]int, error) {
 	nums := []int{}
 	for _, str := range strings.Split(formatStr, ",") {
 		r := strings.Split(str, "-")
@@ -36,4 +36,25 @@ func ToSlice(formatStr string) ([]int, error) {
 	}
 
 	return nums, nil
+}
+
+// SliceContains check the slice contains str or not, if exist return true, else return false.
+func SliceContains(slice []string, str string) bool {
+	for _, value := range slice {
+		if value == str {
+			return true
+		}
+	}
+	return false
+}
+
+// SliceDelete str from slice, if success return true, else return false.
+func SliceDelete(slice *[]string, str string) bool {
+	for i := 0; i < len(*slice); i++ {
+		if (*slice)[i] == str {
+			*slice = append((*slice)[:i], (*slice)[i+1:]...)
+			return true
+		}
+	}
+	return false
 }

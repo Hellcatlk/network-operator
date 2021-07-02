@@ -1,12 +1,12 @@
 package finalizer
 
 import (
-	"github.com/Hellcatlk/network-operator/pkg/utils/stringslice"
+	"github.com/Hellcatlk/network-operator/pkg/utils/strings"
 )
 
 // Add create finalizer, must unique for every object.
 func Add(finalizers *[]string, finalizer string) {
-	if stringslice.Contains(*finalizers, finalizer) {
+	if strings.SliceContains(*finalizers, finalizer) {
 		return
 	}
 
@@ -15,5 +15,5 @@ func Add(finalizers *[]string, finalizer string) {
 
 // Remove remove finalizer
 func Remove(finalizers *[]string, finalizer string) {
-	stringslice.Delete(finalizers, finalizer)
+	strings.SliceDelete(finalizers, finalizer)
 }
