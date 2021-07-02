@@ -21,7 +21,7 @@ rules:
 - apiGroups:
   - metal3.io
   resources:
-  - ovsswitches
+  - openvswitches
   verbs:
   - create
   - delete
@@ -33,13 +33,13 @@ rules:
 - apiGroups:
   - metal3.io
   resources:
-  - ovsswitches/finalizers
+  - openvswitches/finalizers
   verbs:
   - update
 - apiGroups:
   - metal3.io
   resources:
-  - ovsswitches/status
+  - openvswitches/status
   verbs:
   - get
   - patch

@@ -10,9 +10,9 @@ data:
 
 ---
 apiVersion: metal3.io/v1alpha1
-kind: OVSSwitch
+kind: OpenVSwitch
 metadata:
-  name: ovsswitch-example
+  name: openvswitch-example
 spec:
   host: <host-ip>
   bridge: <bridge-name>
@@ -27,8 +27,8 @@ metadata:
   name: switch-example
 spec:
   providerSwitch:
-    kind: OVSSwitch
-    name: ovsswitch-example
+    kind: OpenVSwitch
+    name: openvswitch-example
   ports:
     "switchport-example":
       name: <port-name>

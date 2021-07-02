@@ -26,8 +26,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// OVSSwitchSpec defines the desired state of OVSSwitch
-type OVSSwitchSpec struct {
+// OpenVSwitchSpec defines the desired state of OpenVSwitch
+type OpenVSwitchSpec struct {
 	Host string `json:"host"`
 
 	Bridge string `json:"bridge"`
@@ -36,48 +36,48 @@ type OVSSwitchSpec struct {
 	Secret *corev1.SecretReference `json:"secret"`
 }
 
-// OVSSwitchStatus defines the observed state of OVSSwitch
-type OVSSwitchStatus struct {
+// OpenVSwitchStatus defines the observed state of OpenVSwitch
+type OpenVSwitchStatus struct {
 }
 
 // +kubebuilder:object:root=true
 
-// OVSSwitch is the Schema for the ovsswitches API
-type OVSSwitch struct {
+// OpenVSwitch is the Schema for the OpenVSwitches API
+type OpenVSwitch struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   OVSSwitchSpec   `json:"spec,omitempty"`
-	Status OVSSwitchStatus `json:"status,omitempty"`
+	Spec   OpenVSwitchSpec   `json:"spec,omitempty"`
+	Status OpenVSwitchStatus `json:"status,omitempty"`
 }
 
 // GetConfiguration generate configuration from openvswitch switch
-func (ovss *OVSSwitch) GetConfiguration(ctx context.Context, client client.Client) (*provider.Config, error) {
-	cert, err := certificate.Fetch(ctx, client, ovss.Spec.Secret)
+func (ovs *OpenVSwitch) GetConfiguration(ctx context.Context, client client.Client) (*provider.Config, error) {
+	cert, err := certificate.Fetch(ctx, client, ovs.Spec.Secret)
 	if err != nil {
 		return nil, err
 	}
 
 	return &provider.Config{
 		OS:      "openvswitch",
-		Host:    ovss.Spec.Host,
+		Host:    ovs.Spec.Host,
 		Cert:    cert,
 		Backend: "ansible",
 		Options: map[string]interface{}{
-			"bridge": ovss.Spec.Bridge,
+			"bridge": ovs.Spec.Bridge,
 		},
 	}, nil
 }
 
 // +kubebuilder:object:root=true
 
-// OVSSwitchList contains a list of OVSSwitch
-type OVSSwitchList struct {
+// OpenVSwitchList contains a list of OpenVSwitch
+type OpenVSwitchList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []OVSSwitch `json:"items"`
+	Items           []OpenVSwitch `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&OVSSwitch{}, &OVSSwitchList{})
+	SchemeBuilder.Register(&OpenVSwitch{}, &OpenVSwitchList{})
 }

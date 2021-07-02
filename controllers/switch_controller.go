@@ -41,9 +41,9 @@ type SwitchReconciler struct {
 // +kubebuilder:rbac:groups=metal3.io,resources=switches/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=metal3.io,resources=switches/finalizers,verbs=update
 
-// +kubebuilder:rbac:groups=metal3.io,resources=ovsswitches,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=metal3.io,resources=ovsswitches/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups=metal3.io,resources=ovsswitches/finalizers,verbs=update
+// +kubebuilder:rbac:groups=metal3.io,resources=openvswitches,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=metal3.io,resources=openvswitches/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=metal3.io,resources=openvswitches/finalizers,verbs=update
 
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
 

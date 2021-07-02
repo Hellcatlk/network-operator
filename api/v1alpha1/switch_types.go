@@ -67,8 +67,8 @@ func (ref *ProviderSwitchRef) Fetch(ctx context.Context, client client.Client) (
 	case "TestSwitch":
 		instance = &provider.Test{}
 
-	case "OVSSwitch":
-		ps := &OVSSwitch{}
+	case "OpenVSwitch":
+		ps := &OpenVSwitch{}
 		err = client.Get(
 			ctx,
 			types.NamespacedName{

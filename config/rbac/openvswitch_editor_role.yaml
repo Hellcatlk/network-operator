@@ -1,13 +1,13 @@
-# permissions for end users to edit ovsswitches.
+# permissions for end users to edit openvswitches.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: ovsswitch-editor-role
+  name: openvswitch-editor-role
 rules:
 - apiGroups:
   - metal3.io
   resources:
-  - ovsswitches
+  - openvswitches
   verbs:
   - create
   - delete
@@ -19,6 +19,6 @@ rules:
 - apiGroups:
   - metal3.io
   resources:
-  - ovsswitches/status
+  - openvswitches/status
   verbs:
   - get
