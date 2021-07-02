@@ -43,14 +43,14 @@ type networkRunnerData struct {
 	Cert *certificate.Certificate `json:"cert"`
 	OS   string                   `json:"os"`
 	// Bridge just use for openvswitch
-	Bridge       string          `json:"bridge,omitempty"`
-	Operator     string          `json:"operator"`
-	Port         string          `json:"port"`
-	UntaggedVLAN *v1alpha1.VLAN  `json:"untaggedVLAN,omitempty"`
-	VLANs        []v1alpha1.VLAN `json:"vlans,omitempty"`
+	Bridge       string `json:"bridge,omitempty"`
+	Operator     string `json:"operator"`
+	Port         string `json:"port"`
+	UntaggedVLAN *int   `json:"untaggedVLAN,omitempty"`
+	VLANs        []int  `json:"vlans,omitempty"`
 }
 
-func (a *ansible) configureAccessPort(port string, untaggedVLAN *v1alpha1.VLAN) error {
+func (a *ansible) configureAccessPort(port string, untaggedVLAN *int) error {
 	data, err := json.Marshal(networkRunnerData{
 		Host:         a.host,
 		Cert:         a.cert,
@@ -72,7 +72,7 @@ func (a *ansible) configureAccessPort(port string, untaggedVLAN *v1alpha1.VLAN) 
 	return nil
 }
 
-func (a *ansible) configureTrunkPort(port string, untaggedVLAN *v1alpha1.VLAN, vlans []v1alpha1.VLAN) error {
+func (a *ansible) configureTrunkPort(port string, untaggedVLAN *int, vlans []int) error {
 	data, err := json.Marshal(networkRunnerData{
 		Host:         a.host,
 		Cert:         a.cert,

@@ -70,30 +70,10 @@ spec:
                 description: Disable port
                 type: boolean
               untaggedVLAN:
-                description: VLAN is tagged vlan
-                properties:
-                  id:
-                    maximum: 4094
-                    minimum: 0
-                    type: integer
-                  name:
-                    type: string
-                required:
-                - id
-                type: object
+                type: integer
               vlans:
                 items:
-                  description: VLAN is tagged vlan
-                  properties:
-                    id:
-                      maximum: 4094
-                      minimum: 0
-                      type: integer
-                    name:
-                      type: string
-                  required:
-                  - id
-                  type: object
+                  type: integer
                 type: array
             type: object
           status:

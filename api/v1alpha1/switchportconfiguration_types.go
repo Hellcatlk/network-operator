@@ -42,23 +42,14 @@ type ACL struct {
 	DesPortRange string `json:"desPortRange,omitempty"`
 }
 
-// VLAN is tagged vlan
-type VLAN struct {
-	Name string `json:"name,omitempty"`
-
-	// +kubebuilder:validation:Minimum=0
-	// +kubebuilder:validation:Maximum=4094
-	ID int `json:"id"`
-}
-
 // SwitchPortConfigurationSpec defines the desired state of SwitchPortConfiguration
 type SwitchPortConfigurationSpec struct {
 	// +kubebuilder:validation:MaxItems=10
 	ACLs []ACL `json:"acls,omitempty"`
 
-	UntaggedVLAN *VLAN `json:"untaggedVLAN,omitempty"`
+	UntaggedVLAN *int `json:"untaggedVLAN,omitempty"`
 
-	VLANs []VLAN `json:"vlans,omitempty"`
+	VLANs []int `json:"vlans,omitempty"`
 
 	// Disable port
 	Disable bool `json:"disable,omitempty"`

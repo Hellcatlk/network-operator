@@ -61,9 +61,7 @@ func (s *ssh) GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPor
 
 	return &v1alpha1.SwitchPortConfiguration{
 		Spec: v1alpha1.SwitchPortConfigurationSpec{
-			UntaggedVLAN: &v1alpha1.VLAN{
-				ID: id,
-			},
+			UntaggedVLAN: &id,
 		},
 	}, nil
 }
@@ -78,12 +76,8 @@ func (s *ssh) SetPortAttr(ctx context.Context, port string, configuration *v1alp
 		return nil
 	}
 
-	if len(configuration.Spec.UntaggedVLAN.Name) != 0 {
-		return fmt.Errorf("openvswitch isn't support set vlan name")
-	}
-
 	output, err := ussh.Output(s.Host, s.cert.Username, s.cert.Password, exec.Command(
-		"sudo", "ovs-vsctl", "set", "port", port, "tag="+strconv.Itoa(configuration.Spec.UntaggedVLAN.ID),
+		"sudo", "ovs-vsctl", "set", "port", port, "tag="+strconv.Itoa(*configuration.Spec.UntaggedVLAN),
 	)) // #nosec
 	if err != nil {
 		return fmt.Errorf("set port failed: %s[%s]", output, err)
@@ -112,7 +106,7 @@ func (s *ssh) ResetPort(ctx context.Context, port string, configuration *v1alpha
 	}
 
 	output, err := ussh.Output(s.Host, s.cert.Username, s.cert.Password, exec.Command(
-		"sudo", "ovs-vsctl", "remove ", "port", port, "tag", strconv.Itoa(configuration.Spec.UntaggedVLAN.ID),
+		"sudo", "ovs-vsctl", "remove ", "port", port, "tag", strconv.Itoa(*configuration.Spec.UntaggedVLAN),
 	)) // #nosec
 	if err != nil {
 		return fmt.Errorf("set port failed: %s[%s]", output, err)

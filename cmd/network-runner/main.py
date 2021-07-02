@@ -14,17 +14,17 @@ def _config_access_port(port, untaggedVLAN):
     :type data: String
 
     :param untaggedVLAN: untagged vlan ID and name
-    :type untaggedVLAN: Dict{id: Int, name: String}
+    :type untaggedVLAN: Int
 
     :returns: None
     """
 
     # Create untagged vlan
     network_runner.create_vlan(
-        "network-operator", untaggedVLAN["id"], untaggedVLAN.get("name"))
+        "network-operator", untaggedVLAN)
     # Configure access port
     network_runner.conf_access_port(
-        "network-operator", port, untaggedVLAN["id"])
+        "network-operator", port, untaggedVLAN)
     return
 
 
@@ -36,29 +36,25 @@ def _config_trunk_port(port, untaggedVLAN, vlans):
     :type data: String
 
     :param untaggedVLAN: untagged vlan ID and name
-    :type untaggedVLAN: Dict{id: Int, name: String}
+    :type untaggedVLAN: Int
 
     :param vlans: list of vlan
-    :type vlans: List[Dict{id: Int, name: String}]
+    :type vlans: List[]
 
     :returns: None
     """
 
     # Create untagged vlan
-    untaggedVLANID = None
     if untaggedVLAN != None:
         network_runner.create_vlan(
-            "network-operator", untaggedVLAN["id"], untaggedVLAN.get("name"))
-        untaggedVLANID = untaggedVLAN["id"]
-    # Create tagged vlans
-    vlanIDs = []
+            "network-operator", untaggedVLAN)
+    # Create vlans
     for vlan in vlans:
         network_runner.create_vlan(
-            "network-operator", vlan["id"], vlan.get("name"))
-        vlanIDs.append(vlan["id"])
+            "network-operator", vlan)
     # Configure trunk port
     network_runner.conf_trunk_port(
-        "network-operator", port, untaggedVLANID, vlanIDs)
+        "network-operator", port, untaggedVLAN, vlans)
     return
 
 
@@ -91,16 +87,8 @@ if __name__ == '__main__':
     #     bridge: "",
     #     operator: "",
     #     port: "",
-    #     untaggedVLAN: {
-    #         name: "",
-    #         id: 0,
-    #     },
-    #     vlans: [
-    #         {
-    #             name: "",
-    #             id: 0,
-    #         },
-    #     ],
+    #     untaggedVLAN: 0
+    #     vlans: [1,2,3],
     # }
     data = json.loads(sys.argv[1])
 

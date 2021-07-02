@@ -3,5 +3,4 @@ kind: SwitchPortConfiguration
 metadata:
   name: switchportconfiguration-example
 spec:
-  untaggedVLAN:
-    id: 10
+  untaggedVLAN: 10
