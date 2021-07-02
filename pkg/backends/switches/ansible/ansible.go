@@ -10,6 +10,7 @@ import (
 	"github.com/Hellcatlk/network-operator/pkg/backends"
 	"github.com/Hellcatlk/network-operator/pkg/provider"
 	"github.com/Hellcatlk/network-operator/pkg/utils/certificate"
+	"github.com/Hellcatlk/network-operator/pkg/utils/strings"
 )
 
 // New return ansible backend
@@ -128,7 +129,11 @@ func (a *ansible) SetPortAttr(ctx context.Context, port string, configuration *v
 		return a.configureAccessPort(port, configuration.Spec.UntaggedVLAN)
 	}
 
-	return a.configureTrunkPort(port, configuration.Spec.UntaggedVLAN, configuration.Spec.VLANs)
+	vlans, err := strings.ToSlice(configuration.Spec.VLANs)
+	if err != nil {
+		return err
+	}
+	return a.configureTrunkPort(port, configuration.Spec.UntaggedVLAN, vlans)
 }
 
 // ResetPort clean the configuration in the port

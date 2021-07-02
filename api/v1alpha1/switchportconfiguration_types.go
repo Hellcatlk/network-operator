@@ -49,7 +49,8 @@ type SwitchPortConfigurationSpec struct {
 
 	UntaggedVLAN *int `json:"untaggedVLAN,omitempty"`
 
-	VLANs []int `json:"vlans,omitempty"`
+	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
+	VLANs string `json:"vlans,omitempty"`
 
 	// Disable port
 	Disable bool `json:"disable,omitempty"`
