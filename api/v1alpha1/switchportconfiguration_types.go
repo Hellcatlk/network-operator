@@ -49,6 +49,9 @@ type SwitchPortConfigurationSpec struct {
 
 	UntaggedVLAN *int `json:"untaggedVLAN,omitempty"`
 
+	// The range of tagged vlans. You can use `-` to connect two numbers to express the range
+	// or use separate numbers. You can use `,` to combine the above two methods, for example:
+	// `1-10,11,13-20`
 	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
 	VLANs string `json:"vlans,omitempty"`
 

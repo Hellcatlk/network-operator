@@ -111,9 +111,9 @@ spec:
                       untaggedVLAN:
                         type: integer
                       vlans:
-                        items:
-                          type: integer
-                        type: array
+                        description: 'The range of tagged vlans. You can use `-` to connect two numbers to express the range or use separate numbers. You can use `,` to combine the above two methods, for example: `1-10,11,13-20`'
+                        pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
+                        type: string
                     type: object
                   status:
                     description: SwitchPortConfigurationStatus defines the observed state of SwitchPortConfiguration
