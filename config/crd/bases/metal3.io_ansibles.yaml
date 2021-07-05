@@ -6,20 +6,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: (devel)
   creationTimestamp: null
-  name: openvswitches.metal3.io
+  name: ansibles.metal3.io
 spec:
   group: metal3.io
   names:
-    kind: OpenVSwitch
-    listKind: OpenVSwitchList
-    plural: openvswitches
-    singular: openvswitch
+    kind: Ansible
+    listKind: AnsibleList
+    plural: ansibles
+    singular: ansible
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: OpenVSwitch is the Schema for the OpenVSwitches API
+        description: Ansible is the Schema for the ansibles API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
@@ -30,11 +30,23 @@ spec:
           metadata:
             type: object
           spec:
-            description: OpenVSwitchSpec defines the desired state of OpenVSwitch
+            description: AnsibleSpec defines the desired state of Ansible
             properties:
               bridge:
+                description: OVS bridge
                 type: string
               host:
+                type: string
+              os:
+                enum:
+                - openvswitch
+                - junos
+                - nxos
+                - eos
+                - enos
+                - cumulus
+                - dellos10
+                - fos
                 type: string
               secret:
                 description: The secret containing the switch credentials
@@ -47,12 +59,12 @@ spec:
                     type: string
                 type: object
             required:
-            - bridge
             - host
+            - os
             - secret
             type: object
           status:
-            description: OpenVSwitchStatus defines the observed state of OpenVSwitch
+            description: AnsibleStatus defines the observed state of Ansible
             type: object
         type: object
     served: true

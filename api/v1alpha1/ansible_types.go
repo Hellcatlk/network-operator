@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Hellcatlk/network-operator/pkg/provider"
 	"github.com/Hellcatlk/network-operator/pkg/utils/certificate"
@@ -26,58 +27,69 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// OpenVSwitchSpec defines the desired state of OpenVSwitch
-type OpenVSwitchSpec struct {
+// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
+// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+
+// AnsibleSpec defines the desired state of Ansible
+type AnsibleSpec struct {
+	// +kubebuilder:validation:Enum=openvswitch;junos;nxos;eos;enos;cumulus;dellos10;fos
+	OS string `json:"os"`
+
 	Host string `json:"host"`
 
-	Bridge string `json:"bridge"`
+	// OVS bridge
+	Bridge string `json:"bridge,omitempty"`
 
 	// The secret containing the switch credentials
 	Secret *corev1.SecretReference `json:"secret"`
 }
 
-// OpenVSwitchStatus defines the observed state of OpenVSwitch
-type OpenVSwitchStatus struct {
+// AnsibleStatus defines the observed state of Ansible
+type AnsibleStatus struct {
 }
 
 // +kubebuilder:object:root=true
 
-// OpenVSwitch is the Schema for the OpenVSwitches API
-type OpenVSwitch struct {
+// Ansible is the Schema for the ansibles API
+type Ansible struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   OpenVSwitchSpec   `json:"spec,omitempty"`
-	Status OpenVSwitchStatus `json:"status,omitempty"`
+	Spec   AnsibleSpec   `json:"spec,omitempty"`
+	Status AnsibleStatus `json:"status,omitempty"`
 }
 
 // GetConfiguration generate configuration from openvswitch switch
-func (ovs *OpenVSwitch) GetConfiguration(ctx context.Context, client client.Client) (*provider.Config, error) {
-	cert, err := certificate.Fetch(ctx, client, ovs.Spec.Secret)
+func (a *Ansible) GetConfiguration(ctx context.Context, client client.Client) (*provider.Config, error) {
+	cert, err := certificate.Fetch(ctx, client, a.Spec.Secret)
 	if err != nil {
 		return nil, err
 	}
 
+	if a.Spec.OS == "openvswitch" && a.Spec.Bridge == "" {
+		return nil, fmt.Errorf("for openvswitch bridge is required")
+	}
+
 	return &provider.Config{
-		OS:      "openvswitch",
-		Host:    ovs.Spec.Host,
+		OS:      a.Spec.OS,
+		Host:    a.Spec.Host,
 		Cert:    cert,
 		Backend: "ansible",
 		Options: map[string]interface{}{
-			"bridge": ovs.Spec.Bridge,
+			"bridge": a.Spec.Bridge,
 		},
 	}, nil
 }
 
 // +kubebuilder:object:root=true
 
-// OpenVSwitchList contains a list of OpenVSwitch
-type OpenVSwitchList struct {
+// AnsibleList contains a list of Ansible
+type AnsibleList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []OpenVSwitch `json:"items"`
+	Items           []Ansible `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&OpenVSwitch{}, &OpenVSwitchList{})
+	SchemeBuilder.Register(&Ansible{}, &AnsibleList{})
 }

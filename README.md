@@ -17,7 +17,7 @@
 
 |ProviderSwitch|Which backend it uses|
 |:-|:-|
-|OVSSwitch|ansible|
+|Ansible|ansible|
 
 ## Notes
 

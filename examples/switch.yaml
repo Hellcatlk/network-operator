@@ -10,11 +10,12 @@ data:
 
 ---
 apiVersion: metal3.io/v1alpha1
-kind: OpenVSwitch
+kind: Ansible
 metadata:
-  name: openvswitch-example
+  name: ansible-example
 spec:
   host: <host-ip>
+  os: openvswitch
   bridge: <bridge-name>
   secret:
     name: switch-example-secret
@@ -27,8 +28,8 @@ metadata:
   name: switch-example
 spec:
   providerSwitch:
-    kind: OpenVSwitch
-    name: openvswitch-example
+    kind: Ansible
+    name: ansible-example
   ports:
     "switchport-example":
       name: <port-name>

@@ -6,6 +6,7 @@ resources:
 - bases/metal3.io_switchportconfigurations.yaml
 - bases/metal3.io_switchports.yaml
 - bases/metal3.io_openvswitches.yaml
+- bases/metal3.io_ansibles.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:
@@ -14,7 +15,7 @@ patchesStrategicMerge:
 #- patches/webhook_in_switches.yaml
 #- patches/webhook_in_switchportconfigurations.yaml
 #- patches/webhook_in_switchports.yaml
-#- patches/webhook_in_openvswitches.yaml
+#- patches/webhook_in_ansibles.yaml
 # +kubebuilder:scaffold:crdkustomizewebhookpatch
 
 # [CERTMANAGER] To enable webhook, uncomment all the sections with [CERTMANAGER] prefix.
@@ -22,7 +23,7 @@ patchesStrategicMerge:
 #- patches/cainjection_in_switches.yaml
 #- patches/cainjection_in_switchportconfigurations.yaml
 #- patches/cainjection_in_switchports.yaml
-#- patches/cainjection_in_openvswitches.yaml
+#- patches/cainjection_in_ansibles.yaml
 # +kubebuilder:scaffold:crdkustomizecainjectionpatch
 
 # the following config is for teaching kustomize how to do kustomization for CRDs.

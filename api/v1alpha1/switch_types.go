@@ -67,17 +67,17 @@ func (ref *ProviderSwitchRef) Fetch(ctx context.Context, client client.Client) (
 	case "TestSwitch":
 		instance = &provider.Test{}
 
-	case "OpenVSwitch":
-		ps := &OpenVSwitch{}
+	case "Ansible":
+		a := &Ansible{}
 		err = client.Get(
 			ctx,
 			types.NamespacedName{
 				Name:      ref.Name,
 				Namespace: ref.Namespace,
 			},
-			ps,
+			a,
 		)
-		instance = ps
+		instance = a
 
 	default:
 		err = fmt.Errorf("unknown provider switch kind")

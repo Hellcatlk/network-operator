@@ -22,13 +22,13 @@ import (
 
 // ACL describes the rules applied in the switch
 type ACL struct {
-	// +kubebuilder:validation:Enum="ipv4";"ipv6"
+	// +kubebuilder:validation:Enum=ipv4;ipv6
 	Type string `json:"type,omitempty"`
 
-	// +kubebuilder:validation:Enum="allow";"deny"
+	// +kubebuilder:validation:Enum=allow;deny
 	Action string `json:"action,omitempty"`
 
-	// +kubebuilder:validation:Enum="TCP";"UDP";"ICMP";"ALL"
+	// +kubebuilder:validation:Enum=TCP;UDP;ICMP;ALL
 	Protocol string `json:"protocol,omitempty"`
 
 	Src string `json:"src,omitempty"`

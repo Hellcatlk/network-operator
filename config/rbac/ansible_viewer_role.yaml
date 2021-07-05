@@ -1,24 +1,20 @@
-# permissions for end users to edit openvswitches.
+# permissions for end users to view ansibles.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: openvswitch-editor-role
+  name: ansible-viewer-role
 rules:
 - apiGroups:
   - metal3.io
   resources:
-  - openvswitches
+  - ansibles
   verbs:
-  - create
-  - delete
   - get
   - list
-  - patch
-  - update
   - watch
 - apiGroups:
   - metal3.io
   resources:
-  - openvswitches/status
+  - ansibles/status
   verbs:
   - get
