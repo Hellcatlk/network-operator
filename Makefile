@@ -98,5 +98,5 @@ clean:
 
 .PHONY: bin/network-runner
 bin/network-runner:
-        mkdir -p ./bin
+	mkdir -p ./bin
 	cp ./cmd/network-runner/main.py ./bin/network-runner
