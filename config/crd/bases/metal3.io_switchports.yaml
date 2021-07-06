@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: (devel)
+    controller-gen.kubebuilder.io/version: v0.6.1
   creationTimestamp: null
   name: switchports.metal3.io
 spec:
@@ -31,10 +31,14 @@ spec:
         description: SwitchPort is the Schema for the switchports API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
           metadata:
             type: object
@@ -61,15 +65,22 @@ spec:
                 description: The current Configuration of the port
                 properties:
                   apiVersion:
-                    description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+                    description: 'APIVersion defines the versioned schema of this
+                      representation of an object. Servers should convert recognized
+                      schemas to the latest internal value, and may reject unrecognized
+                      values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
                     type: string
                   kind:
-                    description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                    description: 'Kind is a string value representing the REST resource
+                      this object represents. Servers may infer this from the endpoint
+                      the client submits requests to. Cannot be updated. In CamelCase.
+                      More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
                     type: string
                   metadata:
                     type: object
                   spec:
-                    description: SwitchPortConfigurationSpec defines the desired state of SwitchPortConfiguration
+                    description: SwitchPortConfigurationSpec defines the desired state
+                      of SwitchPortConfiguration
                     properties:
                       acls:
                         items:
@@ -111,12 +122,16 @@ spec:
                       untaggedVLAN:
                         type: integer
                       vlans:
-                        description: 'The range of tagged vlans. You can use `-` to connect two numbers to express the range or use separate numbers. You can use `,` to combine the above two methods, for example: `1-10,11,13-20`'
+                        description: 'The range of tagged vlans. You can use `-` to
+                          connect two numbers to express the range or use separate
+                          numbers. You can use `,` to combine the above two methods,
+                          for example: `1-10,11,13-20`'
                         pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
                         type: string
                     type: object
                   status:
-                    description: SwitchPortConfigurationStatus defines the observed state of SwitchPortConfiguration
+                    description: SwitchPortConfigurationStatus defines the observed
+                      state of SwitchPortConfiguration
                     type: object
                 type: object
               error:

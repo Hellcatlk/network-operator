@@ -15,6 +15,12 @@ GOOS=$(shell go env GOOS)
 GOARCH=$(shell go env GOARCH)
 PATH := $(shell pwd)/bin:$(PATH)
 
+# Tools
+controller-gen ?= go run sigs.k8s.io/controller-tools/cmd/controller-gen
+golint ?= go run golang.org/x/lint/golint
+gosec ?= go run github.com/securego/gosec/cmd/gosec
+kustomize ?= go run sigs.k8s.io/kustomize/kustomize/v3
+
 # Build manager binary
 build: generate bin/network-runner
 	CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} GO111MODULE=on go build -a -o bin/manager main.go
@@ -29,22 +35,22 @@ docker: generate build
 	sudo docker build -f Dockerfile -t ${IMG} .
 
 # Install CRDs into a cluster
-install: manifests bin/kustomize
-	kustomize build config/crd | kubectl apply -f -
+install: manifests
+	$(kustomize) build config/crd | kubectl apply -f -
 
 # Uninstall CRDs from a cluster
-uninstall: manifests bin/kustomize
-	kustomize build config/crd | kubectl delete -f -
+uninstall: manifests
+	$(kustomize) build config/crd | kubectl delete -f -
 
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
-deploy: manifests bin/kustomize
+deploy: manifests
 	cd config/manager && kustomize edit set image controller=${IMG}
-	kustomize build config/default | kubectl apply -f -
+	$(kustomize) build config/default | kubectl apply -f -
 
 # Undeploy controller in the configured Kubernetes cluster in ~/.kube/config
-undeploy: manifests bin/kustomize
+undeploy: manifests
 	cd config/manager && kustomize edit set image controller=${IMG}
-	kustomize build config/default | kubectl delete -f -`
+	$(kustomize) build config/default | kubectl delete -f -`
 
 # Generate docs
 .PHONY: docs
@@ -52,12 +58,12 @@ docs:
 	find ./docs -name "*.plantuml" | xargs ./hack/plantuml.sh
 
 # Generate code
-generate: bin/controller-gen
-	controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
+generate:
+	$(controller-gen) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
 # Generate manifests e.g. CRD, RBAC etc.
-manifests: bin/controller-gen
-	controller-gen $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+manifests:
+	$(controller-gen) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 
 # Run tests
 test: generate gofmt golint govet gosec unit manifests
@@ -67,16 +73,16 @@ gofmt:
 	./hack/gofmt.sh
 
 # Run go lint against code
-golint: bin/golangci-lint
-	golangci-lint run ./... --timeout=10m
+golint:
+	$(golint) ./...
 
 # Run go vet against code
 govet:
 	go vet ./...
 
 # Run go sec against code
-gosec: bin/gosec
-	gosec -quiet ./...
+gosec:
+	$(gosec) -quiet ./...
 
 # Run go test against code
 unit: bin/network-runner
@@ -93,19 +99,3 @@ clean:
 .PHONY: bin/network-runner
 bin/network-runner:
 	cp ./cmd/network-runner/main.py ./bin/network-runner
-
-# Install kustomize
-bin/kustomize:
-	./hack/install_kustomize.sh
-
-# Install controller-gen
-bin/controller-gen:
-	./hack/install_controller-gen.sh
-
-# Install golangci-lint
-bin/golangci-lint:
-	./hack/install_golangci-lint.sh
-
-# Install gosec
-bin/gosec:
-	./hack/install_gosec.sh

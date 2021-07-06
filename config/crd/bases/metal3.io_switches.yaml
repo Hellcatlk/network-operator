@@ -4,7 +4,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: (devel)
+    controller-gen.kubebuilder.io/version: v0.6.1
   creationTimestamp: null
   name: switches.metal3.io
 spec:
@@ -31,10 +31,14 @@ spec:
         description: Switch is the Schema for the switches API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
             type: string
           metadata:
             type: object
@@ -52,10 +56,12 @@ spec:
                       description: Describes the port name on the device
                       type: string
                     trunkDisable:
-                      description: True if this port can be used as a trunk port, false otherwise
+                      description: True if this port can be used as a trunk port,
+                        false otherwise
                       type: boolean
                     vlanRange:
-                      description: Indicates the range of VLANs allowed by this port in the switch
+                      description: Indicates the range of VLANs allowed by this port
+                        in the switch
                       pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
                       type: string
                   type: object
@@ -94,10 +100,12 @@ spec:
                       description: Describes the port name on the device
                       type: string
                     trunkDisable:
-                      description: True if this port can be used as a trunk port, false otherwise
+                      description: True if this port can be used as a trunk port,
+                        false otherwise
                       type: boolean
                     vlanRange:
-                      description: Indicates the range of VLANs allowed by this port in the switch
+                      description: Indicates the range of VLANs allowed by this port
+                        in the switch
                       pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
                       type: string
                   type: object
