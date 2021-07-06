@@ -7,6 +7,7 @@ import (
 	"github.com/Hellcatlk/network-operator/api/v1alpha1"
 	"github.com/Hellcatlk/network-operator/pkg/machine"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -20,7 +21,7 @@ type fakeClient struct {
 	client.StatusClient
 }
 
-func (c *fakeClient) Get(ctx context.Context, key types.NamespacedName, obj runtime.Object) error {
+func (c *fakeClient) Get(ctx context.Context, key types.NamespacedName, obj client.Object) error {
 	switch key.Name {
 	case "Switch":
 		*obj.(*v1alpha1.Switch) = v1alpha1.Switch{
@@ -37,6 +38,14 @@ func (c *fakeClient) Get(ctx context.Context, key types.NamespacedName, obj runt
 		*obj.(*corev1.Secret) = corev1.Secret{}
 	}
 
+	return nil
+}
+
+func (c *fakeClient) Scheme() *runtime.Scheme {
+	return nil
+}
+
+func (c *fakeClient) RESTMapper() meta.RESTMapper {
 	return nil
 }
 

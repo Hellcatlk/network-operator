@@ -28,7 +28,6 @@ import (
 
 	metal3iov1alpha1 "github.com/Hellcatlk/network-operator/api/v1alpha1"
 	"github.com/Hellcatlk/network-operator/controllers"
-	"github.com/Hellcatlk/network-operator/pkg/utils/trace"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -54,9 +53,6 @@ func main() {
 	flag.Parse()
 
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
-
-	shutdown := trace.InitTracer()
-	defer shutdown()
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:             scheme,
