@@ -5,7 +5,6 @@ resources:
 - bases/metal3.io_switches.yaml
 - bases/metal3.io_switchportconfigurations.yaml
 - bases/metal3.io_switchports.yaml
-- bases/metal3.io_openvswitches.yaml
 - bases/metal3.io_ansibles.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
