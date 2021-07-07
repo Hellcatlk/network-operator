@@ -46,6 +46,7 @@ type SwitchReconciler struct {
 // +kubebuilder:rbac:groups=metal3.io,resources=ansibles/finalizers,verbs=update
 
 // +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=coordination.k8s.io,resources=leases,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile switch resources
 func (r *SwitchReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
