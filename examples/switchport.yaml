@@ -3,10 +3,10 @@ kind: SwitchPort
 metadata:
   name: switchport-example
   ownerReferences:
-    - apiVersion: metal3.io/v1alpha1
-      kind: Switch
-      name: switch-example
-      uid: <switch-uuid>
+  - apiVersion: metal3.io/v1alpha1
+    kind: Switch
+    name: switch-example
+    uid: <switch-uuid>
 spec:
   configuration:
     name: switchportconfiguration-example
