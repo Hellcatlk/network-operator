@@ -6,7 +6,6 @@ import (
 
 	"github.com/Hellcatlk/network-operator/pkg/backends"
 	"github.com/Hellcatlk/network-operator/pkg/backends/switches/ansible"
-	"github.com/Hellcatlk/network-operator/pkg/backends/switches/ssh"
 	"github.com/Hellcatlk/network-operator/pkg/provider"
 )
 
@@ -15,7 +14,6 @@ type newFuncType func(context.Context, *provider.Config) (backends.Switch, error
 var backendNews map[string]newFuncType = make(map[string]newFuncType)
 
 func init() {
-	Register("ssh", ssh.New)
 	Register("ansible", ansible.New)
 }
 
