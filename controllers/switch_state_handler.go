@@ -45,7 +45,7 @@ func (r *SwitchReconciler) configuringHandler(ctx context.Context, info *machine
 	// Create SwitchPorts
 	for name := range i.Status.Ports {
 		switchPort := &v1alpha1.SwitchPort{}
-		switchPort.Name = name
+		switchPort.Name = i.Name + "[" + name + "]"
 		switchPort.Namespace = i.Namespace
 		switchPort.OwnerReferences = []metav1.OwnerReference{
 			{
@@ -84,7 +84,7 @@ func (r *SwitchReconciler) runningHandler(ctx context.Context, info *machine.Rec
 		// Get SwitchPort
 		err := info.Client.Get(
 			ctx, types.NamespacedName{
-				Name:      name,
+				Name:      i.Name + "[" + name + "]",
 				Namespace: i.Namespace,
 			},
 			&v1alpha1.SwitchPort{},
