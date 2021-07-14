@@ -36,7 +36,8 @@ type Instance interface {
 	SetError(err error)
 }
 
-// Handler is a state handle function
+// Handler is a state handle function. If an error isn't nil or
+// ctrl.Result.Requeue is true the state machine will requeue the Request again
 type Handler func(ctx context.Context, info *ReconcileInfo, instance interface{}) (StateType, ctrl.Result, error)
 
 // New a state machine
@@ -49,7 +50,7 @@ func New(info *ReconcileInfo, instance Instance, handlers map[StateType]Handler)
 	}
 }
 
-// Reconcile state machine. If dirty is true, it means the instance has changed.
+// Reconcile state machine. If dirty is true, it means the instance has changed
 func (m *Machine) Reconcile(ctx context.Context) (bool, ctrl.Result, error) {
 	m.info.Logger.Info(string(m.instance.GetState()))
 

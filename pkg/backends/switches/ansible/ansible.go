@@ -120,7 +120,7 @@ func (a *ansible) deletePort(port string) error {
 
 // GetPortAttr return the port's configuration
 func (a *ansible) GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPortConfiguration, error) {
-	return nil, fmt.Errorf("ansible backend isn't support GetPortAttr")
+	return nil, fmt.Errorf("ansible backend does not support GetPortAttr")
 }
 
 // SetPortAttr set the configuration to the port

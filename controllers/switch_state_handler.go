@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"reflect"
 
 	"github.com/Hellcatlk/network-operator/api/v1alpha1"
 	"github.com/Hellcatlk/network-operator/pkg/machine"
@@ -30,6 +31,23 @@ func (r *SwitchReconciler) verifyingHandler(ctx context.Context, info *machine.R
 		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true}, nil
 	}
 
+	// Delete SwitchPorts which isn't included i.Spec
+	for name := range i.Status.Ports {
+		_, exist := i.Spec.Ports[name]
+		if !exist || !reflect.DeepEqual(i.Spec.Ports[name], i.Status.Ports[name]) {
+			switchPort := &v1alpha1.SwitchPort{}
+			switchPort.Name = name
+			switchPort.Namespace = i.Namespace
+			err := info.Client.Delete(ctx, switchPort)
+			if err != nil {
+				if errors.IsNotFound(err) {
+					continue
+				}
+				return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+			}
+		}
+	}
+
 	i.Status.ProviderSwitch = i.Spec.ProviderSwitch.DeepCopy()
 	i.Status.Ports = i.Spec.Ports
 	return v1alpha1.SwitchConfiguring, ctrl.Result{Requeue: true}, nil
@@ -45,7 +63,7 @@ func (r *SwitchReconciler) configuringHandler(ctx context.Context, info *machine
 	// Create SwitchPorts
 	for name := range i.Status.Ports {
 		switchPort := &v1alpha1.SwitchPort{}
-		switchPort.Name = i.Name + "[" + name + "]"
+		switchPort.Name = name
 		switchPort.Namespace = i.Namespace
 		switchPort.OwnerReferences = []metav1.OwnerReference{
 			{
@@ -79,12 +97,16 @@ func (r *SwitchReconciler) runningHandler(ctx context.Context, info *machine.Rec
 		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true}, nil
 	}
 
+	if !reflect.DeepEqual(i.Spec.Ports, i.Status.Ports) {
+		return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true}, nil
+	}
+
 	// Check SwitchPorts are existed
 	for name := range i.Status.Ports {
 		// Get SwitchPort
 		err := info.Client.Get(
 			ctx, types.NamespacedName{
-				Name:      i.Name + "[" + name + "]",
+				Name:      name,
 				Namespace: i.Namespace,
 			},
 			&v1alpha1.SwitchPort{},
