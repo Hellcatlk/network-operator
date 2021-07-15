@@ -13,7 +13,7 @@ func init() {
 }
 
 // New return test backend
-func new(ctx context.Context, config *provider.Config) (backends.Switch, error) {
+func new(ctx context.Context, config *provider.SwitchConfiguration) (backends.Switch, error) {
 	return &test{}, nil
 }
 

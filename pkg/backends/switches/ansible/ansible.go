@@ -14,7 +14,7 @@ import (
 )
 
 // New return ansible backend
-func New(ctx context.Context, config *provider.Config) (backends.Switch, error) {
+func New(ctx context.Context, config *provider.SwitchConfiguration) (backends.Switch, error) {
 	if config == nil {
 		return nil, fmt.Errorf("configure of switch(%s) is nil", config.OS)
 	}

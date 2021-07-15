@@ -33,7 +33,7 @@ func TestNew(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			_, err := New(context.Background(), &provider.Config{
+			_, err := New(context.Background(), &provider.SwitchConfiguration{
 				OS:      "openvswitch",
 				Host:    "test",
 				Backend: c.backend,

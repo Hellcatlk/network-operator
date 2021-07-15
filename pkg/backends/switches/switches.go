@@ -9,7 +9,7 @@ import (
 	"github.com/Hellcatlk/network-operator/pkg/provider"
 )
 
-type newFuncType func(context.Context, *provider.Config) (backends.Switch, error)
+type newFuncType func(context.Context, *provider.SwitchConfiguration) (backends.Switch, error)
 
 var backendNews map[string]newFuncType = make(map[string]newFuncType)
 
@@ -23,7 +23,7 @@ func Register(backend string, new newFuncType) {
 }
 
 // New return a implementation of SwitchBackend interface
-func New(ctx context.Context, config *provider.Config) (backends.Switch, error) {
+func New(ctx context.Context, config *provider.SwitchConfiguration) (backends.Switch, error) {
 	if backendNews[config.Backend] == nil {
 		return nil, fmt.Errorf("the type of backend(%s) is invalid", config.Backend)
 	}

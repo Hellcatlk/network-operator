@@ -8,8 +8,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// Config is configuration of device provider
-type Config struct {
+// SwitchConfiguration is configuration of device provider
+type SwitchConfiguration struct {
 	// which os this provider switch used
 	OS string
 	// Switch's host
@@ -24,5 +24,5 @@ type Config struct {
 // Switch is a interface of provider switch
 type Switch interface {
 	// GetConfiguration generate configuration from provider switch
-	GetConfiguration(ctx context.Context, client client.Client) (*Config, error)
+	GetConfiguration(ctx context.Context, client client.Client) (*SwitchConfiguration, error)
 }

@@ -57,7 +57,7 @@ type AnsibleSwitch struct {
 }
 
 // GetConfiguration generate configuration from openvswitch switch
-func (a *AnsibleSwitch) GetConfiguration(ctx context.Context, client client.Client) (*provider.Config, error) {
+func (a *AnsibleSwitch) GetConfiguration(ctx context.Context, client client.Client) (*provider.SwitchConfiguration, error) {
 	cert, err := certificate.Fetch(ctx, client, a.Spec.Secret)
 	if err != nil {
 		return nil, err
@@ -67,7 +67,7 @@ func (a *AnsibleSwitch) GetConfiguration(ctx context.Context, client client.Clie
 		return nil, fmt.Errorf("for openvswitch bridge is required")
 	}
 
-	return &provider.Config{
+	return &provider.SwitchConfiguration{
 		OS:      a.Spec.OS,
 		Host:    a.Spec.Host,
 		Cert:    cert,
