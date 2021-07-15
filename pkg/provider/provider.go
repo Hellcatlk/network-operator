@@ -8,7 +8,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// Config is configuration of provider device
+// Config is configuration of device provider
 type Config struct {
 	// which os this provider switch used
 	OS string

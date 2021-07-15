@@ -48,7 +48,7 @@ func (r *SwitchReconciler) verifyingHandler(ctx context.Context, info *machine.R
 		}
 	}
 
-	i.Status.ProviderSwitch = i.Spec.ProviderSwitch.DeepCopy()
+	i.Status.Provider = i.Spec.Provider.DeepCopy()
 	i.Status.Ports = i.Spec.Ports
 	return v1alpha1.SwitchConfiguring, ctrl.Result{Requeue: true}, nil
 }

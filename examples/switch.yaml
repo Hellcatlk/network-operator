@@ -27,7 +27,7 @@ kind: Switch
 metadata:
   name: switch-example
 spec:
-  providerSwitch:
+  provider:
     kind: Ansible
     name: ansible-example
   ports:

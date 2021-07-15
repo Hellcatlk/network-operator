@@ -43,8 +43,9 @@ type Port struct {
 	VLANRange string `json:"vlanRange,omitempty"`
 }
 
-// ProviderSwitchRef is the reference for ProviderSwitch CR
-type ProviderSwitchRef struct {
+// SwitchProviderRef is the reference for SwitchProvider CR
+type SwitchProviderRef struct {
+	// +kubebuilder:validation:Enum=ansible
 	Kind string `json:"kind"`
 
 	Name string `json:"name"`
@@ -55,7 +56,7 @@ type ProviderSwitchRef struct {
 }
 
 // Fetch the instance
-func (ref *ProviderSwitchRef) Fetch(ctx context.Context, client client.Client) (provider.Switch, error) {
+func (ref *SwitchProviderRef) Fetch(ctx context.Context, client client.Client) (provider.Switch, error) {
 	if ref == nil {
 		return nil, fmt.Errorf("provider switch reference is nil")
 	}
@@ -65,7 +66,7 @@ func (ref *ProviderSwitchRef) Fetch(ctx context.Context, client client.Client) (
 
 	switch ref.Kind {
 	case "TestSwitch":
-		instance = &provider.Test{}
+		instance = &provider.TestSwitch{}
 
 	case "Ansible":
 		a := &Ansible{}
@@ -88,8 +89,8 @@ func (ref *ProviderSwitchRef) Fetch(ctx context.Context, client client.Client) (
 
 // SwitchSpec defines the desired state of Switch
 type SwitchSpec struct {
-	// The reference of provider switch
-	ProviderSwitch *ProviderSwitchRef `json:"providerSwitch,omitempty"`
+	// The reference of provider
+	Provider *SwitchProviderRef `json:"providerSwitch,omitempty"`
 
 	// Restricted ports in the switch
 	Ports map[string]Port `json:"ports,omitempty"`
@@ -100,8 +101,8 @@ type SwitchStatus struct {
 	// The current configuration status of the switch
 	State machine.StateType `json:"state,omitempty"`
 
-	// The reference of provider switch
-	ProviderSwitch *ProviderSwitchRef `json:"providerSwitch,omitempty"`
+	// The reference of switch provider
+	Provider *SwitchProviderRef `json:"providerSwitch,omitempty"`
 
 	// Restricted ports in the switch
 	Ports map[string]Port `json:"ports,omitempty"`

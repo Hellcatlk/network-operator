@@ -68,9 +68,11 @@ spec:
                 description: Restricted ports in the switch
                 type: object
               providerSwitch:
-                description: The reference of provider switch
+                description: The reference of provider
                 properties:
                   kind:
+                    enum:
+                    - ansible
                     type: string
                   name:
                     type: string
@@ -112,9 +114,11 @@ spec:
                 description: Restricted ports in the switch
                 type: object
               providerSwitch:
-                description: The reference of provider switch
+                description: The reference of switch provider
                 properties:
                   kind:
+                    enum:
+                    - ansible
                     type: string
                   name:
                     type: string
