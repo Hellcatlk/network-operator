@@ -33,7 +33,7 @@ rules:
 - apiGroups:
   - metal3.io
   resources:
-  - ansibles
+  - ansibleswitches
   verbs:
   - create
   - delete
@@ -45,13 +45,13 @@ rules:
 - apiGroups:
   - metal3.io
   resources:
-  - ansibles/finalizers
+  - ansibleswitches/finalizers
   verbs:
   - update
 - apiGroups:
   - metal3.io
   resources:
-  - ansibles/status
+  - ansibleswitches/status
   verbs:
   - get
   - patch

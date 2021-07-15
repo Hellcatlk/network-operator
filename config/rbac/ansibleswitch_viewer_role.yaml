@@ -1,24 +1,20 @@
-# permissions for end users to edit ansibles.
+# permissions for end users to view ansibleswitches.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: ansible-editor-role
+  name: ansibleswitch-viewer-role
 rules:
 - apiGroups:
   - metal3.io
   resources:
-  - ansibles
+  - ansibleswitches
   verbs:
-  - create
-  - delete
   - get
   - list
-  - patch
-  - update
   - watch
 - apiGroups:
   - metal3.io
   resources:
-  - ansibles/status
+  - ansibleswitches/status
   verbs:
   - get

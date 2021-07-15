@@ -1,7 +1,7 @@
 apiVersion: metal3.io/v1alpha1
-kind: Ansible
+kind: AnsibleSwitch
 metadata:
-  name: ansible-sample
+  name: ansibleswitch-sample
 spec:
   # Add fields here
   foo: bar

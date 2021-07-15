@@ -27,11 +27,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
-// AnsibleSpec defines the desired state of Ansible
-type AnsibleSpec struct {
+// AnsibleSwitchSpec defines the desired state of AnsibleSwitch
+type AnsibleSwitchSpec struct {
 	// +kubebuilder:validation:Enum=openvswitch;junos;nxos;eos;enos;cumulus;dellos10;fos
 	OS string `json:"os"`
 
@@ -44,23 +41,23 @@ type AnsibleSpec struct {
 	Secret *corev1.SecretReference `json:"secret"`
 }
 
-// AnsibleStatus defines the observed state of Ansible
-type AnsibleStatus struct {
+// AnsibleSwitchStatus defines the observed state of AnsibleSwitch
+type AnsibleSwitchStatus struct {
 }
 
 // +kubebuilder:object:root=true
 
-// Ansible is the Schema for the ansibles API
-type Ansible struct {
+// AnsibleSwitch is the Schema for the ansibleswitches API
+type AnsibleSwitch struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   AnsibleSpec   `json:"spec,omitempty"`
-	Status AnsibleStatus `json:"status,omitempty"`
+	Spec   AnsibleSwitchSpec   `json:"spec,omitempty"`
+	Status AnsibleSwitchStatus `json:"status,omitempty"`
 }
 
 // GetConfiguration generate configuration from openvswitch switch
-func (a *Ansible) GetConfiguration(ctx context.Context, client client.Client) (*provider.Config, error) {
+func (a *AnsibleSwitch) GetConfiguration(ctx context.Context, client client.Client) (*provider.Config, error) {
 	cert, err := certificate.Fetch(ctx, client, a.Spec.Secret)
 	if err != nil {
 		return nil, err
@@ -83,13 +80,13 @@ func (a *Ansible) GetConfiguration(ctx context.Context, client client.Client) (*
 
 // +kubebuilder:object:root=true
 
-// AnsibleList contains a list of Ansible
-type AnsibleList struct {
+// AnsibleSwitchList contains a list of AnsibleSwitch
+type AnsibleSwitchList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Ansible `json:"items"`
+	Items           []AnsibleSwitch `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&Ansible{}, &AnsibleList{})
+	SchemeBuilder.Register(&AnsibleSwitch{}, &AnsibleSwitchList{})
 }

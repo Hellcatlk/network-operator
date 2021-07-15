@@ -45,7 +45,7 @@ type Port struct {
 
 // SwitchProviderRef is the reference for SwitchProvider CR
 type SwitchProviderRef struct {
-	// +kubebuilder:validation:Enum=ansible
+	// +kubebuilder:validation:Enum=AnsibleSwitch
 	Kind string `json:"kind"`
 
 	Name string `json:"name"`
@@ -68,8 +68,8 @@ func (ref *SwitchProviderRef) Fetch(ctx context.Context, client client.Client) (
 	case "TestSwitch":
 		instance = &provider.TestSwitch{}
 
-	case "Ansible":
-		a := &Ansible{}
+	case "AnsibleSwitch":
+		a := &AnsibleSwitch{}
 		err = client.Get(
 			ctx,
 			types.NamespacedName{
