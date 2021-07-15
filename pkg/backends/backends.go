@@ -8,7 +8,7 @@ import (
 
 // Switch is a interface for switch backend
 type Switch interface {
-	// GetPortAttr get the port's configure
+	// GetPortAttr get the port's configuration
 	GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPortConfiguration, error)
 
 	// SetPortAttr set configure to the port
