@@ -10,6 +10,7 @@
 "Configuring*" --> [ Configuration finished ] "Running*"
 "Configuring*" --> [ spec.configurationRef is nil ||\n !instance.DeletionTimestamp.IsZero() ] "Deleting*"
 
+"Running*" --> [ spec.ports has been updated ] "Verifying*"
 "Running*" --> [ SwitchPort's has been deleted ] "Configuring*"
 "Running*" --> [ spec.configurationRef is nil ||\n !instance.DeletionTimestamp.IsZero() ] "Deleting*"
 
