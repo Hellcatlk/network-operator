@@ -15,9 +15,9 @@
 
 ## Supported backend
 
-|Provider|Which backend it uses|
-|:-|:-|
-|AnsibleSwitch|ansible|
+|Device|Provider|Which backend it uses|
+|:-|:-|:-|
+|Switch|AnsibleSwitch|ansible|
 
 ## Notes
 
