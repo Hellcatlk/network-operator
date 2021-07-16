@@ -11,7 +11,7 @@
 
 **NOTE**: If you execute `make deploy` in a multi-node cluster environment, you need to upload the image to the image repository.
 
-**NOTE**: In most cases you needn't to apply SwitchPort manually.
+**NOTE**: In most cases you needn't to apply SwitchPort manually, `Switch` controller will create it.
 
 ## Supported backend
 
