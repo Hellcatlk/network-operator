@@ -31,5 +31,5 @@ spec:
     kind: AnsibleSwitch
     name: ansible-switch-example
   ports:
-    "switchport-example":
+    switchport-example:
       name: <port-name>
