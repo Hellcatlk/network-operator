@@ -11,9 +11,6 @@ func TestVerify(t *testing.T) {
 		expectedError bool
 	}{
 		{
-			name: "nil",
-		},
-		{
 			name: "disabled",
 			port: &Port{
 				Disabled: true,

@@ -47,7 +47,15 @@ type Port struct {
 
 // Verify configuration
 func (p *Port) Verify(configuration *SwitchPortConfiguration) error {
-	if p == nil || configuration == nil {
+	if p == nil {
+		return fmt.Errorf("the port is nil")
+	}
+
+	if p.Name == "" {
+		return fmt.Errorf("the port's name can't be empty")
+	}
+
+	if configuration == nil {
 		return nil
 	}
 

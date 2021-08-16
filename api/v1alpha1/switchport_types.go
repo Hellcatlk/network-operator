@@ -98,6 +98,9 @@ type SwitchPortStatus struct {
 
 	// The current Configuration of the port
 	Configuration *SwitchPortConfiguration `json:"configuration,omitempty"`
+
+	// The name of physics port
+	PortName string `json:"portName,omitempty"`
 }
 
 const (

@@ -30,6 +30,11 @@ func (c *fakeClient) Get(ctx context.Context, key types.NamespacedName, obj clie
 					Kind: "TestSwitch",
 					Name: "TestSwitch",
 				},
+				Ports: map[string]*v1alpha1.Port{
+					"SwitchPort": {
+						Name: "test",
+					},
+				},
 			},
 		}
 	case "SwitchPortConfiguration":
@@ -52,6 +57,7 @@ func (c *fakeClient) RESTMapper() meta.RESTMapper {
 func TestSwitchPortStateMachine(t *testing.T) {
 	r := SwitchPortReconciler{}
 	instance := v1alpha1.SwitchPort{}
+	instance.Name = "SwitchPort"
 	instance.OwnerReferences = []metav1.OwnerReference{
 		{
 			Name: "Switch",

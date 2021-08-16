@@ -137,6 +137,9 @@ spec:
               error:
                 description: The error message of the port
                 type: string
+              portName:
+                description: The name of physics port
+                type: string
               state:
                 description: The current configuration status of the port
                 type: string

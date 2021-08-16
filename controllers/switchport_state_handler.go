@@ -65,6 +65,7 @@ func (r *SwitchPortReconciler) verifyingHandler(ctx context.Context, info *machi
 
 	// Copy configuration to Status.Configuration
 	i.Status.Configuration = configuration
+	i.Status.PortName = owner.Status.Ports[i.Name].Name
 	return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true}, nil
 }
 
@@ -97,7 +98,7 @@ func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *mac
 	}
 
 	// Set configuration to port
-	err = sw.SetPortAttr(ctx, owner.Status.Ports[i.Name].Name, i.Status.Configuration)
+	err = sw.SetPortAttr(ctx, i.Status.PortName, i.Status.Configuration)
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
