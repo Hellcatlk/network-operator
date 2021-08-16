@@ -53,8 +53,8 @@ type networkRunnerData struct {
 
 type portConfiguration struct {
 	Mode         string `json:"mode"`
-	Vlan         *int   `json:"vlan,omitempty"`
-	TrunkedVlans string `json:"trunked_vlans,omitempty"`
+	VLAN         *int   `json:"vlan,omitempty"`
+	TrunkedVLANs string `json:"trunked_vlans,omitempty"`
 }
 
 func (a *ansible) getPortConf(port string) (*portConfiguration, error) {
@@ -167,8 +167,8 @@ func (a *ansible) GetPortAttr(ctx context.Context, port string) (*v1alpha1.Switc
 
 	return &v1alpha1.SwitchPortConfiguration{
 		Spec: v1alpha1.SwitchPortConfigurationSpec{
-			UntaggedVLAN: portConfiguration.Vlan,
-			VLANs:        portConfiguration.TrunkedVlans,
+			UntaggedVLAN: portConfiguration.VLAN,
+			VLANs:        portConfiguration.TrunkedVLANs,
 		},
 	}, fmt.Errorf("ansible backend does not support GetPortAttr")
 }
