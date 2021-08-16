@@ -461,9 +461,17 @@ func (in *SwitchSpec) DeepCopyInto(out *SwitchSpec) {
 	}
 	if in.Ports != nil {
 		in, out := &in.Ports, &out.Ports
-		*out = make(map[string]Port, len(*in))
+		*out = make(map[string]*Port, len(*in))
 		for key, val := range *in {
-			(*out)[key] = val
+			var outVal *Port
+			if val == nil {
+				(*out)[key] = nil
+			} else {
+				in, out := &val, &outVal
+				*out = new(Port)
+				**out = **in
+			}
+			(*out)[key] = outVal
 		}
 	}
 }
@@ -488,9 +496,17 @@ func (in *SwitchStatus) DeepCopyInto(out *SwitchStatus) {
 	}
 	if in.Ports != nil {
 		in, out := &in.Ports, &out.Ports
-		*out = make(map[string]Port, len(*in))
+		*out = make(map[string]*Port, len(*in))
 		for key, val := range *in {
-			(*out)[key] = val
+			var outVal *Port
+			if val == nil {
+				(*out)[key] = nil
+			} else {
+				in, out := &val, &outVal
+				*out = new(Port)
+				**out = **in
+			}
+			(*out)[key] = outVal
 		}
 	}
 }

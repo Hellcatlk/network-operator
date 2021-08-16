@@ -60,10 +60,13 @@ spec:
                         false otherwise
                       type: boolean
                     vlanRange:
+                      default: 1-4096
                       description: Indicates the range of VLANs allowed by this port
                         in the switch
                       pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
                       type: string
+                  required:
+                  - name
                   type: object
                 description: Restricted ports in the switch
                 type: object
@@ -106,10 +109,13 @@ spec:
                         false otherwise
                       type: boolean
                     vlanRange:
+                      default: 1-4096
                       description: Indicates the range of VLANs allowed by this port
                         in the switch
                       pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
                       type: string
+                  required:
+                  - name
                   type: object
                 description: Restricted ports in the switch
                 type: object

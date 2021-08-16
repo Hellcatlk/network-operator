@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 	"time"
 
@@ -59,12 +58,9 @@ func (r *SwitchPortReconciler) verifyingHandler(ctx context.Context, info *machi
 		return v1alpha1.SwitchPortVerifying, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
-	if owner.Status.Ports[i.Name].Disabled {
-		return v1alpha1.SwitchPortVerifying, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, fmt.Errorf("the port is disabled")
-	}
-
-	if owner.Status.Ports[i.Name].TrunkDisabled && len(configuration.Spec.VLANs) != 0 {
-		return v1alpha1.SwitchPortVerifying, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, fmt.Errorf("set the port to trunk mode is disabled")
+	err = owner.Status.Ports[i.Name].Verify(configuration)
+	if err != nil {
+		return v1alpha1.SwitchPortVerifying, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
 	// Copy configuration to Status.Configuration

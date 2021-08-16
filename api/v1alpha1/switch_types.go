@@ -22,6 +22,7 @@ import (
 
 	"github.com/Hellcatlk/network-operator/pkg/machine"
 	"github.com/Hellcatlk/network-operator/pkg/provider"
+	"github.com/Hellcatlk/network-operator/pkg/utils/strings"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -30,7 +31,7 @@ import (
 // Port indicates the specific restriction on the port
 type Port struct {
 	// Describes the port name on the device
-	Name string `json:"name,omitempty"`
+	Name string `json:"name"`
 
 	// True if this port is not available, false otherwise
 	Disabled bool `json:"disabled,omitempty"`
@@ -40,7 +41,54 @@ type Port struct {
 
 	// Indicates the range of VLANs allowed by this port in the switch
 	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
+	// +kubebuilder:default:="1-4096"
 	VLANRange string `json:"vlanRange,omitempty"`
+}
+
+// Verify configuration
+func (p *Port) Verify(configuration *SwitchPortConfiguration) error {
+	if p == nil || configuration == nil {
+		return nil
+	}
+
+	if p.Disabled {
+		return fmt.Errorf("the port is disabled")
+	}
+
+	if p.TrunkDisabled && configuration.Spec.VLANs != "" {
+		return fmt.Errorf("the port can be used as a trunk port")
+	}
+
+	if p.VLANRange != "" {
+		// Get allowed vlan range
+		vlanRange, err := strings.RangeToSlice(p.VLANRange)
+		if err != nil {
+			return err
+		}
+		allowed := make(map[int]struct{})
+		for _, vlan := range vlanRange {
+			allowed[vlan] = struct{}{}
+		}
+
+		// Get target vlan range
+		target, err := strings.RangeToSlice(p.VLANRange)
+		if err != nil {
+			return err
+		}
+		if configuration.Spec.UntaggedVLAN != nil {
+			target = append(target, *configuration.Spec.UntaggedVLAN)
+		}
+
+		// Check vlan range
+		for _, vlan := range target {
+			_, existed := allowed[vlan]
+			if !existed {
+				return fmt.Errorf("vlan %d is out of permissible range", vlan)
+			}
+		}
+	}
+
+	return nil
 }
 
 // SwitchProviderRef is the reference for SwitchProvider CR
@@ -93,7 +141,7 @@ type SwitchSpec struct {
 	Provider *SwitchProviderRef `json:"providerSwitch,omitempty"`
 
 	// Restricted ports in the switch
-	Ports map[string]Port `json:"ports,omitempty"`
+	Ports map[string]*Port `json:"ports,omitempty"`
 }
 
 // SwitchStatus defines the observed state of Switch
@@ -105,7 +153,7 @@ type SwitchStatus struct {
 	Provider *SwitchProviderRef `json:"providerSwitch,omitempty"`
 
 	// Restricted ports in the switch
-	Ports map[string]Port `json:"ports,omitempty"`
+	Ports map[string]*Port `json:"ports,omitempty"`
 
 	// The error message of the port
 	Error string `json:"error,omitempty"`
