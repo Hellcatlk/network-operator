@@ -38,6 +38,36 @@ func RangeToSlice(formatStr string) ([]int, error) {
 	return nums, nil
 }
 
+// LastJSON find last json from string
+func LastJSON(str string) ([]byte, error) {
+	lastJSON := ""
+	count := 0
+	for _, char := range str {
+		switch char {
+		case '{':
+			count = count + 1
+			if count == 1 {
+				lastJSON = ""
+			}
+		case '}':
+			count = count - 1
+			if count == 0 {
+				lastJSON = lastJSON + "}"
+			}
+		}
+		if count > 0 {
+			lastJSON = lastJSON + string(char)
+		} else if count < 0 {
+			return nil, fmt.Errorf("invalid string: %s", str)
+		}
+	}
+	if count != 0 || len(lastJSON) == 0 {
+		return nil, fmt.Errorf("invalid string: %s", str)
+	}
+
+	return []byte(lastJSON), nil
+}
+
 // SliceContains check the slice contains str or not, if exist return true, else return false.
 func SliceContains(slice []string, str string) bool {
 	for _, value := range slice {

@@ -38,6 +38,47 @@ func TestToSlice(t *testing.T) {
 	}
 }
 
+func TestLastJSON(t *testing.T) {
+	cases := []struct {
+		data          string
+		expected      []byte
+		expectedError bool
+	}{
+		{
+			data:          "invalid",
+			expectedError: true,
+		},
+		{
+			data:     "test:{a:123}",
+			expected: []byte("{a:123}"),
+		},
+		{
+			data:     "test:{a:123}, {b:123}",
+			expected: []byte("{b:123}"),
+		},
+		{
+			data:          "test:{a:123}}",
+			expectedError: true,
+		},
+		{
+			data:          "test:{{a:123}",
+			expectedError: true,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.data, func(t *testing.T) {
+			got, err := LastJSON(c.data)
+			if !reflect.DeepEqual(c.expected, got) {
+				t.Errorf("expected: %v, got: %v", c.expected, got)
+			}
+			if (err != nil) != c.expectedError {
+				t.Errorf("got unexpected error: %v", err)
+			}
+		})
+	}
+}
+
 func TestContains(t *testing.T) {
 	cases := []struct {
 		slice    []string

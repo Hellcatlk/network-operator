@@ -51,6 +51,46 @@ type networkRunnerData struct {
 	VLANs        []int  `json:"vlans,omitempty"`
 }
 
+type portConfiguration struct {
+	Mode         string `json:"mode"`
+	Vlan         *int   `json:"vlan,omitempty"`
+	TrunkedVlans string `json:"trunked_vlans,omitempty"`
+}
+
+func (a *ansible) getPortConf(port string) (*portConfiguration, error) {
+	data, err := json.Marshal(networkRunnerData{
+		Host:     a.host,
+		Cert:     a.cert,
+		OS:       a.os,
+		Bridge:   a.bridge,
+		Operator: "GetPortConf",
+		Port:     port,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Execute network runner
+	cmd := exec.Command("network-runner", string(data)) // #nosec
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("%s[%s]", output, err)
+	}
+
+	// Find last json string from output
+	output, err = strings.LastJSON(string(output))
+	if err != nil {
+		return nil, err
+	}
+	portConfiguration := &portConfiguration{}
+	err = json.Unmarshal(output, portConfiguration)
+	if err != nil {
+		return nil, err
+	}
+
+	return portConfiguration, nil
+}
+
 func (a *ansible) configureAccessPort(port string, untaggedVLAN *int) error {
 	data, err := json.Marshal(networkRunnerData{
 		Host:         a.host,
@@ -120,7 +160,17 @@ func (a *ansible) deletePort(port string) error {
 
 // GetPortAttr return the port's configuration
 func (a *ansible) GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPortConfiguration, error) {
-	return nil, fmt.Errorf("ansible backend does not support GetPortAttr")
+	portConfiguration, err := a.getPortConf(port)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1alpha1.SwitchPortConfiguration{
+		Spec: v1alpha1.SwitchPortConfigurationSpec{
+			UntaggedVLAN: portConfiguration.Vlan,
+			VLANs:        portConfiguration.TrunkedVlans,
+		},
+	}, fmt.Errorf("ansible backend does not support GetPortAttr")
 }
 
 // SetPortAttr set the configuration to the port

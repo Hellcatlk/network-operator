@@ -6,6 +6,19 @@ from network_runner import api
 from network_runner.models.inventory import Host, Inventory
 
 
+def _get_port_conf(port):
+    """Get port configuration
+
+    :param port: port ID
+    :type data: String
+
+    :returns: None
+    """
+
+    network_runner.get_port_conf("network-operator", port, True)
+    return
+
+
 def _config_access_port(port, untaggedVLAN):
     """Config untagged vlan to access port
     If untaggedVLAN isn't exist, we will create it.
@@ -103,7 +116,9 @@ if __name__ == '__main__':
     network_runner = api.NetworkRunner(inventory)
 
     # Deal operator
-    if data["operator"] == "ConfigAccessPort":
+    if data["operator"] == "GetPortConf":
+        _get_port_conf(data["port"])
+    elif data["operator"] == "ConfigAccessPort":
         _config_access_port(data["port"], data["untaggedVLAN"])
     elif data["operator"] == "ConfigTrunkPort":
         _config_trunk_port(data["port"], data.get(
