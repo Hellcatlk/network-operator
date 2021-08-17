@@ -63,6 +63,8 @@ func (r *SwitchPortReconciler) verifyingHandler(ctx context.Context, info *machi
 		return v1alpha1.SwitchPortVerifying, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
+	// TODO: Check connection with switch
+
 	// Copy configuration to Status.Configuration
 	i.Status.Configuration = configuration
 	i.Status.PortName = owner.Status.Ports[i.Name].Name
