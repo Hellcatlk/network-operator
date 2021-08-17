@@ -7,6 +7,7 @@ require (
 	github.com/onsi/ginkgo v1.16.4
 	github.com/onsi/gomega v1.13.0
 	github.com/securego/gosec v0.0.0-20200401082031-e946c8c39989
+	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b
 	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
 	k8s.io/api v0.21.2

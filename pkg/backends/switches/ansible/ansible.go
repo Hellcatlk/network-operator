@@ -4,13 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"os/exec"
+	"strings"
 
 	"github.com/Hellcatlk/network-operator/api/v1alpha1"
 	"github.com/Hellcatlk/network-operator/pkg/backends"
 	"github.com/Hellcatlk/network-operator/pkg/provider"
 	"github.com/Hellcatlk/network-operator/pkg/utils/certificate"
-	"github.com/Hellcatlk/network-operator/pkg/utils/strings"
+	ustrings "github.com/Hellcatlk/network-operator/pkg/utils/strings"
+	"golang.org/x/crypto/ssh"
 )
 
 // New return ansible backend
@@ -78,7 +81,7 @@ func (a *ansible) getPortConf(port string) (*portConfiguration, error) {
 	}
 
 	// Find last json string from output
-	output, err = strings.LastJSON(string(output))
+	output, err = ustrings.LastJSON(string(output))
 	if err != nil {
 		return nil, err
 	}
@@ -160,6 +163,33 @@ func (a *ansible) deletePort(port string) error {
 
 // IsAvaliable check switch is avaliable or not
 func (a *ansible) IsAvaliable() error {
+	config := &ssh.ClientConfig{
+		Auth: []ssh.AuthMethod{
+			ssh.Password(a.cert.Password),
+		},
+		User: a.cert.Username,
+		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+			return nil
+		},
+	}
+	config.SetDefaults()
+
+	address := a.host
+	if !strings.Contains(address, ":") {
+		address = a.host + ":22"
+	}
+	client, err := ssh.Dial("tcp", address, config)
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	session, err := client.NewSession()
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+
 	return nil
 }
 
@@ -184,7 +214,7 @@ func (a *ansible) SetPortAttr(ctx context.Context, port string, configuration *v
 		return a.configureAccessPort(port, configuration.Spec.UntaggedVLAN)
 	}
 
-	vlans, err := strings.RangeToSlice(configuration.Spec.VLANs)
+	vlans, err := ustrings.RangeToSlice(configuration.Spec.VLANs)
 	if err != nil {
 		return err
 	}
