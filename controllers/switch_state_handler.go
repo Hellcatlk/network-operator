@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 
 	"github.com/Hellcatlk/network-operator/api/v1alpha1"
@@ -49,6 +50,9 @@ func (r *SwitchReconciler) verifyingHandler(ctx context.Context, info *machine.R
 	}
 
 	if i.Status.Provider == nil {
+		if i.Spec.Provider == nil || reflect.DeepEqual(i.Spec.Provider, &v1alpha1.SwitchProviderRef{}) {
+			return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, fmt.Errorf("provider is nil or empty")
+		}
 		i.Status.Provider = i.Spec.Provider.DeepCopy()
 	}
 	i.Status.Ports = i.Spec.Ports
