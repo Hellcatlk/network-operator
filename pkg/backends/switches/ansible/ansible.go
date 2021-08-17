@@ -158,6 +158,11 @@ func (a *ansible) deletePort(port string) error {
 	return nil
 }
 
+// IsAvaliable check switch is avaliable or not
+func (a *ansible) IsAvaliable() error {
+	return nil
+}
+
 // GetPortAttr return the port's configuration
 func (a *ansible) GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPortConfiguration, error) {
 	portConfiguration, err := a.getPortConf(port)

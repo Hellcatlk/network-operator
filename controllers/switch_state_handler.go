@@ -32,6 +32,16 @@ func (r *SwitchReconciler) verifyingHandler(ctx context.Context, info *machine.R
 		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true}, nil
 	}
 
+	// Check connection with switch
+	backend, err := getSwitchBackend(ctx, info.Client, i)
+	if err != nil {
+		return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+	}
+	err = backend.IsAvaliable()
+	if err != nil {
+		return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+	}
+
 	// Delete SwitchPorts which isn't included i.Spec
 	for name := range i.Status.Ports {
 		_, exist := i.Spec.Ports[name]

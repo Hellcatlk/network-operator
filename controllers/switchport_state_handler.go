@@ -6,14 +6,31 @@ import (
 	"time"
 
 	"github.com/Hellcatlk/network-operator/api/v1alpha1"
+	"github.com/Hellcatlk/network-operator/pkg/backends"
 	"github.com/Hellcatlk/network-operator/pkg/backends/switches"
 	"github.com/Hellcatlk/network-operator/pkg/machine"
 	"github.com/Hellcatlk/network-operator/pkg/utils/finalizer"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const finalizerKey string = "metal3.io"
 const requeueAfterTime time.Duration = time.Second * 10
+
+// getSwitchBackend return switch backend
+func getSwitchBackend(ctx context.Context, client client.Client, sw *v1alpha1.Switch) (backends.Switch, error) {
+	providerSwitch, err := sw.Status.Provider.Fetch(ctx, client)
+	if err != nil {
+		return nil, err
+	}
+
+	config, err := providerSwitch.GetConfiguration(ctx, client)
+	if err != nil {
+		return nil, err
+	}
+
+	return switches.New(ctx, config)
+}
 
 // noneHandler add finalizers to CR
 func (r *SwitchPortReconciler) noneHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
@@ -48,22 +65,29 @@ func (r *SwitchPortReconciler) verifyingHandler(ctx context.Context, info *machi
 		return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true}, nil
 	}
 
+	// Check connection with switch
 	owner, err := i.FetchOwnerReference(ctx, info.Client)
 	if err != nil {
 		return v1alpha1.SwitchPortVerifying, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
+	backend, err := getSwitchBackend(ctx, info.Client, owner)
+	if err != nil {
+		return v1alpha1.SwitchPortVerifying, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+	}
+	err = backend.IsAvaliable()
+	if err != nil {
+		return v1alpha1.SwitchPortVerifying, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+	}
 
+	// Check switch port configuration
 	configuration, err := i.Spec.Configuration.Fetch(ctx, info.Client)
 	if err != nil {
 		return v1alpha1.SwitchPortVerifying, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
-
 	err = owner.Status.Ports[i.Name].Verify(configuration)
 	if err != nil {
 		return v1alpha1.SwitchPortVerifying, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
-
-	// TODO: Check connection with switch
 
 	// Copy configuration to Status.Configuration
 	i.Status.Configuration = configuration
@@ -79,28 +103,16 @@ func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *mac
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true}, nil
 	}
 
+	// Set configuration to port
 	owner, err := i.FetchOwnerReference(ctx, info.Client)
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
-
-	providerSwitch, err := owner.Status.Provider.Fetch(ctx, info.Client)
+	backend, err := getSwitchBackend(ctx, info.Client, owner)
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
-
-	config, err := providerSwitch.GetConfiguration(ctx, info.Client)
-	if err != nil {
-		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
-	}
-
-	sw, err := switches.New(ctx, config)
-	if err != nil {
-		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
-	}
-
-	// Set configuration to port
-	err = sw.SetPortAttr(ctx, i.Status.PortName, i.Status.Configuration)
+	err = backend.SetPortAttr(ctx, i.Status.PortName, i.Status.Configuration)
 	if err != nil {
 		return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
@@ -126,28 +138,16 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true}, nil
 	}
 
+	// Check status.Configuration as same as switch's port configuration or not
 	owner, err := i.FetchOwnerReference(ctx, info.Client)
 	if err != nil {
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
-
-	providerSwitch, err := owner.Status.Provider.Fetch(ctx, info.Client)
+	backend, err := getSwitchBackend(ctx, info.Client, owner)
 	if err != nil {
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
-
-	config, err := providerSwitch.GetConfiguration(ctx, info.Client)
-	if err != nil {
-		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
-	}
-
-	sw, err := switches.New(ctx, config)
-	if err != nil {
-		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
-	}
-
-	// Check status.Configuration as same as switch's port configuration or not
-	configuration, err = sw.GetPortAttr(ctx, owner.Status.Ports[i.Name].Name)
+	configuration, err = backend.GetPortAttr(ctx, i.Status.PortName)
 	if err != nil || reflect.DeepEqual(configuration.Spec, i.Status.Configuration.Spec) {
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
@@ -160,33 +160,22 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
+	// Remove switch's port configuration
 	owner, err := i.FetchOwnerReference(ctx, info.Client)
 	if err != nil {
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
-
-	providerSwitch, err := owner.Status.Provider.Fetch(ctx, info.Client)
+	backend, err := getSwitchBackend(ctx, info.Client, owner)
 	if err != nil {
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
-
-	config, err := providerSwitch.GetConfiguration(ctx, info.Client)
-	if err != nil {
-		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
-	}
-
-	sw, err := switches.New(ctx, config)
-	if err != nil {
-		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
-	}
-
-	// Remove switch's port configuration
-	err = sw.ResetPort(ctx, owner.Status.Ports[i.Name].Name, i.Status.Configuration)
+	err = backend.ResetPort(ctx, i.Status.PortName, i.Status.Configuration)
 	if err != nil {
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 
 	i.Status.Configuration = nil
+	i.Status.PortName = ""
 	return v1alpha1.SwitchPortIdle, ctrl.Result{Requeue: true}, err
 }
 

@@ -21,6 +21,11 @@ func new(ctx context.Context, config *provider.SwitchConfiguration) (backends.Sw
 type test struct {
 }
 
+// IsAvaliable check switch is avaliable or not
+func (t *test) IsAvaliable() error {
+	return nil
+}
+
 // GetPortAttr just for test
 func (t *test) GetPortAttr(ctx context.Context, name string) (*v1alpha1.SwitchPortConfiguration, error) {
 	return &v1alpha1.SwitchPortConfiguration{}, nil
