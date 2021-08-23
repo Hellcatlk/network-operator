@@ -86,7 +86,6 @@ gosec:
 
 # Run go test against code
 unit: bin/network-runner
-	./tools/install_kubebuilder.sh
 	go test ./... -coverprofile=cover.out
 	go tool cover -html=cover.out -o coverage.html
 
