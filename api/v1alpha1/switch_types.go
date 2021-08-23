@@ -146,7 +146,7 @@ func (ref *SwitchProviderRef) Fetch(ctx context.Context, client client.Client) (
 // SwitchSpec defines the desired state of Switch
 type SwitchSpec struct {
 	// The reference of provider
-	Provider *SwitchProviderRef `json:"providerSwitch"`
+	Provider *SwitchProviderRef `json:"provider"`
 
 	// Restricted ports in the switch
 	Ports map[string]*Port `json:"ports,omitempty"`
@@ -158,7 +158,7 @@ type SwitchStatus struct {
 	State machine.StateType `json:"state,omitempty"`
 
 	// The reference of switch provider
-	Provider *SwitchProviderRef `json:"providerSwitch,omitempty"`
+	Provider *SwitchProviderRef `json:"provider,omitempty"`
 
 	// Restricted ports in the switch
 	Ports map[string]*Port `json:"ports,omitempty"`

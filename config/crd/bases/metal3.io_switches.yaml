@@ -70,7 +70,7 @@ spec:
                   type: object
                 description: Restricted ports in the switch
                 type: object
-              providerSwitch:
+              provider:
                 description: The reference of provider
                 properties:
                   kind:
@@ -88,7 +88,7 @@ spec:
                 - name
                 type: object
             required:
-            - providerSwitch
+            - provider
             type: object
           status:
             description: SwitchStatus defines the observed state of Switch
@@ -121,7 +121,7 @@ spec:
                   type: object
                 description: Restricted ports in the switch
                 type: object
-              providerSwitch:
+              provider:
                 description: The reference of switch provider
                 properties:
                   kind:
