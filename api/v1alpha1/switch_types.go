@@ -114,7 +114,7 @@ type SwitchProviderRef struct {
 // Fetch the instance
 func (ref *SwitchProviderRef) Fetch(ctx context.Context, client client.Client) (provider.Switch, error) {
 	if ref == nil {
-		return nil, fmt.Errorf("provider switch reference is nil")
+		return nil, fmt.Errorf("provider reference is nil")
 	}
 
 	var instance provider.Switch

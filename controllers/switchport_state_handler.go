@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/Hellcatlk/network-operator/pkg/backends"
 	"github.com/Hellcatlk/network-operator/pkg/backends/switches"
 	"github.com/Hellcatlk/network-operator/pkg/machine"
+	"github.com/Hellcatlk/network-operator/pkg/provider"
 	"github.com/Hellcatlk/network-operator/pkg/utils/finalizer"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -19,12 +21,24 @@ const requeueAfterTime time.Duration = time.Second * 10
 
 // getSwitchBackend return switch backend
 func getSwitchBackend(ctx context.Context, client client.Client, sw *v1alpha1.Switch) (backends.Switch, error) {
-	providerSwitch, err := sw.Status.Provider.Fetch(ctx, client)
-	if err != nil {
-		return nil, err
+	var provider provider.Switch
+	var err error
+	if sw.Status.Provider != nil {
+		provider, err = sw.Status.Provider.Fetch(ctx, client)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		provider, err = sw.Spec.Provider.Fetch(ctx, client)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if provider == nil {
+		return nil, fmt.Errorf("can not fetch provider")
 	}
 
-	config, err := providerSwitch.GetConfiguration(ctx, client)
+	config, err := provider.GetConfiguration(ctx, client)
 	if err != nil {
 		return nil, err
 	}
