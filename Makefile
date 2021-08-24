@@ -11,6 +11,7 @@ else
 GOBIN=$(shell go env GOBIN)
 endif
 
+GOROOT=$(shell go env GOROOT)
 GOOS=$(shell go env GOOS)
 GOARCH=$(shell go env GOARCH)
 PATH := $(shell pwd)/bin:$(PATH)
@@ -27,7 +28,7 @@ build: generate bin/network-runner
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: generate bin/network-runner
-	go run ./main.go
+	PATH=${GOBIN}:${GOROOT}/bin:./bin go run ./main.go
 
 # Build the docker image
 docker: generate build
