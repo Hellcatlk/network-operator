@@ -27,16 +27,16 @@ func (t *test) IsAvaliable() error {
 }
 
 // GetPortAttr just for test
-func (t *test) GetPortAttr(ctx context.Context, name string) (*v1alpha1.SwitchPortConfiguration, error) {
-	return &v1alpha1.SwitchPortConfiguration{}, nil
+func (t *test) GetPortAttr(ctx context.Context, name string) (*v1alpha1.SwitchPortConfigurationSpec, error) {
+	return &v1alpha1.SwitchPortConfigurationSpec{}, nil
 }
 
 // SetPortAttr just for test
-func (t *test) SetPortAttr(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) error {
+func (t *test) SetPortAttr(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfigurationSpec) error {
 	return nil
 }
 
 // ResetPort just for test
-func (t *test) ResetPort(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfiguration) error {
+func (t *test) ResetPort(ctx context.Context, name string, configuration *v1alpha1.SwitchPortConfigurationSpec) error {
 	return nil
 }

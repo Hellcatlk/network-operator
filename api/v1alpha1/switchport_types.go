@@ -97,7 +97,7 @@ type SwitchPortStatus struct {
 	Error string `json:"error,omitempty"`
 
 	// The current Configuration of the port
-	Configuration *SwitchPortConfiguration `json:"configuration,omitempty"`
+	Configuration *SwitchPortConfigurationSpec `json:"configuration,omitempty"`
 
 	// The name of physics port
 	PortName string `json:"portName,omitempty"`

@@ -421,7 +421,7 @@ func (in *SwitchPortStatus) DeepCopyInto(out *SwitchPortStatus) {
 	*out = *in
 	if in.Configuration != nil {
 		in, out := &in.Configuration, &out.Configuration
-		*out = new(SwitchPortConfiguration)
+		*out = new(SwitchPortConfigurationSpec)
 		(*in).DeepCopyInto(*out)
 	}
 }

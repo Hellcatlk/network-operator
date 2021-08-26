@@ -17,6 +17,9 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"reflect"
+
+	"github.com/Hellcatlk/network-operator/pkg/utils/strings"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -57,6 +60,35 @@ type SwitchPortConfigurationSpec struct {
 
 	// Disable port
 	Disable bool `json:"disable,omitempty"`
+}
+
+// IsEqual check configuration is equal or not
+func (target *SwitchPortConfigurationSpec) IsEqual(actual *SwitchPortConfigurationSpec) bool {
+	if (target == nil) != (actual == nil) {
+		return false
+	}
+
+	if target == nil {
+		return true
+	}
+
+	rangeTarget, err := strings.RangeToSlice(target.VLANs)
+	if err != nil {
+		return false
+	}
+	rangeActual, err := strings.RangeToSlice(target.VLANs)
+	if err != nil {
+		return false
+	}
+	if !reflect.DeepEqual(rangeTarget, rangeActual) {
+		return false
+	}
+
+	targetCopy := target.DeepCopy()
+	targetCopy.VLANs = ""
+	actualCopy := actual.DeepCopy()
+	actualCopy.VLANs = ""
+	return reflect.DeepEqual(targetCopy, actualCopy)
 }
 
 // SwitchPortConfigurationStatus defines the observed state of SwitchPortConfiguration

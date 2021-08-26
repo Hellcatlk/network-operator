@@ -3,7 +3,6 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"time"
 
 	"github.com/Hellcatlk/network-operator/api/v1alpha1"
@@ -104,7 +103,7 @@ func (r *SwitchPortReconciler) verifyingHandler(ctx context.Context, info *machi
 	}
 
 	// Copy configuration to Status.Configuration
-	i.Status.Configuration = configuration
+	i.Status.Configuration = &configuration.Spec
 	i.Status.PortName = owner.Status.Ports[i.Name].Name
 	return v1alpha1.SwitchPortConfiguring, ctrl.Result{Requeue: true}, nil
 }
@@ -148,7 +147,7 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 	if err != nil {
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
-	if !reflect.DeepEqual(configuration.Spec, i.Status.Configuration.Spec) {
+	if !i.Status.Configuration.IsEqual(&configuration.Spec) {
 		return v1alpha1.SwitchPortCleaning, ctrl.Result{Requeue: true}, nil
 	}
 
@@ -161,8 +160,8 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 	if err != nil {
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
-	configuration, err = backend.GetPortAttr(ctx, i.Status.PortName)
-	if err != nil || reflect.DeepEqual(configuration.Spec, i.Status.Configuration.Spec) {
+	actualConfiguration, err := backend.GetPortAttr(ctx, i.Status.PortName)
+	if err != nil || i.Status.Configuration.IsEqual(actualConfiguration) {
 		return v1alpha1.SwitchPortActive, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
 	}
 

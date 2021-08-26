@@ -194,34 +194,32 @@ func (a *ansible) IsAvaliable() error {
 }
 
 // GetPortAttr return the port's configuration
-func (a *ansible) GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPortConfiguration, error) {
+func (a *ansible) GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPortConfigurationSpec, error) {
 	portConfiguration, err := a.getPortConf(port)
 	if err != nil {
 		return nil, err
 	}
 
-	return &v1alpha1.SwitchPortConfiguration{
-		Spec: v1alpha1.SwitchPortConfigurationSpec{
-			UntaggedVLAN: portConfiguration.VLAN,
-			VLANs:        portConfiguration.TrunkedVLANs,
-		},
+	return &v1alpha1.SwitchPortConfigurationSpec{
+		UntaggedVLAN: portConfiguration.VLAN,
+		VLANs:        portConfiguration.TrunkedVLANs,
 	}, nil
 }
 
 // SetPortAttr set the configuration to the port
-func (a *ansible) SetPortAttr(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfiguration) error {
-	if len(configuration.Spec.VLANs) == 0 {
-		return a.configureAccessPort(port, configuration.Spec.UntaggedVLAN)
+func (a *ansible) SetPortAttr(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfigurationSpec) error {
+	if len(configuration.VLANs) == 0 {
+		return a.configureAccessPort(port, configuration.UntaggedVLAN)
 	}
 
-	vlans, err := ustrings.RangeToSlice(configuration.Spec.VLANs)
+	vlans, err := ustrings.RangeToSlice(configuration.VLANs)
 	if err != nil {
 		return err
 	}
-	return a.configureTrunkPort(port, configuration.Spec.UntaggedVLAN, vlans)
+	return a.configureTrunkPort(port, configuration.UntaggedVLAN, vlans)
 }
 
 // ResetPort clean the configuration in the port
-func (a *ansible) ResetPort(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfiguration) error {
+func (a *ansible) ResetPort(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfigurationSpec) error {
 	return a.deletePort(port)
 }
