@@ -16,11 +16,25 @@ func TestIsEqual(t *testing.T) {
 		{
 			target:   &SwitchPortConfigurationSpec{},
 			actual:   nil,
-			expected: false,
+			expected: true,
 		},
 		{
 			target:   nil,
 			actual:   &SwitchPortConfigurationSpec{},
+			expected: true,
+		},
+		{
+			target:   &SwitchPortConfigurationSpec{},
+			actual:   &SwitchPortConfigurationSpec{},
+			expected: true,
+		},
+		{
+			target: &SwitchPortConfigurationSpec{
+				VLANs: "1-10,11",
+			},
+			actual: &SwitchPortConfigurationSpec{
+				VLANs: "1-12",
+			},
 			expected: false,
 		},
 		{

@@ -208,7 +208,7 @@ func (a *ansible) GetPortAttr(ctx context.Context, port string) (*v1alpha1.Switc
 
 // SetPortAttr set the configuration to the port
 func (a *ansible) SetPortAttr(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfigurationSpec) error {
-	if len(configuration.VLANs) == 0 {
+	if configuration.VLANs == "" {
 		return a.configureAccessPort(port, configuration.UntaggedVLAN)
 	}
 

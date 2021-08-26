@@ -8,6 +8,9 @@ import (
 
 // RangeToSlice transform "1-5,7" to [1,2,3,4,5,7]
 func RangeToSlice(formatStr string) ([]int, error) {
+	if formatStr == "" {
+		return nil, nil
+	}
 	nums := []int{}
 	for _, str := range strings.Split(formatStr, ",") {
 		r := strings.Split(str, "-")

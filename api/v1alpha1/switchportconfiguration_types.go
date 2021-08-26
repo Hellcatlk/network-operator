@@ -64,11 +64,13 @@ type SwitchPortConfigurationSpec struct {
 
 // IsEqual check configuration is equal or not
 func (target *SwitchPortConfigurationSpec) IsEqual(actual *SwitchPortConfigurationSpec) bool {
-	if (target == nil) != (actual == nil) {
-		return false
+	if target == actual {
+		return true
 	}
-
-	if target == nil {
+	if target == nil && reflect.DeepEqual(actual, &SwitchPortConfigurationSpec{}) {
+		return true
+	}
+	if actual == nil && reflect.DeepEqual(target, &SwitchPortConfigurationSpec{}) {
 		return true
 	}
 
@@ -76,7 +78,7 @@ func (target *SwitchPortConfigurationSpec) IsEqual(actual *SwitchPortConfigurati
 	if err != nil {
 		return false
 	}
-	rangeActual, err := strings.RangeToSlice(target.VLANs)
+	rangeActual, err := strings.RangeToSlice(actual.VLANs)
 	if err != nil {
 		return false
 	}
