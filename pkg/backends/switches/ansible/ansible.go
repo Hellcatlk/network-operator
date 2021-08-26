@@ -205,7 +205,7 @@ func (a *ansible) GetPortAttr(ctx context.Context, port string) (*v1alpha1.Switc
 			UntaggedVLAN: portConfiguration.VLAN,
 			VLANs:        portConfiguration.TrunkedVLANs,
 		},
-	}, fmt.Errorf("ansible backend does not support GetPortAttr")
+	}, nil
 }
 
 // SetPortAttr set the configuration to the port
