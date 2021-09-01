@@ -3,6 +3,8 @@
 [![Continuous Integration](https://github.com/Hellcatlk/network-operator/workflows/Continuous%20Integration/badge.svg)](https://github.com/Hellcatlk/network-operator/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Hellcatlk/network-operator)](https://goreportcard.com/report/github.com/Hellcatlk/network-operator)
 
+Network operators is a kubernetes API for managing network devices. 
+
 ## Quick start
 
 1. Run `make install`
@@ -18,8 +20,3 @@
 |Device|Provider|Which backend it uses|
 |:-|:-|:-|
 |Switch|AnsibleSwitch|ansible|
-
-## Notes
-
-1. Run `./tools/install_kubebuilder.sh` to install kubebuilder
-2. Run `kubebuilder create api --group metal3.io --version v1alpha1 --kind <ResourceKind>` add API
