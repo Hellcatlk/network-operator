@@ -73,7 +73,7 @@ func (r *SwitchReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 		instance,
 		map[machine.StateType]machine.Handler{
 			metal3iov1alpha1.SwitchNone:        r.noneHandler,
-			metal3iov1alpha1.SwitchVerify:      r.verifyingHandler,
+			metal3iov1alpha1.SwitchVerifying:   r.verifyingHandler,
 			metal3iov1alpha1.SwitchConfiguring: r.configuringHandler,
 			metal3iov1alpha1.SwitchRunning:     r.runningHandler,
 			metal3iov1alpha1.SwitchDeleting:    r.deletingHandler,

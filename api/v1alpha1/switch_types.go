@@ -171,8 +171,8 @@ const (
 	// SwitchNone means the CR has just been created
 	SwitchNone machine.StateType = ""
 
-	// SwitchVerify means we are verifying the connection of switch
-	SwitchVerify machine.StateType = "Verifying"
+	// SwitchVerifying means we are verifying the connection of switch
+	SwitchVerifying machine.StateType = "Verifying"
 
 	// SwitchConfiguring means we are creating SwitchPort
 	SwitchConfiguring machine.StateType = "Configuring"

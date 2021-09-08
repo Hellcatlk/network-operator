@@ -22,24 +22,24 @@ func (r *SwitchReconciler) noneHandler(ctx context.Context, info *machine.Reconc
 	// Add finalizer
 	finalizer.Add(&i.Finalizers, finalizerKey)
 
-	return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true}, nil
+	return machine.ResultContinue(v1alpha1.SwitchVerifying, 0, nil)
 }
 
 func (r *SwitchReconciler) verifyingHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.Switch)
 
 	if !i.DeletionTimestamp.IsZero() {
-		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true}, nil
+		return machine.ResultContinue(v1alpha1.SwitchDeleting, 0, nil)
 	}
 
 	// Check connection with switch
 	backend, err := getSwitchBackend(ctx, info.Client, i)
 	if err != nil {
-		return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+		return machine.ResultContinue(v1alpha1.SwitchVerifying, requeueAfterTime, err)
 	}
 	err = backend.IsAvaliable()
 	if err != nil {
-		return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+		return machine.ResultContinue(v1alpha1.SwitchVerifying, requeueAfterTime, err)
 	}
 
 	// Delete SwitchPorts which isn't included i.Spec
@@ -54,26 +54,28 @@ func (r *SwitchReconciler) verifyingHandler(ctx context.Context, info *machine.R
 				if errors.IsNotFound(err) {
 					continue
 				}
-				return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+				return machine.ResultContinue(v1alpha1.SwitchVerifying, requeueAfterTime, err)
 			}
 		}
 	}
 
 	if i.Status.Provider == nil {
 		if i.Spec.Provider == nil || reflect.DeepEqual(i.Spec.Provider, &v1alpha1.SwitchProviderRef{}) {
-			return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, fmt.Errorf("provider is nil or empty")
+			return machine.ResultContinue(v1alpha1.SwitchVerifying, requeueAfterTime, fmt.Errorf("provider is nil or empty"))
 		}
 		i.Status.Provider = i.Spec.Provider.DeepCopy()
+	} else {
+		info.Logger.Info("the provider field is not allowed to be edited ")
 	}
 	i.Status.Ports = i.Spec.Ports
-	return v1alpha1.SwitchConfiguring, ctrl.Result{Requeue: true}, nil
+	return machine.ResultContinue(v1alpha1.SwitchConfiguring, 0, nil)
 }
 
 func (r *SwitchReconciler) configuringHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.Switch)
 
 	if !i.DeletionTimestamp.IsZero() {
-		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true}, nil
+		return machine.ResultContinue(v1alpha1.SwitchDeleting, 0, nil)
 	}
 
 	// Create SwitchPorts
@@ -99,22 +101,22 @@ func (r *SwitchReconciler) configuringHandler(ctx context.Context, info *machine
 			if errors.IsAlreadyExists(err) {
 				continue
 			}
-			return v1alpha1.SwitchConfiguring, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+			return machine.ResultContinue(v1alpha1.SwitchConfiguring, requeueAfterTime, err)
 		}
 	}
 
-	return v1alpha1.SwitchRunning, ctrl.Result{Requeue: true}, nil
+	return machine.ResultContinue(v1alpha1.SwitchRunning, 0, nil)
 }
 
 func (r *SwitchReconciler) runningHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.Switch)
 
 	if !i.DeletionTimestamp.IsZero() {
-		return v1alpha1.SwitchDeleting, ctrl.Result{Requeue: true}, nil
+		return machine.ResultContinue(v1alpha1.SwitchDeleting, 0, nil)
 	}
 
 	if !reflect.DeepEqual(i.Spec.Ports, i.Status.Ports) {
-		return v1alpha1.SwitchVerify, ctrl.Result{Requeue: true}, nil
+		return machine.ResultContinue(v1alpha1.SwitchVerifying, 0, nil)
 	}
 
 	// Check SwitchPorts are existed
@@ -130,13 +132,13 @@ func (r *SwitchReconciler) runningHandler(ctx context.Context, info *machine.Rec
 		if err != nil {
 			// If SwitchPort isn't find, return configuring state and create it
 			if errors.IsNotFound(err) {
-				return v1alpha1.SwitchConfiguring, ctrl.Result{Requeue: true}, nil
+				return machine.ResultContinue(v1alpha1.SwitchConfiguring, 0, err)
 			}
-			return v1alpha1.SwitchRunning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, err
+			return machine.ResultContinue(v1alpha1.SwitchRunning, requeueAfterTime, err)
 		}
 	}
 
-	return v1alpha1.SwitchRunning, ctrl.Result{Requeue: true, RequeueAfter: requeueAfterTime}, nil
+	return machine.ResultContinue(v1alpha1.SwitchRunning, requeueAfterTime, nil)
 }
 
 func (r *SwitchReconciler) deletingHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
@@ -152,5 +154,5 @@ func (r *SwitchReconciler) deletingHandler(ctx context.Context, info *machine.Re
 	// Remove finalizer
 	finalizer.Remove(&i.Finalizers, finalizerKey)
 
-	return v1alpha1.SwitchDeleting, ctrl.Result{}, nil
+	return machine.ResultComplete(v1alpha1.SwitchDeleting, nil)
 }
