@@ -74,7 +74,7 @@ func (a *ansible) getPortConf(port string) (*portConfiguration, error) {
 	}
 
 	// Execute network runner
-	cmd := exec.Command("network-runner", string(data)) // #nosec
+	cmd := exec.Command("network-runner", string(data), "2>&1") // #nosec
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, fmt.Errorf("%s[%s]", output, err)
@@ -107,7 +107,7 @@ func (a *ansible) configureAccessPort(port string, untaggedVLAN *int) error {
 		return err
 	}
 
-	cmd := exec.Command("network-runner", string(data)) // #nosec
+	cmd := exec.Command("network-runner", string(data), "2>&1") // #nosec
 	output, err := cmd.Output()
 	if err != nil {
 		return fmt.Errorf("%s[%s]", output, err)
@@ -130,7 +130,7 @@ func (a *ansible) configureTrunkPort(port string, untaggedVLAN *int, vlans []int
 		return err
 	}
 
-	cmd := exec.Command("network-runner", string(data)) // #nosec
+	cmd := exec.Command("network-runner", string(data), "2>&1") // #nosec
 	output, err := cmd.Output()
 	if err != nil {
 		return fmt.Errorf("%s[%s]", output, err)
@@ -152,7 +152,7 @@ func (a *ansible) deletePort(port string) error {
 		return err
 	}
 
-	cmd := exec.Command("network-runner", string(data)) // #nosec
+	cmd := exec.Command("network-runner", string(data), "2&>1") // #nosec
 	output, err := cmd.Output()
 	if err != nil {
 		return fmt.Errorf("%s[%s]", output, err)
