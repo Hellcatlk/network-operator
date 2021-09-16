@@ -161,8 +161,8 @@ func (a *ansible) deletePort(port string) error {
 	return nil
 }
 
-// IsAvaliable check switch is avaliable or not
-func (a *ansible) IsAvaliable() error {
+// IsAvailable check switch is available or not
+func (a *ansible) IsAvailable() error {
 	config := &ssh.ClientConfig{
 		Auth: []ssh.AuthMethod{
 			ssh.Password(a.cert.Password),

@@ -21,8 +21,8 @@ func new(ctx context.Context, config *provider.SwitchConfiguration) (backends.Sw
 type test struct {
 }
 
-// IsAvaliable check switch is avaliable or not
-func (t *test) IsAvaliable() error {
+// IsAvailable check switch is available or not
+func (t *test) IsAvailable() error {
 	return nil
 }
 

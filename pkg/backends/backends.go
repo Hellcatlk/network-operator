@@ -8,8 +8,8 @@ import (
 
 // Switch is a interface for switch backend
 type Switch interface {
-	// IsAvaliable check switch is avaliable or not
-	IsAvaliable() error
+	// IsAvailable check switch is available or not
+	IsAvailable() error
 
 	// GetPortAttr get the port's configuration
 	GetPortAttr(ctx context.Context, port string) (*v1alpha1.SwitchPortConfigurationSpec, error)

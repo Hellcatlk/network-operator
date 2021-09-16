@@ -87,7 +87,7 @@ func (r *SwitchPortReconciler) verifyingHandler(ctx context.Context, info *machi
 	if err != nil {
 		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
 	}
-	err = backend.IsAvaliable()
+	err = backend.IsAvailable()
 	if err != nil {
 		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
 	}

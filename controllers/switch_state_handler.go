@@ -37,7 +37,7 @@ func (r *SwitchReconciler) verifyingHandler(ctx context.Context, info *machine.R
 	if err != nil {
 		return machine.ResultContinue(v1alpha1.SwitchVerifying, requeueAfterTime, err)
 	}
-	err = backend.IsAvaliable()
+	err = backend.IsAvailable()
 	if err != nil {
 		return machine.ResultContinue(v1alpha1.SwitchVerifying, requeueAfterTime, err)
 	}
