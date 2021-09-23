@@ -17,7 +17,7 @@ spec:
   host: <host-ip>
   os: openvswitch
   bridge: <bridge-name>
-  secret:
+  credentials:
     name: switch-example-secret
     namespace: default
 

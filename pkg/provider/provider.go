@@ -4,7 +4,7 @@ package provider
 import (
 	"context"
 
-	"github.com/Hellcatlk/network-operator/pkg/utils/certificate"
+	"github.com/Hellcatlk/network-operator/pkg/utils/credentials"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -15,7 +15,7 @@ type SwitchConfiguration struct {
 	// Switch's host
 	Host string
 	// Certificate of switch
-	Cert *certificate.Certificate
+	Credentials *credentials.Credentials
 	// Which backend to use
 	Backend string
 	Options map[string]interface{}

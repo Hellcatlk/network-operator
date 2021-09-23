@@ -91,39 +91,39 @@ if __name__ == '__main__':
     # Parse json data
     # format:
     # {
-    #     host: "",
-    #     cert: {
-    #         username: "",
-    #         password: "",
+    #     "host": "192.168.0.1",
+    #     "credentials": {
+    #         "username": "admin",
+    #         "password": "admin"
     #     },
-    #     os: "",
-    #     bridge: "",
-    #     operator: "",
-    #     port: "",
-    #     untaggedVLAN: 0
-    #     vlans: [1,2,3],
+    #     "os": "fos",
+    #     "bridge": "",
+    #     "operator": "getPortConf/configAccessPort/configTrunkPort/deletePort",
+    #     "port": "0/32",
+    #     "untaggedVLAN": 0
+    #     "vlans": [1,2,3]
     # }
     data = json.loads(sys.argv[1])
 
     # Initial network runner
     host = Host(name="network-operator",
                 ansible_host=data["host"],
-                ansible_user=data["cert"]["username"],
-                ansible_ssh_pass=data["cert"]["password"],
+                ansible_user=data["credentials"]["username"],
+                ansible_ssh_pass=data["credentials"]["password"],
                 ansible_network_os=data["os"])
     inventory = Inventory()
     inventory.hosts.add(host)
     network_runner = api.NetworkRunner(inventory)
 
     # Deal operator
-    if data["operator"] == "GetPortConf":
+    if data["operator"] == "getPortConf":
         _get_port_conf(data["port"])
-    elif data["operator"] == "ConfigAccessPort":
+    elif data["operator"] == "configAccessPort":
         _config_access_port(data["port"], data["untaggedVLAN"])
-    elif data["operator"] == "ConfigTrunkPort":
+    elif data["operator"] == "configTrunkPort":
         _config_trunk_port(data["port"], data.get(
             "untaggedVLAN"), data.get("vlans"))
-    elif data["operator"] == "DeletePort":
+    elif data["operator"] == "deletePort":
         _delete_port(data["port"], data.get("bridge"))
     else:
         print("invalid operator")

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/Hellcatlk/network-operator/pkg/provider"
-	"github.com/Hellcatlk/network-operator/pkg/utils/certificate"
+	"github.com/Hellcatlk/network-operator/pkg/utils/credentials"
 )
 
 func TestNew(t *testing.T) {
@@ -37,7 +37,7 @@ func TestNew(t *testing.T) {
 				OS:      "openvswitch",
 				Host:    "test",
 				Backend: c.backend,
-				Cert: &certificate.Certificate{
+				Credentials: &credentials.Credentials{
 					Username: "test",
 					Password: "test",
 				},

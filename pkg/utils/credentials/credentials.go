@@ -1,4 +1,4 @@
-package certificate
+package credentials
 
 import (
 	"context"
@@ -9,14 +9,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// Certificate include username and password
-type Certificate struct {
+// Credentials include username and password
+type Credentials struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
 // Fetch secret
-func Fetch(ctx context.Context, client client.Client, secretRef *corev1.SecretReference) (*Certificate, error) {
+func Fetch(ctx context.Context, client client.Client, secretRef *corev1.SecretReference) (*Credentials, error) {
 	if secretRef == nil {
 		return nil, fmt.Errorf("secret reference is nil")
 	}
@@ -34,7 +34,7 @@ func Fetch(ctx context.Context, client client.Client, secretRef *corev1.SecretRe
 		return nil, err
 	}
 
-	return &Certificate{
+	return &Credentials{
 		Username: string(instance.Data["username"]),
 		Password: string(instance.Data["password"]),
 	}, nil

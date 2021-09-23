@@ -39,6 +39,18 @@ spec:
               bridge:
                 description: OVS bridge
                 type: string
+              credentials:
+                description: A secret containing the switch credentials
+                properties:
+                  name:
+                    description: Name is unique within a namespace to reference a
+                      secret resource.
+                    type: string
+                  namespace:
+                    description: Namespace defines the space within which the secret
+                      name must be unique.
+                    type: string
+                type: object
               host:
                 type: string
               os:
@@ -52,22 +64,10 @@ spec:
                 - dellos10
                 - fos
                 type: string
-              secret:
-                description: The secret containing the switch credentials
-                properties:
-                  name:
-                    description: Name is unique within a namespace to reference a
-                      secret resource.
-                    type: string
-                  namespace:
-                    description: Namespace defines the space within which the secret
-                      name must be unique.
-                    type: string
-                type: object
             required:
+            - credentials
             - host
             - os
-            - secret
             type: object
           status:
             description: AnsibleSwitchStatus defines the observed state of AnsibleSwitch

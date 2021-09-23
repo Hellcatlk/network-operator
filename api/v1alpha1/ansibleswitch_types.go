@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	"github.com/Hellcatlk/network-operator/pkg/provider"
-	"github.com/Hellcatlk/network-operator/pkg/utils/certificate"
+	"github.com/Hellcatlk/network-operator/pkg/utils/credentials"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -34,11 +34,11 @@ type AnsibleSwitchSpec struct {
 
 	Host string `json:"host"`
 
+	// A secret containing the switch credentials
+	Credentials *corev1.SecretReference `json:"credentials"`
+
 	// OVS bridge
 	Bridge string `json:"bridge,omitempty"`
-
-	// The secret containing the switch credentials
-	Secret *corev1.SecretReference `json:"secret"`
 }
 
 // AnsibleSwitchStatus defines the observed state of AnsibleSwitch
@@ -58,7 +58,7 @@ type AnsibleSwitch struct {
 
 // GetConfiguration generate configuration from openvswitch switch
 func (a *AnsibleSwitch) GetConfiguration(ctx context.Context, client client.Client) (*provider.SwitchConfiguration, error) {
-	cert, err := certificate.Fetch(ctx, client, a.Spec.Secret)
+	cert, err := credentials.Fetch(ctx, client, a.Spec.Credentials)
 	if err != nil {
 		return nil, err
 	}
@@ -68,10 +68,10 @@ func (a *AnsibleSwitch) GetConfiguration(ctx context.Context, client client.Clie
 	}
 
 	return &provider.SwitchConfiguration{
-		OS:      a.Spec.OS,
-		Host:    a.Spec.Host,
-		Cert:    cert,
-		Backend: "ansible",
+		OS:          a.Spec.OS,
+		Host:        a.Spec.Host,
+		Credentials: cert,
+		Backend:     "ansible",
 		Options: map[string]interface{}{
 			"bridge": a.Spec.Bridge,
 		},

@@ -11,7 +11,7 @@ import (
 	"github.com/Hellcatlk/network-operator/api/v1alpha1"
 	"github.com/Hellcatlk/network-operator/pkg/backends"
 	"github.com/Hellcatlk/network-operator/pkg/provider"
-	"github.com/Hellcatlk/network-operator/pkg/utils/certificate"
+	"github.com/Hellcatlk/network-operator/pkg/utils/credentials"
 	ustrings "github.com/Hellcatlk/network-operator/pkg/utils/strings"
 	"golang.org/x/crypto/ssh"
 )
@@ -22,31 +22,31 @@ func New(ctx context.Context, config *provider.SwitchConfiguration) (backends.Sw
 		return nil, fmt.Errorf("configure of switch(%s) is nil", config.OS)
 	}
 
-	if config.Cert == nil {
+	if config.Credentials == nil {
 		return nil, fmt.Errorf("certificate of switch(%s) is nil", config.OS)
 	}
 
 	return &ansible{
-		host:   config.Host,
-		cert:   config.Cert,
-		os:     config.OS,
-		bridge: config.Options["bridge"].(string),
+		host:        config.Host,
+		credentials: config.Credentials,
+		os:          config.OS,
+		bridge:      config.Options["bridge"].(string),
 	}, nil
 }
 
 // ansible backend
 type ansible struct {
-	host   string
-	os     string
-	cert   *certificate.Certificate
-	bridge string
+	host        string
+	os          string
+	credentials *credentials.Credentials
+	bridge      string
 }
 
 type networkRunnerData struct {
-	Host string                   `json:"host"`
-	Cert *certificate.Certificate `json:"cert"`
-	OS   string                   `json:"os"`
-	// Bridge just use for openvswitch
+	Host        string                   `json:"host"`
+	Credentials *credentials.Credentials `json:"credentials"`
+	OS          string                   `json:"os"`
+	// Bridge only use for openvswitch
 	Bridge       string `json:"bridge,omitempty"`
 	Operator     string `json:"operator"`
 	Port         string `json:"port"`
@@ -62,12 +62,12 @@ type portConfiguration struct {
 
 func (a *ansible) getPortConf(port string) (*portConfiguration, error) {
 	data, err := json.Marshal(networkRunnerData{
-		Host:     a.host,
-		Cert:     a.cert,
-		OS:       a.os,
-		Bridge:   a.bridge,
-		Operator: "GetPortConf",
-		Port:     port,
+		Host:        a.host,
+		Credentials: a.credentials,
+		OS:          a.os,
+		Bridge:      a.bridge,
+		Operator:    "getPortConf",
+		Port:        port,
 	})
 	if err != nil {
 		return nil, err
@@ -97,9 +97,9 @@ func (a *ansible) getPortConf(port string) (*portConfiguration, error) {
 func (a *ansible) configureAccessPort(port string, untaggedVLAN *int) error {
 	data, err := json.Marshal(networkRunnerData{
 		Host:         a.host,
-		Cert:         a.cert,
+		Credentials:  a.credentials,
 		OS:           a.os,
-		Operator:     "ConfigAccessPort",
+		Operator:     "configAccessPort",
 		Port:         port,
 		UntaggedVLAN: untaggedVLAN,
 	})
@@ -119,9 +119,9 @@ func (a *ansible) configureAccessPort(port string, untaggedVLAN *int) error {
 func (a *ansible) configureTrunkPort(port string, untaggedVLAN *int, vlans []int) error {
 	data, err := json.Marshal(networkRunnerData{
 		Host:         a.host,
-		Cert:         a.cert,
+		Credentials:  a.credentials,
 		OS:           a.os,
-		Operator:     "ConfigTrunkPort",
+		Operator:     "configTrunkPort",
 		Port:         port,
 		UntaggedVLAN: untaggedVLAN,
 		VLANs:        vlans,
@@ -141,12 +141,12 @@ func (a *ansible) configureTrunkPort(port string, untaggedVLAN *int, vlans []int
 
 func (a *ansible) deletePort(port string) error {
 	data, err := json.Marshal(networkRunnerData{
-		Host:     a.host,
-		Cert:     a.cert,
-		OS:       a.os,
-		Bridge:   a.bridge,
-		Operator: "DeletePort",
-		Port:     port,
+		Host:        a.host,
+		Credentials: a.credentials,
+		OS:          a.os,
+		Bridge:      a.bridge,
+		Operator:    "deletePort",
+		Port:        port,
 	})
 	if err != nil {
 		return err
@@ -165,9 +165,9 @@ func (a *ansible) deletePort(port string) error {
 func (a *ansible) IsAvailable() error {
 	config := &ssh.ClientConfig{
 		Auth: []ssh.AuthMethod{
-			ssh.Password(a.cert.Password),
+			ssh.Password(a.credentials.Password),
 		},
-		User: a.cert.Username,
+		User: a.credentials.Username,
 		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
 			return nil
 		},
