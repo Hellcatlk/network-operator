@@ -3,12 +3,12 @@
 [![Continuous Integration](https://github.com/Hellcatlk/network-operator/workflows/Continuous%20Integration/badge.svg)](https://github.com/Hellcatlk/network-operator/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Hellcatlk/network-operator)](https://goreportcard.com/report/github.com/Hellcatlk/network-operator)
 
-Network operators is a kubernetes API for managing network devices. 
+Network operators is a kubernetes API for managing network devices.
 
 ## Quick start
 
 1. Run `make install`.
-2. Run `make run`(run the controller locally) or `make deploy`(run the controller as a deployment).
+2. Run `make run`(run the controller locally) or `make docker && make deploy`(run the controller as a deployment).
 3. Apply CRs, [here](./examples) are some examples.
 
 **NOTE**: If you execute `make deploy` in a multi-node cluster environment, you need to upload the image to the image repository.
