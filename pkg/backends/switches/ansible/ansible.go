@@ -42,121 +42,6 @@ type ansible struct {
 	bridge      string
 }
 
-type networkRunnerData struct {
-	Host        string                   `json:"host"`
-	Credentials *credentials.Credentials `json:"credentials"`
-	OS          string                   `json:"os"`
-	// Bridge only use for openvswitch
-	Bridge       string `json:"bridge,omitempty"`
-	Operator     string `json:"operator"`
-	Port         string `json:"port"`
-	UntaggedVLAN *int   `json:"untaggedVLAN,omitempty"`
-	VLANs        []int  `json:"vlans,omitempty"`
-}
-
-type portConfiguration struct {
-	Mode         string `json:"mode"`
-	VLAN         *int   `json:"vlan,omitempty"`
-	TrunkedVLANs string `json:"trunked_vlans,omitempty"`
-}
-
-func (a *ansible) getPortConf(port string) (*portConfiguration, error) {
-	data, err := json.Marshal(networkRunnerData{
-		Host:        a.host,
-		Credentials: a.credentials,
-		OS:          a.os,
-		Bridge:      a.bridge,
-		Operator:    "getPortConf",
-		Port:        port,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	// Execute network runner
-	output, err := exec.Command("network-runner", string(data)).CombinedOutput() // #nosec
-	if err != nil {
-		return nil, fmt.Errorf("%s[%s]", output, err)
-	}
-
-	// Find last json string from output
-	output, err = ustrings.LastJSON(string(output))
-	if err != nil {
-		return nil, err
-	}
-	portConfiguration := &portConfiguration{}
-	err = json.Unmarshal(output, portConfiguration)
-	if err != nil {
-		return nil, err
-	}
-
-	return portConfiguration, nil
-}
-
-func (a *ansible) configureAccessPort(port string, untaggedVLAN *int) error {
-	data, err := json.Marshal(networkRunnerData{
-		Host:         a.host,
-		Credentials:  a.credentials,
-		OS:           a.os,
-		Operator:     "configAccessPort",
-		Port:         port,
-		UntaggedVLAN: untaggedVLAN,
-	})
-	if err != nil {
-		return err
-	}
-
-	output, err := exec.Command("network-runner", string(data)).CombinedOutput() // #nosec
-	if err != nil {
-		return fmt.Errorf("%s[%s]", output, err)
-	}
-
-	return nil
-}
-
-func (a *ansible) configureTrunkPort(port string, untaggedVLAN *int, vlans []int) error {
-	data, err := json.Marshal(networkRunnerData{
-		Host:         a.host,
-		Credentials:  a.credentials,
-		OS:           a.os,
-		Operator:     "configTrunkPort",
-		Port:         port,
-		UntaggedVLAN: untaggedVLAN,
-		VLANs:        vlans,
-	})
-	if err != nil {
-		return err
-	}
-
-	output, err := exec.Command("network-runner", string(data)).CombinedOutput() // #nosec
-	if err != nil {
-		return fmt.Errorf("%s[%s]", output, err)
-	}
-
-	return nil
-}
-
-func (a *ansible) deletePort(port string) error {
-	data, err := json.Marshal(networkRunnerData{
-		Host:        a.host,
-		Credentials: a.credentials,
-		OS:          a.os,
-		Bridge:      a.bridge,
-		Operator:    "deletePort",
-		Port:        port,
-	})
-	if err != nil {
-		return err
-	}
-
-	output, err := exec.Command("network-runner", string(data)).CombinedOutput() // #nosec
-	if err != nil {
-		return fmt.Errorf("%s[%s]", output, err)
-	}
-
-	return nil
-}
-
 // IsAvailable check switch is available or not
 func (a *ansible) IsAvailable() error {
 	config := &ssh.ClientConfig{
@@ -218,4 +103,119 @@ func (a *ansible) SetPortAttr(ctx context.Context, port string, configuration *v
 // ResetPort clean the configuration in the port
 func (a *ansible) ResetPort(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfigurationSpec) error {
 	return a.deletePort(port)
+}
+
+type networkRunnerData struct {
+	Host        string                   `json:"host"`
+	Credentials *credentials.Credentials `json:"credentials"`
+	OS          string                   `json:"os"`
+	// Bridge only use for openvswitch
+	Bridge       string `json:"bridge,omitempty"`
+	Operator     string `json:"operator"`
+	Port         string `json:"port"`
+	UntaggedVLAN *int   `json:"untaggedVLAN,omitempty"`
+	VLANs        []int  `json:"vlans,omitempty"`
+}
+
+type portConfiguration struct {
+	Mode         string `json:"mode"`
+	VLAN         *int   `json:"vlan,omitempty"`
+	TrunkedVLANs string `json:"trunked_vlans,omitempty"`
+}
+
+func (a *ansible) getPortConf(port string) (*portConfiguration, error) {
+	data, err := json.Marshal(networkRunnerData{
+		Host:        a.host,
+		Credentials: a.credentials,
+		OS:          a.os,
+		Bridge:      a.bridge,
+		Operator:    "getPortConf",
+		Port:        port,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Execute network runner
+	output, err := exec.Command("network-runner", string(data)).CombinedOutput() // #nosec
+	if err != nil && err.Error()[:4] != "wait" {
+		return nil, fmt.Errorf("%s[%s]", output, err)
+	}
+
+	// Find last json string from output
+	output, err = ustrings.LastJSON(string(output))
+	if err != nil {
+		return nil, err
+	}
+	portConfiguration := &portConfiguration{}
+	err = json.Unmarshal(output, portConfiguration)
+	if err != nil {
+		return nil, err
+	}
+
+	return portConfiguration, nil
+}
+
+func (a *ansible) configureAccessPort(port string, untaggedVLAN *int) error {
+	data, err := json.Marshal(networkRunnerData{
+		Host:         a.host,
+		Credentials:  a.credentials,
+		OS:           a.os,
+		Operator:     "configAccessPort",
+		Port:         port,
+		UntaggedVLAN: untaggedVLAN,
+	})
+	if err != nil {
+		return err
+	}
+
+	output, err := exec.Command("network-runner", string(data)).CombinedOutput() // #nosec
+	if err != nil && err.Error()[:4] != "wait" {
+		return fmt.Errorf("%s[%s]", output, err)
+	}
+
+	return nil
+}
+
+func (a *ansible) configureTrunkPort(port string, untaggedVLAN *int, vlans []int) error {
+	data, err := json.Marshal(networkRunnerData{
+		Host:         a.host,
+		Credentials:  a.credentials,
+		OS:           a.os,
+		Operator:     "configTrunkPort",
+		Port:         port,
+		UntaggedVLAN: untaggedVLAN,
+		VLANs:        vlans,
+	})
+	if err != nil {
+		return err
+	}
+
+	output, err := exec.Command("network-runner", string(data)).CombinedOutput() // #nosec
+	if err != nil && err.Error()[:4] != "wait" {
+		return fmt.Errorf("%s[%s]", output, err)
+	}
+
+	return nil
+}
+
+func (a *ansible) deletePort(port string) error {
+	data, err := json.Marshal(networkRunnerData{
+		Host:        a.host,
+		Credentials: a.credentials,
+		OS:          a.os,
+		Bridge:      a.bridge,
+		Operator:    "deletePort",
+		Port:        port,
+	})
+	if err != nil {
+		return err
+	}
+
+	output, err := exec.Command("network-runner", string(data)).CombinedOutput() // #nosec
+	if err != nil && err.Error()[:4] != "wait" {
+		return fmt.Errorf("%s[%s]", output, err)
+	}
+
+	return nil
 }
