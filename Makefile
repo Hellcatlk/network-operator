@@ -51,7 +51,7 @@ deploy: manifests
 # Undeploy controller in the configured Kubernetes cluster in ~/.kube/config
 undeploy: manifests
 	cd config/manager && kustomize edit set image controller=${IMG}
-	$(kustomize) build config/default | kubectl delete -f -`
+	$(kustomize) build config/default | kubectl delete -f -
 
 # Generate docs
 .PHONY: docs
