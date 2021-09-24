@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestToSlice(t *testing.T) {
+func TestRangeToSlice(t *testing.T) {
 	cases := []struct {
 		name          string
 		expected      []int
