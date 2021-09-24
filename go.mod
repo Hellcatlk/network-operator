@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/go-logr/logr v0.4.0
+	github.com/ramr/go-reaper v0.2.1
 	github.com/securego/gosec v0.0.0-20200401082031-e946c8c39989
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b

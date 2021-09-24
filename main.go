@@ -20,6 +20,7 @@ import (
 	"flag"
 	"os"
 
+	reaper "github.com/ramr/go-reaper"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -53,6 +54,9 @@ func main() {
 	flag.Parse()
 
 	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
+
+	// Recycling zombie processes
+	go reaper.Reap()
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:             scheme,
