@@ -102,6 +102,19 @@ func (r *SwitchPortReconciler) verifyingHandler(ctx context.Context, info *machi
 		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
 	}
 
+	resourceLimit, err := i.FetchSwitchResourceLimit(ctx, info.Client)
+	if err != nil {
+		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
+	}
+	port := v1alpha1.Port{
+		Name:      "*",
+		VLANRange: resourceLimit.Spec.VLANRange,
+	}
+	err = port.Verify(configuration)
+	if err != nil {
+		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
+	}
+
 	// Copy configuration to Status.Configuration
 	i.Status.Configuration = &configuration.Spec
 	i.Status.PortName = owner.Status.Ports[i.Name].Name

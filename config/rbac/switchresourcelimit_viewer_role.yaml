@@ -1,0 +1,20 @@
+# permissions for end users to view switchresourcelimits.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: switchresourcelimit-viewer-role
+rules:
+- apiGroups:
+  - metal3.io
+  resources:
+  - switchresourcelimits
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - metal3.io
+  resources:
+  - switchresourcelimits/status
+  verbs:
+  - get
