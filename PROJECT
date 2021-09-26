@@ -12,4 +12,7 @@ resources:
 - group: metal3.io
   kind: AnsibleSwitch
   version: v1alpha1
+- group: metal3.io
+  kind: SwitchResourceLimit
+  version: v1alpha1
 version: "2"

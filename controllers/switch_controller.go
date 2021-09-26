@@ -25,7 +25,6 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/Hellcatlk/network-operator/api/v1alpha1"
 	metal3iov1alpha1 "github.com/Hellcatlk/network-operator/api/v1alpha1"
 	"github.com/Hellcatlk/network-operator/pkg/machine"
 )
@@ -53,7 +52,7 @@ func (r *SwitchReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctr
 	logger := r.Log.WithValues("switch", req.NamespacedName)
 
 	// Fetch the instance
-	instance := &v1alpha1.Switch{}
+	instance := &metal3iov1alpha1.Switch{}
 	err := r.Get(ctx, req.NamespacedName, instance)
 	if err != nil {
 		// The object has been deleted
