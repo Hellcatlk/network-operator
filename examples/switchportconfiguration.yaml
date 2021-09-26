@@ -1,6 +1,0 @@
-apiVersion: metal3.io/v1alpha1
-kind: SwitchPortConfiguration
-metadata:
-  name: switchportconfiguration-example
-spec:
-  untaggedVLAN: 10

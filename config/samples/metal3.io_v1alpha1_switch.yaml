@@ -1,7 +1,11 @@
 apiVersion: metal3.io/v1alpha1
 kind: Switch
 metadata:
-  name: switch-sample
+  name: switch-example
 spec:
-  # Add fields here
-  foo: bar
+  provider:
+    kind: AnsibleSwitch
+    name: ansible-switch-example
+  ports:
+    switchport-example:
+      name: <port-name>

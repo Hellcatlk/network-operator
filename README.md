@@ -9,7 +9,7 @@ Network operators is a kubernetes API for managing network devices.
 
 1. Run `make install`.
 2. Run `make run`(run the controller locally) or `make docker && make deploy`(run the controller as a deployment).
-3. Apply CRs, [here](./examples) are some examples.
+3. Apply CRs, [here](./config/samples) are some samples.
 
 **NOTE**: If you execute `make deploy` in a multi-node cluster environment, you need to upload the image to the image repository.
 

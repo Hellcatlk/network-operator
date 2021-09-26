@@ -1,7 +1,6 @@
 apiVersion: metal3.io/v1alpha1
 kind: SwitchPortConfiguration
 metadata:
-  name: switchportconfiguration-sample
+  name: switchportconfiguration-example
 spec:
-  # Add fields here
-  foo: bar
+  untaggedVLAN: 10
