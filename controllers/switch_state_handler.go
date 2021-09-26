@@ -138,6 +138,16 @@ func (r *SwitchReconciler) runningHandler(ctx context.Context, info *machine.Rec
 		}
 	}
 
+	// Check connection with switch
+	backend, err := getSwitchBackend(ctx, info.Client, i)
+	if err != nil {
+		return machine.ResultContinue(v1alpha1.SwitchRunning, requeueAfterTime, err)
+	}
+	err = backend.IsAvailable()
+	if err != nil {
+		return machine.ResultContinue(v1alpha1.SwitchRunning, requeueAfterTime, err)
+	}
+
 	return machine.ResultContinue(v1alpha1.SwitchRunning, requeueAfterTime, nil)
 }
 
