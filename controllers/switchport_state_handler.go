@@ -11,6 +11,7 @@ import (
 	"github.com/Hellcatlk/network-operator/pkg/machine"
 	"github.com/Hellcatlk/network-operator/pkg/provider"
 	"github.com/Hellcatlk/network-operator/pkg/utils/finalizer"
+	"k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -103,16 +104,18 @@ func (r *SwitchPortReconciler) verifyingHandler(ctx context.Context, info *machi
 	}
 
 	resourceLimit, err := i.FetchSwitchResourceLimit(ctx, info.Client)
-	if err != nil {
+	if err != nil && !errors.IsNotFound(err) {
 		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
 	}
-	port := v1alpha1.Port{
-		Name:      "*",
-		VLANRange: resourceLimit.Spec.VLANRange,
-	}
-	err = port.Verify(configuration)
-	if err != nil {
-		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
+	if resourceLimit != nil {
+		port := v1alpha1.Port{
+			Name:      "*",
+			VLANRange: resourceLimit.Spec.VLANRange,
+		}
+		err = port.Verify(configuration)
+		if err != nil {
+			return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
+		}
 	}
 
 	// Copy configuration to Status.Configuration
