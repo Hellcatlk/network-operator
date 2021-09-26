@@ -18,4 +18,3 @@ spec:
   bridge: <bridge-name>
   credentials:
     name: ansible-switch-example-secret
-    namespace: default

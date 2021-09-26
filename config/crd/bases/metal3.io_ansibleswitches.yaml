@@ -40,7 +40,8 @@ spec:
                 description: OVS bridge
                 type: string
               credentials:
-                description: A secret containing the switch credentials
+                description: A secret containing the switch credentials The default
+                  namespace is the same as `AnsibleSwitch`
                 properties:
                   name:
                     description: Name is unique within a namespace to reference a

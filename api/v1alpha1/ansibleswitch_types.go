@@ -35,6 +35,7 @@ type AnsibleSwitchSpec struct {
 	Host string `json:"host"`
 
 	// A secret containing the switch credentials
+	// The default namespace is the same as `AnsibleSwitch`
 	Credentials *corev1.SecretReference `json:"credentials"`
 
 	// OVS bridge
@@ -58,6 +59,11 @@ type AnsibleSwitch struct {
 
 // GetConfiguration generate configuration from openvswitch switch
 func (a *AnsibleSwitch) GetConfiguration(ctx context.Context, client client.Client) (*provider.SwitchConfiguration, error) {
+	// Set the default namespace of `Credentials` to the same as `AnsibleSwitch`
+	if a.Spec.Credentials.Namespace == "" {
+		a.Spec.Credentials.Namespace = a.Namespace
+	}
+
 	cert, err := credentials.Fetch(ctx, client, a.Spec.Credentials)
 	if err != nil {
 		return nil, err
