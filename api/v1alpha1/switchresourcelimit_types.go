@@ -25,7 +25,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// Fetch the SwitchResourceLimit instance
+// FetchSwitchResourceLimit fetch the SwitchResourceLimit/user-limit instance
 func (ref *SwitchPort) FetchSwitchResourceLimit(ctx context.Context, client client.Client) (*SwitchResourceLimit, error) {
 	if ref == nil {
 		return nil, fmt.Errorf("switch port is nil")
@@ -55,8 +55,8 @@ type SwitchResourceLimitSpec struct {
 type SwitchResourceLimitStatus struct {
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 
 // SwitchResourceLimit is the Schema for the switchresourcelimits API
 type SwitchResourceLimit struct {
