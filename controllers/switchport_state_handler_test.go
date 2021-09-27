@@ -6,7 +6,6 @@ import (
 
 	"github.com/Hellcatlk/network-operator/api/v1alpha1"
 	"github.com/Hellcatlk/network-operator/pkg/machine"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -39,8 +38,6 @@ func (c *fakeClient) Get(ctx context.Context, key types.NamespacedName, obj clie
 		}
 	case "SwitchPortConfiguration":
 		*obj.(*v1alpha1.SwitchPortConfiguration) = v1alpha1.SwitchPortConfiguration{}
-	case "Secret":
-		*obj.(*corev1.Secret) = corev1.Secret{}
 	}
 
 	return nil
@@ -89,7 +86,6 @@ func TestSwitchPortStateMachine(t *testing.T) {
 		expectedState          machine.StateType
 		expectedError          bool
 	}{
-		// Delete when `Idle` state
 		{
 			name:          "<None> -> Idle",
 			expectedDirty: true,
