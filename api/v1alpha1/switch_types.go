@@ -204,6 +204,7 @@ func (s *Switch) SetError(err error) {
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="STATE",type="string",JSONPath=".status.state",description="state"
 // +kubebuilder:printcolumn:name="ERROR",type="string",JSONPath=".status.error",description="error"
 

@@ -165,6 +165,7 @@ func (sp *SwitchPort) FetchOwnerReference(ctx context.Context, client client.Cli
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="STATE",type="string",JSONPath=".status.state",description="state"
 // +kubebuilder:printcolumn:name="ERROR",type="string",JSONPath=".status.error",description="error"
 

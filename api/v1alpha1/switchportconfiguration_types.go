@@ -98,6 +98,7 @@ type SwitchPortConfigurationStatus struct {
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 
 // SwitchPortConfiguration is the Schema for the switchportconfigurations API
 type SwitchPortConfiguration struct {

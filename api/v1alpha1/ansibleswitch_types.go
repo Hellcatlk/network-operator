@@ -47,6 +47,7 @@ type AnsibleSwitchStatus struct {
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 
 // AnsibleSwitch is the Schema for the ansibleswitches API
 type AnsibleSwitch struct {
