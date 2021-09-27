@@ -55,7 +55,7 @@ func (m *Machine) Reconcile(ctx context.Context) (bool, ctrl.Result, error) {
 	m.info.Logger.Info(string(m.instance.GetState()))
 
 	// There are any handler in handlers?
-	if m.handlers == nil {
+	if len(m.handlers) == 0 {
 		return false, ctrl.Result{}, fmt.Errorf("haven't any handler")
 	}
 
