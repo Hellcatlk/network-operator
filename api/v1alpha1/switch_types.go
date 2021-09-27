@@ -50,8 +50,8 @@ func (ref *SwitchProviderReference) Fetch(ctx context.Context, client client.Cli
 	var err error
 
 	switch ref.Kind {
-	case "TestSwitch":
-		instance = &provider.TestSwitch{}
+	case "FakeSwitch":
+		instance = &provider.FakeSwitch{}
 
 	case "AnsibleSwitch":
 		a := &AnsibleSwitch{}

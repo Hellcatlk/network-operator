@@ -6,6 +6,7 @@ import (
 
 	"github.com/Hellcatlk/network-operator/pkg/backends"
 	"github.com/Hellcatlk/network-operator/pkg/backends/switches/ansible"
+	"github.com/Hellcatlk/network-operator/pkg/backends/switches/fake"
 	"github.com/Hellcatlk/network-operator/pkg/provider"
 )
 
@@ -14,6 +15,7 @@ type newFuncType func(context.Context, *provider.SwitchConfiguration) (backends.
 var backendNews map[string]newFuncType = make(map[string]newFuncType)
 
 func init() {
+	Register("fake", fake.New)
 	Register("ansible", ansible.New)
 }
 

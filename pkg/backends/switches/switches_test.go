@@ -21,13 +21,8 @@ func TestNew(t *testing.T) {
 			expectError: true,
 		},
 		{
-			name:        "new test backend",
-			backend:     "test",
-			expectError: false,
-		},
-		{
-			name:        "new ansible backend",
-			backend:     "ansible",
+			name:        "new fake backend",
+			backend:     "fake",
 			expectError: false,
 		},
 	}
