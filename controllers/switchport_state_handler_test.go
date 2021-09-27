@@ -46,6 +46,10 @@ func (c *fakeClient) Get(ctx context.Context, key types.NamespacedName, obj clie
 	return nil
 }
 
+func (c *fakeClient) Delete(ctx context.Context, obj client.Object, opts ...client.DeleteOption) error {
+	return nil
+}
+
 func (c *fakeClient) Scheme() *runtime.Scheme {
 	return nil
 }
