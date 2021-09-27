@@ -15,7 +15,7 @@ func TestSwitchStateMachine(t *testing.T) {
 	r := SwitchReconciler{}
 	instance := v1alpha1.Switch{}
 	instance.Name = "Switch"
-	instance.Spec.Provider = &v1alpha1.SwitchProviderRef{
+	instance.Spec.Provider = &v1alpha1.SwitchProviderReference{
 		Kind: "TestSwitch",
 		Name: "TestSwitch",
 	}
