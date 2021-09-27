@@ -114,7 +114,10 @@ func (r *SwitchPortReconciler) verifyingHandler(ctx context.Context, info *machi
 		}
 		err = port.Verify(configuration)
 		if err != nil {
-			return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
+			return machine.ResultContinue(v1alpha1.SwitchPortVerifying,
+				requeueAfterTime,
+				fmt.Errorf("%s, %s", err, "please check `SwitchResourceLimit/user-limit`"),
+			)
 		}
 	}
 

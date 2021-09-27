@@ -65,7 +65,7 @@ func (r *SwitchReconciler) verifyingHandler(ctx context.Context, info *machine.R
 		}
 		i.Status.Provider = i.Spec.Provider.DeepCopy()
 	} else {
-		info.Logger.Info("the provider field is not allowed to be edited ")
+		info.Logger.Info("the provider field is not allowed to be edited")
 	}
 	i.Status.Ports = i.Spec.Ports
 	return machine.ResultContinue(v1alpha1.SwitchConfiguring, 0, nil)
