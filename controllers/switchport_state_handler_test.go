@@ -26,7 +26,7 @@ func (c *fakeClient) Get(ctx context.Context, key types.NamespacedName, obj clie
 	case "Switch":
 		*obj.(*v1alpha1.Switch) = v1alpha1.Switch{
 			Status: v1alpha1.SwitchStatus{
-				Provider: &v1alpha1.SwitchProviderRef{
+				Provider: &v1alpha1.SwitchProviderReference{
 					Kind: "TestSwitch",
 					Name: "TestSwitch",
 				},

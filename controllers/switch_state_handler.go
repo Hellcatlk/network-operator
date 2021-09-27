@@ -60,7 +60,7 @@ func (r *SwitchReconciler) verifyingHandler(ctx context.Context, info *machine.R
 	}
 
 	if i.Status.Provider == nil {
-		if i.Spec.Provider == nil || reflect.DeepEqual(i.Spec.Provider, &v1alpha1.SwitchProviderRef{}) {
+		if i.Spec.Provider == nil || reflect.DeepEqual(i.Spec.Provider, &v1alpha1.SwitchProviderReference{}) {
 			return machine.ResultContinue(v1alpha1.SwitchVerifying, requeueAfterTime, fmt.Errorf("provider is nil or empty"))
 		}
 		i.Status.Provider = i.Spec.Provider.DeepCopy()

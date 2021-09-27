@@ -54,34 +54,6 @@ func (ref *SwitchPortReference) Fetch(ctx context.Context, client client.Client)
 	return instance, err
 }
 
-// SwitchPortConfigurationReference is the reference for SwitchPortConfiguration CR
-type SwitchPortConfigurationReference struct {
-	Name string `json:"name"`
-
-	// If empty use default namespace
-	// +kubebuilder:default:="default"
-	Namespace string `json:"namespace,omitempty"`
-}
-
-// Fetch the instance
-func (ref *SwitchPortConfigurationReference) Fetch(ctx context.Context, client client.Client) (*SwitchPortConfiguration, error) {
-	if ref == nil {
-		return nil, fmt.Errorf("switch port configuration reference is nil")
-	}
-
-	instance := &SwitchPortConfiguration{}
-	err := client.Get(
-		ctx,
-		types.NamespacedName{
-			Name:      ref.Name,
-			Namespace: ref.Namespace,
-		},
-		instance,
-	)
-
-	return instance, err
-}
-
 // SwitchPortSpec defines the desired state of SwitchPort
 type SwitchPortSpec struct {
 	// The reference of PortConfiguration CR
@@ -126,23 +98,18 @@ const (
 	SwitchPortDeleting machine.StateType = "Deleting"
 )
 
-// GetState gets the current state of the port
-func (sp *SwitchPort) GetState() machine.StateType {
-	return sp.Status.State
-}
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="STATE",type="string",JSONPath=".status.state",description="state"
+// +kubebuilder:printcolumn:name="ERROR",type="string",JSONPath=".status.error",description="error"
 
-// SetState sets the state of the port
-func (sp *SwitchPort) SetState(state machine.StateType) {
-	sp.Status.State = state
-}
+// SwitchPort is the Schema for the switchports API
+type SwitchPort struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-// SetError sets the error of the port
-func (sp *SwitchPort) SetError(err error) {
-	if err != nil {
-		sp.Status.Error = err.Error()
-		return
-	}
-	sp.Status.Error = ""
+	Spec   SwitchPortSpec   `json:"spec,omitempty"`
+	Status SwitchPortStatus `json:"status,omitempty"`
 }
 
 // FetchOwnerReference fetch OwnerReference[0]
@@ -164,18 +131,42 @@ func (sp *SwitchPort) FetchOwnerReference(ctx context.Context, client client.Cli
 	return instance, err
 }
 
-// +kubebuilder:object:root=true
-// +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:name="STATE",type="string",JSONPath=".status.state",description="state"
-// +kubebuilder:printcolumn:name="ERROR",type="string",JSONPath=".status.error",description="error"
+// FetchSwitchResourceLimit fetch the SwitchResourceLimit/user-limit instance
+func (sp *SwitchPort) FetchSwitchResourceLimit(ctx context.Context, client client.Client) (*SwitchResourceLimit, error) {
+	if sp == nil {
+		return nil, fmt.Errorf("switch port is nil")
+	}
 
-// SwitchPort is the Schema for the switchports API
-type SwitchPort struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	instance := &SwitchResourceLimit{}
+	err := client.Get(
+		ctx,
+		types.NamespacedName{
+			Name:      "user-limit",
+			Namespace: sp.Spec.Configuration.Namespace,
+		},
+		instance,
+	)
 
-	Spec   SwitchPortSpec   `json:"spec,omitempty"`
-	Status SwitchPortStatus `json:"status,omitempty"`
+	return instance, err
+}
+
+// GetState gets the current state of the port
+func (sp *SwitchPort) GetState() machine.StateType {
+	return sp.Status.State
+}
+
+// SetState sets the state of the port
+func (sp *SwitchPort) SetState(state machine.StateType) {
+	sp.Status.State = state
+}
+
+// SetError sets the error of the port
+func (sp *SwitchPort) SetError(err error) {
+	if err != nil {
+		sp.Status.Error = err.Error()
+		return
+	}
+	sp.Status.Error = ""
 }
 
 // +kubebuilder:object:root=true

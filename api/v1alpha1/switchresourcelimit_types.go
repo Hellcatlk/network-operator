@@ -17,32 +17,8 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"context"
-	"fmt"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
-
-// FetchSwitchResourceLimit fetch the SwitchResourceLimit/user-limit instance
-func (ref *SwitchPort) FetchSwitchResourceLimit(ctx context.Context, client client.Client) (*SwitchResourceLimit, error) {
-	if ref == nil {
-		return nil, fmt.Errorf("switch port is nil")
-	}
-
-	instance := &SwitchResourceLimit{}
-	err := client.Get(
-		ctx,
-		types.NamespacedName{
-			Name:      "user-limit",
-			Namespace: ref.Spec.Configuration.Namespace,
-		},
-		instance,
-	)
-
-	return instance, err
-}
 
 // SwitchResourceLimitSpec defines the desired state of SwitchResourceLimit
 type SwitchResourceLimitSpec struct {

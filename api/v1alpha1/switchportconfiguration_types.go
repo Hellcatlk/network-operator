@@ -17,11 +17,43 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+	"fmt"
 	"reflect"
 
 	"github.com/Hellcatlk/network-operator/pkg/utils/strings"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
+
+// SwitchPortConfigurationReference is the reference for SwitchPortConfiguration CR
+type SwitchPortConfigurationReference struct {
+	Name string `json:"name"`
+
+	// If empty use default namespace
+	// +kubebuilder:default:="default"
+	Namespace string `json:"namespace,omitempty"`
+}
+
+// Fetch the instance
+func (ref *SwitchPortConfigurationReference) Fetch(ctx context.Context, client client.Client) (*SwitchPortConfiguration, error) {
+	if ref == nil {
+		return nil, fmt.Errorf("switch port configuration reference is nil")
+	}
+
+	instance := &SwitchPortConfiguration{}
+	err := client.Get(
+		ctx,
+		types.NamespacedName{
+			Name:      ref.Name,
+			Namespace: ref.Namespace,
+		},
+		instance,
+	)
+
+	return instance, err
+}
 
 // ACL describes the rules applied in the switch
 type ACL struct {

@@ -28,6 +28,50 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+// SwitchProviderReference is the reference for SwitchProvider CR
+type SwitchProviderReference struct {
+	// +kubebuilder:validation:Enum=AnsibleSwitch
+	Kind string `json:"kind"`
+
+	Name string `json:"name"`
+
+	// If empty use default namespace.
+	// +kubebuilder:default:="default"
+	Namespace string `json:"namespace,omitempty"`
+}
+
+// Fetch the instance
+func (ref *SwitchProviderReference) Fetch(ctx context.Context, client client.Client) (provider.Switch, error) {
+	if ref == nil {
+		return nil, fmt.Errorf("provider reference is nil")
+	}
+
+	var instance provider.Switch
+	var err error
+
+	switch ref.Kind {
+	case "TestSwitch":
+		instance = &provider.TestSwitch{}
+
+	case "AnsibleSwitch":
+		a := &AnsibleSwitch{}
+		err = client.Get(
+			ctx,
+			types.NamespacedName{
+				Name:      ref.Name,
+				Namespace: ref.Namespace,
+			},
+			a,
+		)
+		instance = a
+
+	default:
+		err = fmt.Errorf("unknown provider switch kind")
+	}
+
+	return instance, err
+}
+
 // Port indicates the specific restriction on the port
 type Port struct {
 	// Describes the port name on the device
@@ -99,54 +143,10 @@ func (p *Port) Verify(configuration *SwitchPortConfiguration) error {
 	return nil
 }
 
-// SwitchProviderRef is the reference for SwitchProvider CR
-type SwitchProviderRef struct {
-	// +kubebuilder:validation:Enum=AnsibleSwitch
-	Kind string `json:"kind"`
-
-	Name string `json:"name"`
-
-	// If empty use default namespace.
-	// +kubebuilder:default:="default"
-	Namespace string `json:"namespace,omitempty"`
-}
-
-// Fetch the instance
-func (ref *SwitchProviderRef) Fetch(ctx context.Context, client client.Client) (provider.Switch, error) {
-	if ref == nil {
-		return nil, fmt.Errorf("provider reference is nil")
-	}
-
-	var instance provider.Switch
-	var err error
-
-	switch ref.Kind {
-	case "TestSwitch":
-		instance = &provider.TestSwitch{}
-
-	case "AnsibleSwitch":
-		a := &AnsibleSwitch{}
-		err = client.Get(
-			ctx,
-			types.NamespacedName{
-				Name:      ref.Name,
-				Namespace: ref.Namespace,
-			},
-			a,
-		)
-		instance = a
-
-	default:
-		err = fmt.Errorf("unknown provider switch kind")
-	}
-
-	return instance, err
-}
-
 // SwitchSpec defines the desired state of Switch
 type SwitchSpec struct {
 	// The reference of provider
-	Provider *SwitchProviderRef `json:"provider"`
+	Provider *SwitchProviderReference `json:"provider"`
 
 	// Restricted ports in the switch
 	Ports map[string]*Port `json:"ports,omitempty"`
@@ -158,7 +158,7 @@ type SwitchStatus struct {
 	State machine.StateType `json:"state,omitempty"`
 
 	// The reference of switch provider
-	Provider *SwitchProviderRef `json:"provider,omitempty"`
+	Provider *SwitchProviderReference `json:"provider,omitempty"`
 
 	// Restricted ports in the switch
 	Ports map[string]*Port `json:"ports,omitempty"`
@@ -184,6 +184,20 @@ const (
 	SwitchDeleting machine.StateType = "Deleting"
 )
 
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="STATE",type="string",JSONPath=".status.state",description="state"
+// +kubebuilder:printcolumn:name="ERROR",type="string",JSONPath=".status.error",description="error"
+
+// Switch is the Schema for the switches API
+type Switch struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   SwitchSpec   `json:"spec,omitempty"`
+	Status SwitchStatus `json:"status,omitempty"`
+}
+
 // GetState gets the current state of the switch
 func (s *Switch) GetState() machine.StateType {
 	return s.Status.State
@@ -201,20 +215,6 @@ func (s *Switch) SetError(err error) {
 		return
 	}
 	s.Status.Error = ""
-}
-
-// +kubebuilder:object:root=true
-// +kubebuilder:subresource:status
-// +kubebuilder:printcolumn:name="STATE",type="string",JSONPath=".status.state",description="state"
-// +kubebuilder:printcolumn:name="ERROR",type="string",JSONPath=".status.error",description="error"
-
-// Switch is the Schema for the switches API
-type Switch struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   SwitchSpec   `json:"spec,omitempty"`
-	Status SwitchStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
