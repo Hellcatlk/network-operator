@@ -45,6 +45,10 @@ type SwitchPortReconciler struct {
 // +kubebuilder:rbac:groups=metal3.io,resources=switchportconfigurations/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=metal3.io,resources=switchportconfigurations/finalizers,verbs=update
 
+// +kubebuilder:rbac:groups=metal3.io,resources=switchresourcelimits,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=metal3.io,resources=switchresourcelimits/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=metal3.io,resources=switchresourcelimits/finalizers,verbs=update
+
 // Reconcile switch port resources
 func (r *SwitchPortReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := r.Log.WithValues("switchport", req.NamespacedName)
