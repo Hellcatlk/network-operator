@@ -79,11 +79,46 @@ func (r *SwitchPortReconciler) verifyingHandler(ctx context.Context, info *machi
 		return machine.ResultContinue(v1alpha1.SwitchPortIdle, 0, nil)
 	}
 
-	// Check connection with switch
+	// Fetch switch
 	owner, err := i.FetchOwnerReference(ctx, info.Client)
 	if err != nil {
 		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
 	}
+
+	// Fetch configuration
+	configuration, err := i.Spec.Configuration.Fetch(ctx, info.Client)
+	if err != nil {
+		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
+	}
+
+	// Check switch limit
+	err = owner.Spec.Limit.Verify(configuration)
+	if err != nil {
+		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
+	}
+
+	// Check switch port limit
+	err = owner.Status.Ports[i.Name].Verify(configuration)
+	if err != nil {
+		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
+	}
+
+	// Check user limit
+	resourceLimit, err := i.FetchSwitchResourceLimit(ctx, info.Client)
+	if err != nil && !errors.IsNotFound(err) {
+		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
+	}
+	if resourceLimit != nil {
+		err = resourceLimit.Spec.Verify(configuration)
+		if err != nil {
+			return machine.ResultContinue(v1alpha1.SwitchPortVerifying,
+				requeueAfterTime,
+				fmt.Errorf("%s, %s", err, "please check `SwitchResourceLimit/user-limit`"),
+			)
+		}
+	}
+
+	// Check connection with switch
 	backend, err := getSwitchBackend(ctx, info.Client, owner)
 	if err != nil {
 		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
@@ -91,34 +126,6 @@ func (r *SwitchPortReconciler) verifyingHandler(ctx context.Context, info *machi
 	err = backend.IsAvailable()
 	if err != nil {
 		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
-	}
-
-	// Check switch port configuration
-	configuration, err := i.Spec.Configuration.Fetch(ctx, info.Client)
-	if err != nil {
-		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
-	}
-	err = owner.Status.Ports[i.Name].Verify(configuration)
-	if err != nil {
-		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
-	}
-
-	resourceLimit, err := i.FetchSwitchResourceLimit(ctx, info.Client)
-	if err != nil && !errors.IsNotFound(err) {
-		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
-	}
-	if resourceLimit != nil {
-		port := v1alpha1.Port{
-			Name:      "*",
-			VLANRange: resourceLimit.Spec.VLANRange,
-		}
-		err = port.Verify(configuration)
-		if err != nil {
-			return machine.ResultContinue(v1alpha1.SwitchPortVerifying,
-				requeueAfterTime,
-				fmt.Errorf("%s, %s", err, "please check `SwitchResourceLimit/user-limit`"),
-			)
-		}
 	}
 
 	// Copy configuration to Status.Configuration

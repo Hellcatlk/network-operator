@@ -17,14 +17,58 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"fmt"
+
+	"github.com/Hellcatlk/network-operator/pkg/utils/strings"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // SwitchResourceLimitSpec defines the desired state of SwitchResourceLimit
 type SwitchResourceLimitSpec struct {
-	// Indicates the range of VLANs allowed by this user
+	// Indicates the range of VLANs allowed
 	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
+	// +kubebuilder:default:="1-4096"
 	VLANRange string `json:"vlanRange,omitempty"`
+}
+
+// Verify configuration
+func (spec *SwitchResourceLimitSpec) Verify(configuration *SwitchPortConfiguration) error {
+	if spec == nil {
+		return nil
+	}
+
+	if spec.VLANRange == "" {
+		return nil
+	}
+
+	// Get allowed vlan range
+	vlanRange, err := strings.RangeToSlice(spec.VLANRange)
+	if err != nil {
+		return err
+	}
+	allowed := make(map[int]struct{})
+	for _, vlan := range vlanRange {
+		allowed[vlan] = struct{}{}
+	}
+
+	// Get target vlan range
+	target, err := strings.RangeToSlice(spec.VLANRange)
+	if err != nil {
+		return err
+	}
+	if configuration.Spec.UntaggedVLAN != nil {
+		target = append(target, *configuration.Spec.UntaggedVLAN)
+	}
+
+	// Check vlan range
+	for _, vlan := range target {
+		_, existed := allowed[vlan]
+		if !existed {
+			return fmt.Errorf("vlan %d is out of permissible range", vlan)
+		}
+	}
+
+	return nil
 }
 
 // SwitchResourceLimitStatus defines the observed state of SwitchResourceLimit

@@ -2,7 +2,7 @@ package v1alpha1
 
 import "testing"
 
-func TestVerify(t *testing.T) {
+func TestPortVerify(t *testing.T) {
 	untaggedVLAN := 20
 	cases := []struct {
 		name          string
@@ -27,19 +27,6 @@ func TestVerify(t *testing.T) {
 			name: "trunk disabled",
 			port: &Port{
 				TrunkDisabled: true,
-			},
-			configuration: &SwitchPortConfiguration{
-				Spec: SwitchPortConfigurationSpec{
-					VLANs:        "1-10",
-					UntaggedVLAN: &untaggedVLAN,
-				},
-			},
-			expectedError: true,
-		},
-		{
-			name: "vlan range",
-			port: &Port{
-				VLANRange: "1-10",
 			},
 			configuration: &SwitchPortConfiguration{
 				Spec: SwitchPortConfigurationSpec{

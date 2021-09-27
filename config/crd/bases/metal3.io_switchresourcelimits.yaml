@@ -38,7 +38,8 @@ spec:
             description: SwitchResourceLimitSpec defines the desired state of SwitchResourceLimit
             properties:
               vlanRange:
-                description: Indicates the range of VLANs allowed by this user
+                default: 1-4096
+                description: Indicates the range of VLANs allowed
                 pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
                 type: string
             type: object

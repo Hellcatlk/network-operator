@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 
 	"github.com/Hellcatlk/network-operator/api/v1alpha1"
@@ -32,16 +31,6 @@ func (r *SwitchReconciler) verifyingHandler(ctx context.Context, info *machine.R
 		return machine.ResultContinue(v1alpha1.SwitchDeleting, 0, nil)
 	}
 
-	// Check connection with switch
-	backend, err := getSwitchBackend(ctx, info.Client, i)
-	if err != nil {
-		return machine.ResultContinue(v1alpha1.SwitchVerifying, requeueAfterTime, err)
-	}
-	err = backend.IsAvailable()
-	if err != nil {
-		return machine.ResultContinue(v1alpha1.SwitchVerifying, requeueAfterTime, err)
-	}
-
 	// Delete SwitchPorts which isn't included i.Spec
 	for name := range i.Status.Ports {
 		_, exist := i.Spec.Ports[name]
@@ -59,10 +48,17 @@ func (r *SwitchReconciler) verifyingHandler(ctx context.Context, info *machine.R
 		}
 	}
 
+	// Check connection with switch
+	backend, err := getSwitchBackend(ctx, info.Client, i)
+	if err != nil {
+		return machine.ResultContinue(v1alpha1.SwitchVerifying, requeueAfterTime, err)
+	}
+	err = backend.IsAvailable()
+	if err != nil {
+		return machine.ResultContinue(v1alpha1.SwitchVerifying, requeueAfterTime, err)
+	}
+
 	if i.Status.Provider == nil {
-		if i.Spec.Provider == nil || reflect.DeepEqual(i.Spec.Provider, &v1alpha1.SwitchProviderReference{}) {
-			return machine.ResultContinue(v1alpha1.SwitchVerifying, requeueAfterTime, fmt.Errorf("provider is nil or empty"))
-		}
 		i.Status.Provider = i.Spec.Provider.DeepCopy()
 	} else {
 		info.Logger.Info("the provider field is not allowed to be edited")

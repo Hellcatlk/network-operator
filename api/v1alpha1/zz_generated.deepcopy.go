@@ -548,6 +548,11 @@ func (in *SwitchSpec) DeepCopyInto(out *SwitchSpec) {
 		*out = new(SwitchProviderReference)
 		**out = **in
 	}
+	if in.Limit != nil {
+		in, out := &in.Limit, &out.Limit
+		*out = new(SwitchResourceLimitSpec)
+		**out = **in
+	}
 	if in.Ports != nil {
 		in, out := &in.Ports, &out.Ports
 		*out = make(map[string]*Port, len(*in))

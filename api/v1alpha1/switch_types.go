@@ -22,7 +22,6 @@ import (
 
 	"github.com/Hellcatlk/network-operator/pkg/machine"
 	"github.com/Hellcatlk/network-operator/pkg/provider"
-	"github.com/Hellcatlk/network-operator/pkg/utils/strings"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -82,11 +81,6 @@ type Port struct {
 
 	// True if this port can be used as a trunk port, false otherwise
 	TrunkDisabled bool `json:"trunkDisable,omitempty"`
-
-	// Indicates the range of VLANs allowed by this port in the switch
-	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
-	// +kubebuilder:default:="1-4096"
-	VLANRange string `json:"vlanRange,omitempty"`
 }
 
 // Verify configuration
@@ -111,35 +105,6 @@ func (p *Port) Verify(configuration *SwitchPortConfiguration) error {
 		return fmt.Errorf("the port can be used as a trunk port")
 	}
 
-	if p.VLANRange != "" {
-		// Get allowed vlan range
-		vlanRange, err := strings.RangeToSlice(p.VLANRange)
-		if err != nil {
-			return err
-		}
-		allowed := make(map[int]struct{})
-		for _, vlan := range vlanRange {
-			allowed[vlan] = struct{}{}
-		}
-
-		// Get target vlan range
-		target, err := strings.RangeToSlice(p.VLANRange)
-		if err != nil {
-			return err
-		}
-		if configuration.Spec.UntaggedVLAN != nil {
-			target = append(target, *configuration.Spec.UntaggedVLAN)
-		}
-
-		// Check vlan range
-		for _, vlan := range target {
-			_, existed := allowed[vlan]
-			if !existed {
-				return fmt.Errorf("vlan %d is out of permissible range", vlan)
-			}
-		}
-	}
-
 	return nil
 }
 
@@ -147,6 +112,9 @@ func (p *Port) Verify(configuration *SwitchPortConfiguration) error {
 type SwitchSpec struct {
 	// The reference of provider
 	Provider *SwitchProviderReference `json:"provider"`
+
+	// Limit of switch resource
+	Limit *SwitchResourceLimitSpec `json:"limit,omitempty"`
 
 	// Restricted ports in the switch
 	Ports map[string]*Port `json:"ports,omitempty"`
