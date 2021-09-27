@@ -166,6 +166,18 @@ type Switch struct {
 	Status SwitchStatus `json:"status,omitempty"`
 }
 
+// GetMetadataAndSpec return metadata and spec field
+func (s *Switch) GetMetadataAndSpec() interface{} {
+	deepCopy := s.DeepCopy()
+	deepCopy.Status = SwitchStatus{}
+	return deepCopy
+}
+
+// GetStatus return status field
+func (s *Switch) GetStatus() interface{} {
+	return s.Status.DeepCopy()
+}
+
 // GetState gets the current state of the switch
 func (s *Switch) GetState() machine.StateType {
 	return s.Status.State

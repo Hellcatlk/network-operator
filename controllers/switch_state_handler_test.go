@@ -40,39 +40,40 @@ func TestSwitchStateMachine(t *testing.T) {
 	cases := []struct {
 		name                   string
 		deletionTimestampExist bool
-		expectedDirty          bool
+		expectedDirty          machine.DirtyType
 		expectedState          machine.StateType
 		expectedError          bool
 	}{
 		{
 			name:          "<None> -> Verifying",
-			expectedDirty: true,
+			expectedDirty: machine.All,
 			expectedState: v1alpha1.SwitchVerifying,
 		},
 		{
 			name:          "Verifying -> Configuring",
-			expectedDirty: true,
+			expectedDirty: machine.Status,
 			expectedState: v1alpha1.SwitchConfiguring,
 		},
 		{
 			name:          "Configuring -> Running",
-			expectedDirty: true,
+			expectedDirty: machine.Status,
 			expectedState: v1alpha1.SwitchRunning,
 		},
 		{
 			name:          "Running -> Running",
+			expectedDirty: machine.None,
 			expectedState: v1alpha1.SwitchRunning,
 		},
 		{
 			name:                   "Running -> Deleting",
 			deletionTimestampExist: true,
-			expectedDirty:          true,
+			expectedDirty:          machine.Status,
 			expectedState:          v1alpha1.SwitchDeleting,
 		},
 		{
 			name:                   "Deleting -> Deleting",
 			deletionTimestampExist: true,
-			expectedDirty:          true,
+			expectedDirty:          machine.MetadataAndSpec,
 			expectedState:          v1alpha1.SwitchDeleting,
 		},
 	}

@@ -31,6 +31,8 @@ type ReconcileInfo struct {
 // NOTE: Instance must be a pointer
 type Instance interface {
 	runtime.Object
+	GetMetadataAndSpec() interface{}
+	GetStatus() interface{}
 	GetState() StateType
 	SetState(state StateType)
 	SetError(err error)
@@ -50,23 +52,40 @@ func New(info *ReconcileInfo, instance Instance, handlers map[StateType]Handler)
 	}
 }
 
+// DirtyType ...
+type DirtyType int
+
+const (
+	// None means no field changed
+	None DirtyType = 0
+
+	// MetadataAndSpec means metadata and spec changed
+	MetadataAndSpec DirtyType = 1
+
+	// Status means status
+	Status DirtyType = 2
+
+	// All means metadata, spec and status changed
+	All DirtyType = 3
+)
+
 // Reconcile state machine. If dirty is true, it means the instance has changed
-func (m *Machine) Reconcile(ctx context.Context) (bool, ctrl.Result, error) {
+func (m *Machine) Reconcile(ctx context.Context) (DirtyType, ctrl.Result, error) {
 	m.info.Logger.Info(string(m.instance.GetState()))
 
 	// There are any handler in handlers?
 	if len(m.handlers) == 0 {
-		return false, ctrl.Result{}, fmt.Errorf("haven't any handler")
+		return None, ctrl.Result{}, fmt.Errorf("haven't any handler")
 	}
 
 	// Check the state's handler exist or not
 	handler, exist := m.handlers[m.instance.GetState()]
 	if !exist {
-		return false, ctrl.Result{}, fmt.Errorf("no handler for the state(%s)", m.instance.GetState())
+		return None, ctrl.Result{}, fmt.Errorf("no handler for the state(%s)", m.instance.GetState())
 	}
 
 	// Call handler
-	instanceDeepCopy := m.instance.DeepCopyObject()
+	instanceDeepCopy := m.instance.DeepCopyObject().(Instance)
 	nextState, result, err := handler(ctx, m.info, m.instance)
 	if err != nil {
 		err = fmt.Errorf("%s state handler error: %s", m.instance.GetState(), err)
@@ -74,6 +93,14 @@ func (m *Machine) Reconcile(ctx context.Context) (bool, ctrl.Result, error) {
 	m.instance.SetState(nextState)
 	m.instance.SetError(err)
 
+	dirty := None
+	if !reflect.DeepEqual(m.instance.GetMetadataAndSpec(), instanceDeepCopy.GetMetadataAndSpec()) {
+		dirty += MetadataAndSpec
+	}
+	if !reflect.DeepEqual(m.instance.GetStatus(), instanceDeepCopy.GetStatus()) {
+		dirty += Status
+	}
+
 	// Check instance is dirty or not
-	return !reflect.DeepEqual(m.instance, instanceDeepCopy), result, nil
+	return dirty, result, nil
 }

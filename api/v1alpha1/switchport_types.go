@@ -150,6 +150,18 @@ func (sp *SwitchPort) FetchSwitchResourceLimit(ctx context.Context, client clien
 	return instance, err
 }
 
+// GetMetadataAndSpec return metadata and spec field
+func (sp *SwitchPort) GetMetadataAndSpec() interface{} {
+	deepCopy := sp.DeepCopy()
+	deepCopy.Status = SwitchPortStatus{}
+	return deepCopy
+}
+
+// GetStatus return status field
+func (sp *SwitchPort) GetStatus() interface{} {
+	return sp.Status.DeepCopy()
+}
+
 // GetState gets the current state of the port
 func (sp *SwitchPort) GetState() machine.StateType {
 	return sp.Status.State

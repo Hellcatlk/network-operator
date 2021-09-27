@@ -89,66 +89,66 @@ func TestSwitchPortStateMachine(t *testing.T) {
 		name                   string
 		configurationRefExist  bool
 		deletionTimestampExist bool
-		expectedDirty          bool
+		expectedDirty          machine.DirtyType
 		expectedState          machine.StateType
 		expectedError          bool
 	}{
 		// Delete when `Idle` state
 		{
 			name:          "<None> -> Idle",
-			expectedDirty: true,
+			expectedDirty: machine.All,
 			expectedState: v1alpha1.SwitchPortIdle,
 		},
 		{
 			name:          "Idle -> Idle",
-			expectedDirty: false,
+			expectedDirty: machine.None,
 			expectedState: v1alpha1.SwitchPortIdle,
 		},
 		{
 			name:                  "Idle -> Verifying",
 			configurationRefExist: true,
-			expectedDirty:         true,
+			expectedDirty:         machine.Status,
 			expectedState:         v1alpha1.SwitchPortVerifying,
 		},
 		{
 			name:                  "Verifying -> Configuring",
 			configurationRefExist: true,
-			expectedDirty:         true,
+			expectedDirty:         machine.Status,
 			expectedState:         v1alpha1.SwitchPortConfiguring,
 		},
 		{
 			name:                  "Configuring -> Active",
 			configurationRefExist: true,
-			expectedDirty:         true,
+			expectedDirty:         machine.Status,
 			expectedState:         v1alpha1.SwitchPortActive,
 		},
 		{
 			name:                  "Active -> Active",
 			configurationRefExist: true,
-			expectedDirty:         false,
+			expectedDirty:         machine.None,
 			expectedState:         v1alpha1.SwitchPortActive,
 		},
 		{
 			name:          "Active -> Cleaning",
-			expectedDirty: true,
+			expectedDirty: machine.Status,
 			expectedState: v1alpha1.SwitchPortCleaning,
 		},
 		{
 			name:                  "Cleaning -> Idle",
 			configurationRefExist: true,
-			expectedDirty:         true,
+			expectedDirty:         machine.Status,
 			expectedState:         v1alpha1.SwitchPortIdle,
 		},
 		{
 			name:                   "Idle -> Deleting",
 			deletionTimestampExist: true,
-			expectedDirty:          true,
+			expectedDirty:          machine.Status,
 			expectedState:          v1alpha1.SwitchPortDeleting,
 		},
 		{
 			name:                   "Deleting -> Deleting",
 			deletionTimestampExist: true,
-			expectedDirty:          true,
+			expectedDirty:          machine.MetadataAndSpec,
 			expectedState:          v1alpha1.SwitchPortDeleting,
 		},
 	}
