@@ -95,18 +95,18 @@ func (r *SwitchPortReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 
 	// Only need to update switch port when it dirty
 	if dirty == machine.MetadataAndSpec || dirty == machine.All {
-		logger.Info("updating switch")
+		logger.Info("updating switchport")
 		err = r.Update(ctx, instance)
 		if err != nil {
-			logger.Error(err, "update switch failed")
+			logger.Error(err, "update switchport failed")
 			return result, err
 		}
 	}
 	if dirty == machine.Status || dirty == machine.All {
-		logger.Info("updating switch status")
+		logger.Info("updating switchport status")
 		err = r.Status().Update(ctx, instance)
 		if err != nil {
-			logger.Error(err, "update switch status failed")
+			logger.Error(err, "update switchport status failed")
 			return result, err
 		}
 	}
