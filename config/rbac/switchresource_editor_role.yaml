@@ -1,0 +1,24 @@
+# permissions for end users to edit switchresources.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: switchresource-editor-role
+rules:
+- apiGroups:
+  - metal3.io
+  resources:
+  - switchresources
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - metal3.io
+  resources:
+  - switchresources/status
+  verbs:
+  - get

@@ -167,3 +167,110 @@ func TestDelete(t *testing.T) {
 		})
 	}
 }
+
+func TestSliceToRange(t *testing.T) {
+	cases := []struct {
+		arr      []int
+		expected string
+	}{
+		{
+			arr:      []int{1, 2, 3, 4, 5, 7},
+			expected: "1-5,7",
+		},
+		{
+			arr:      []int{},
+			expected: "",
+		},
+		{
+			arr:      []int{1, 2, 3, 4, 5, 6, 7},
+			expected: "1-7",
+		},
+		{
+			arr:      []int{1, 5, 7},
+			expected: "1,5,7",
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(t.Name(), func(t *testing.T) {
+			got := SliceToRange(c.arr)
+			if c.expected != got {
+				t.Errorf("expected: %v, got: %v", c.expected, got)
+			}
+		})
+	}
+}
+
+func TestExpansion(t *testing.T) {
+	cases := []struct {
+		str1          string
+		str2          string
+		expected      string
+		expectedError bool
+	}{
+		{
+			str1:     "1-5,7",
+			str2:     "6,8",
+			expected: "1-8",
+		},
+		{
+			str1:     "1-5,7",
+			str2:     "10-15",
+			expected: "1-5,7,10-15",
+		},
+		{
+			str1:          "1--5,7",
+			str2:          "6,8",
+			expectedError: true,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(t.Name(), func(t *testing.T) {
+			got, err := Expansion(c.str1, c.str2)
+			if c.expected != got {
+				t.Errorf("expected: %v, got: %v", c.expected, got)
+			}
+			if (err != nil) != c.expectedError {
+				t.Errorf("got unexpected error: %v", err)
+			}
+		})
+	}
+}
+
+func TestShrink(t *testing.T) {
+	cases := []struct {
+		str1          string
+		str2          string
+		expected      string
+		expectedError bool
+	}{
+		{
+			str1:     "1-5,7",
+			str2:     "",
+			expected: "1-5,7",
+		},
+		{
+			str1:     "1-5,7",
+			str2:     "3-5,7",
+			expected: "1-2",
+		},
+		{
+			str1:          "1--5,7",
+			str2:          "6,8",
+			expectedError: true,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(t.Name(), func(t *testing.T) {
+			got, err := Shrink(c.str1, c.str2)
+			if c.expected != got {
+				t.Errorf("expected: %v, got: %v", c.expected, got)
+			}
+			if (err != nil) != c.expectedError {
+				t.Errorf("got unexpected error: %v", err)
+			}
+		})
+	}
+}
