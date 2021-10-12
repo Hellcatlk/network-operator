@@ -51,14 +51,27 @@ func SliceToRange(nums []int) string {
 		return strconv.Itoa(nums[0])
 	}
 	sort.Ints(nums)
+	length := len(nums)
+	j := 0
+	for i := 1; i < length; i++ {
+		if nums[i] != nums[j] {
+			j++
+			if j < i {
+				nums[i], nums[j] = nums[j], nums[i]
+			}
+		}
+	}
+	nums = nums[:j+1]
+	length = len(nums)
+
 	formatStr := ""
 	var begin, end int
 	begin = nums[0]
 	end = nums[0]
-	for i := 1; i < len(nums); i++ {
+	for i := 1; i < length; i++ {
 		if end == nums[i]-1 {
 			end = nums[i]
-			if i == (len(nums) - 1) {
+			if i == (length - 1) {
 				formatStr = formatStr + strconv.Itoa(begin) + "-" + strconv.Itoa(end)
 			}
 		} else {
@@ -69,7 +82,7 @@ func SliceToRange(nums []int) string {
 			}
 			begin = nums[i]
 			end = nums[i]
-			if i == (len(nums) - 1) {
+			if i == (length - 1) {
 				formatStr = formatStr + strconv.Itoa(end)
 			}
 		}
@@ -155,6 +168,8 @@ func Expansion(a, b string) (string, error) {
 
 // Shrink remove B from the content of A
 func Shrink(a, b string) (string, error) {
+	var k int
+
 	if a == "" {
 		return "", nil
 	}
@@ -172,13 +187,12 @@ func Shrink(a, b string) (string, error) {
 		return "", err
 	}
 
-	count := len(arr1)
-	for i := 0; i < count; i++ {
+	for i := 0; i < len(arr1); i++ {
+		k = arr1[i]
 		for _, v := range arr2 {
-			if arr1[i] == v {
+			if k == v {
 				arr1 = append(arr1[:i], arr1[i+1:]...)
 				i--
-				count--
 			}
 		}
 	}

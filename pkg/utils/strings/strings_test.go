@@ -174,7 +174,7 @@ func TestSliceToRange(t *testing.T) {
 		expected string
 	}{
 		{
-			arr:      []int{1, 2, 3, 4, 5, 7},
+			arr:      []int{1, 2, 2, 3, 4, 5, 7},
 			expected: "1-5,7",
 		},
 		{
@@ -252,8 +252,8 @@ func TestShrink(t *testing.T) {
 		},
 		{
 			str1:     "1-5,7",
-			str2:     "3-5,7",
-			expected: "1-2",
+			str2:     "1-5,7",
+			expected: "",
 		},
 		{
 			str1:          "1--5,7",

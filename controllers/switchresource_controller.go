@@ -36,10 +36,6 @@ type SwitchResourceReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-// +kubebuilder:rbac:groups=metal3.io,resources=switchresourcelimits,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=metal3.io,resources=switchresourcelimits/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups=metal3.io,resources=switchresourcelimits/finalizers,verbs=update
-
 // +kubebuilder:rbac:groups=metal3.io,resources=switchresources,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=metal3.io,resources=switchresources/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=metal3.io,resources=switchresources/finalizers,verbs=update

@@ -170,9 +170,15 @@ func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *mac
 		return machine.ResultContinue(v1alpha1.SwitchPortConfiguring, requeueAfterTime, err)
 	}
 
-	err = resourceLimit.Expansion(i.Status.Configuration)
-	if err != nil {
-		return machine.ResultContinue(v1alpha1.SwitchPortConfiguring, requeueAfterTime, err)
+	if resourceLimit.GetName() != "" {
+		err = resourceLimit.Expansion(i.Status.Configuration)
+		if err != nil {
+			return machine.ResultContinue(v1alpha1.SwitchPortConfiguring, requeueAfterTime, err)
+		}
+		err = info.Client.Status().Update(ctx, resourceLimit)
+		if err != nil {
+			return machine.ResultContinue(v1alpha1.SwitchPortConfiguring, requeueAfterTime, err)
+		}
 	}
 
 	return machine.ResultContinue(v1alpha1.SwitchPortActive, 0, nil)
@@ -234,11 +240,17 @@ func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machin
 	if err != nil {
 		return machine.ResultContinue(v1alpha1.SwitchPortCleaning, requeueAfterTime, err)
 	}
-	err = resourceLimit.Shrink(i.Status.Configuration)
-	if err != nil {
-		return machine.ResultContinue(v1alpha1.SwitchPortCleaning, requeueAfterTime, err)
-	}
 
+	if resourceLimit.GetName() != "" {
+		err = resourceLimit.Shrink(i.Status.Configuration)
+		if err != nil {
+			return machine.ResultContinue(v1alpha1.SwitchPortCleaning, requeueAfterTime, err)
+		}
+		err = info.Client.Status().Update(ctx, resourceLimit)
+		if err != nil {
+			return machine.ResultContinue(v1alpha1.SwitchPortCleaning, requeueAfterTime, err)
+		}
+	}
 	i.Status.Configuration = nil
 	i.Status.PortName = ""
 	return machine.ResultContinue(v1alpha1.SwitchPortIdle, 0, nil)
