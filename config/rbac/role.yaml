@@ -160,3 +160,29 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - metal3.io
+  resources:
+  - switchresources
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - metal3.io
+  resources:
+  - switchresources/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - metal3.io
+  resources:
+  - switchresources/status
+  verbs:
+  - get
+  - patch
+  - update

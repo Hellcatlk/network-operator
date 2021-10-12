@@ -2,6 +2,7 @@ package strings
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -39,6 +40,42 @@ func RangeToSlice(formatStr string) ([]int, error) {
 	}
 
 	return nums, nil
+}
+
+// SliceToRange transform [1,2,3,4,5,7] to "1-5,7"
+func SliceToRange(nums []int) string {
+	if len(nums) == 0 {
+		return ""
+	}
+	if len(nums) == 1 {
+		return strconv.Itoa(nums[0])
+	}
+	sort.Ints(nums)
+	formatStr := ""
+	var begin, end int
+	begin = nums[0]
+	end = nums[0]
+	for i := 1; i < len(nums); i++ {
+		if end == nums[i]-1 {
+			end = nums[i]
+			if i == (len(nums) - 1) {
+				formatStr = formatStr + strconv.Itoa(begin) + "-" + strconv.Itoa(end)
+			}
+		} else {
+			if begin == end {
+				formatStr = formatStr + strconv.Itoa(begin) + ","
+			} else {
+				formatStr = formatStr + strconv.Itoa(begin) + "-" + strconv.Itoa(end) + ","
+			}
+			begin = nums[i]
+			end = nums[i]
+			if i == (len(nums) - 1) {
+				formatStr = formatStr + strconv.Itoa(end)
+			}
+		}
+	}
+
+	return formatStr
 }
 
 // LastJSON find last json from string
@@ -90,4 +127,61 @@ func SliceDelete(slice *[]string, str string) bool {
 		}
 	}
 	return false
+}
+
+// Expansion combine the contents of A and B
+func Expansion(a, b string) (string, error) {
+	if a == "" {
+		return b, nil
+	}
+	if b == "" {
+		return a, nil
+	}
+
+	arr1, err := RangeToSlice(a)
+	if err != nil {
+		return "", err
+	}
+
+	arr2, err := RangeToSlice(b)
+	if err != nil {
+		return "", err
+	}
+
+	arr1 = append(arr1, arr2...)
+
+	return SliceToRange(arr1), nil
+}
+
+// Shrink remove B from the content of A
+func Shrink(a, b string) (string, error) {
+	if a == "" {
+		return "", nil
+	}
+	if b == "" {
+		return a, nil
+	}
+
+	arr1, err := RangeToSlice(a)
+	if err != nil {
+		return "", err
+	}
+
+	arr2, err := RangeToSlice(b)
+	if err != nil {
+		return "", err
+	}
+
+	count := len(arr1)
+	for i := 0; i < count; i++ {
+		for _, v := range arr2 {
+			if arr1[i] == v {
+				arr1 = append(arr1[:i], arr1[i+1:]...)
+				i--
+				count--
+			}
+		}
+	}
+
+	return SliceToRange(arr1), nil
 }

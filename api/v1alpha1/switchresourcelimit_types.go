@@ -17,62 +17,97 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/Hellcatlk/network-operator/pkg/utils/strings"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-// SwitchResourceLimitSpec defines the desired state of SwitchResourceLimit
-type SwitchResourceLimitSpec struct {
-	// Indicates the range of VLANs allowed
-	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
-	// +kubebuilder:default:="1-4096"
-	VLANRange string `json:"vlanRange,omitempty"`
+// FetchSwitchResource fetch the SwitchResource instance
+func (rl *SwitchResourceLimit) FetchSwitchResource(ctx context.Context, client client.Client) (*SwitchResource, error) {
+	if rl == nil {
+		return nil, fmt.Errorf("SwitchResourceLimit is nil")
+	}
+
+	instance := &SwitchResource{}
+	var err error
+	if rl.Status.SwitchResourceRef != nil {
+		err = client.Get(
+			ctx,
+			types.NamespacedName{
+				Name:      rl.Status.SwitchResourceRef.Name,
+				Namespace: rl.Status.SwitchResourceRef.Namespace,
+			},
+			instance,
+		)
+	}
+
+	return instance, err
 }
 
-// Verify configuration
-func (spec *SwitchResourceLimitSpec) Verify(configuration *SwitchPortConfiguration) error {
-	if spec == nil {
+func (sr *SwitchResourceLimit) Expansion(configuration *SwitchPortConfigurationSpec) error {
+	if configuration == nil {
 		return nil
 	}
-
-	if spec.VLANRange == "" {
-		return nil
-	}
-
-	// Get allowed vlan range
-	vlanRange, err := strings.RangeToSlice(spec.VLANRange)
-	if err != nil {
-		return err
-	}
-	allowed := make(map[int]struct{})
-	for _, vlan := range vlanRange {
-		allowed[vlan] = struct{}{}
-	}
-
-	// Get target vlan range
-	target, err := strings.RangeToSlice(spec.VLANRange)
-	if err != nil {
-		return err
-	}
-	if configuration.Spec.UntaggedVLAN != nil {
-		target = append(target, *configuration.Spec.UntaggedVLAN)
-	}
-
-	// Check vlan range
-	for _, vlan := range target {
-		_, existed := allowed[vlan]
-		if !existed {
-			return fmt.Errorf("vlan %d is out of permissible range", vlan)
+	var err error
+	useVLAN := configuration.VLANs
+	if configuration.UntaggedVLAN != nil {
+		useVLAN, err = strings.Expansion(configuration.VLANs, strconv.Itoa(*configuration.UntaggedVLAN))
+		if err != nil {
+			return err
 		}
+
 	}
+
+	result, err := strings.Expansion(sr.Status.UsedVLAN, useVLAN)
+	if err != nil {
+		return err
+	}
+
+	sr.Status.UsedVLAN = result
 
 	return nil
 }
 
+func (sr *SwitchResourceLimit) Shrink(configuration *SwitchPortConfigurationSpec) error {
+	if configuration == nil {
+		return nil
+	}
+	var err error
+	useVLAN := configuration.VLANs
+	if configuration.UntaggedVLAN != nil {
+		useVLAN, err = strings.Expansion(configuration.VLANs, strconv.Itoa(*configuration.UntaggedVLAN))
+		if err != nil {
+			return err
+		}
+
+	}
+	result, err := strings.Shrink(sr.Status.UsedVLAN, useVLAN)
+	if err != nil {
+		return err
+	}
+
+	sr.Status.UsedVLAN = result
+
+	return nil
+}
+
+// SwitchResourceLimitSpec defines the desired state of SwitchResourceLimit
+type SwitchResourceLimitSpec struct {
+}
+
 // SwitchResourceLimitStatus defines the observed state of SwitchResourceLimit
 type SwitchResourceLimitStatus struct {
+	// Indicates the range of VLANs allowed
+	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
+	// +kubebuilder:default:="1-4096"
+	VLANRange         string          `json:"vlanRange,omitempty"`
+	SwitchResourceRef *SwitchResource `json:"switchResourceRef"`
+	UsedVLAN          string          `json:"usedVLAN,omitempty"`
 }
 
 // +kubebuilder:object:root=true

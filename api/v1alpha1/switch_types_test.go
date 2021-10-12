@@ -2,6 +2,74 @@ package v1alpha1
 
 import "testing"
 
+func TestLimitVerify(t *testing.T) {
+	untaggedVLAN := 20
+	cases := []struct {
+		name          string
+		limit         *Limit
+		configuration *SwitchPortConfiguration
+		expectedError bool
+	}{
+		{
+			name:  "no limit",
+			limit: nil,
+			configuration: &SwitchPortConfiguration{
+				Spec: SwitchPortConfigurationSpec{
+					VLANs:        "1-10",
+					UntaggedVLAN: &untaggedVLAN,
+				},
+			},
+			expectedError: false,
+		},
+		{
+			name:  "no limit",
+			limit: &Limit{},
+			configuration: &SwitchPortConfiguration{
+				Spec: SwitchPortConfigurationSpec{
+					VLANs:        "1-10",
+					UntaggedVLAN: &untaggedVLAN,
+				},
+			},
+			expectedError: false,
+		},
+		{
+			name: "vlan range limit: 1-20",
+			limit: &Limit{
+				VLANRange: "1-20",
+			},
+			configuration: &SwitchPortConfiguration{
+				Spec: SwitchPortConfigurationSpec{
+					VLANs:        "1-10",
+					UntaggedVLAN: &untaggedVLAN,
+				},
+			},
+			expectedError: false,
+		},
+		{
+			name: "vlan range limit: 1-10",
+			limit: &Limit{
+				VLANRange: "1-10",
+			},
+			configuration: &SwitchPortConfiguration{
+				Spec: SwitchPortConfigurationSpec{
+					VLANs:        "1-10",
+					UntaggedVLAN: &untaggedVLAN,
+				},
+			},
+			expectedError: true,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			err := c.limit.VerifyConfiguration(c.configuration)
+			if (err != nil) != c.expectedError {
+				t.Errorf("Got unexpected error: %v", err)
+			}
+		})
+	}
+}
+
 func TestPortVerify(t *testing.T) {
 	untaggedVLAN := 20
 	cases := []struct {

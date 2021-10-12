@@ -136,16 +136,18 @@ func (sp *SwitchPort) FetchSwitchResourceLimit(ctx context.Context, client clien
 	if sp == nil {
 		return nil, fmt.Errorf("switch port is nil")
 	}
-
+	var err error
 	instance := &SwitchResourceLimit{}
-	err := client.Get(
-		ctx,
-		types.NamespacedName{
-			Name:      "user-limit",
-			Namespace: sp.Spec.Configuration.Namespace,
-		},
-		instance,
-	)
+	if sp.Spec.Configuration != nil {
+		err = client.Get(
+			ctx,
+			types.NamespacedName{
+				Name:      "user-limit",
+				Namespace: sp.Spec.Configuration.Namespace,
+			},
+			instance,
+		)
+	}
 
 	return instance, err
 }

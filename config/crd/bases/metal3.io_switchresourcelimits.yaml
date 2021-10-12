@@ -36,15 +36,82 @@ spec:
             type: object
           spec:
             description: SwitchResourceLimitSpec defines the desired state of SwitchResourceLimit
+            type: object
+          status:
+            description: SwitchResourceLimitStatus defines the observed state of SwitchResourceLimit
             properties:
+              switchResourceRef:
+                description: SwitchResource is the Schema for the switchresources
+                  API
+                properties:
+                  apiVersion:
+                    description: 'APIVersion defines the versioned schema of this
+                      representation of an object. Servers should convert recognized
+                      schemas to the latest internal value, and may reject unrecognized
+                      values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+                    type: string
+                  kind:
+                    description: 'Kind is a string value representing the REST resource
+                      this object represents. Servers may infer this from the endpoint
+                      the client submits requests to. Cannot be updated. In CamelCase.
+                      More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                    type: string
+                  metadata:
+                    type: object
+                  spec:
+                    description: SwitchResourceSpec defines the desired state of SwitchResource
+                    properties:
+                      tenantLimits:
+                        additionalProperties:
+                          description: TenantLimit indicates resource restrictions
+                            on tenants
+                          properties:
+                            namespace:
+                              type: string
+                            vlanRange:
+                              type: string
+                          type: object
+                        type: object
+                      vlanRange:
+                        description: Indicates the initial allocatable vlan range
+                        type: string
+                    type: object
+                  status:
+                    description: SwitchResourceStatus defines the observed state of
+                      SwitchResource
+                    properties:
+                      availableVLAN:
+                        description: Indicates the vlan range that the administrator
+                          can assign to the user currently.
+                        type: string
+                      error:
+                        description: The error message of the port
+                        type: string
+                      state:
+                        description: The current configuration status of the SwitchResource
+                        type: string
+                      tenantLimits:
+                        additionalProperties:
+                          description: TenantLimit indicates resource restrictions
+                            on tenants
+                          properties:
+                            namespace:
+                              type: string
+                            vlanRange:
+                              type: string
+                          type: object
+                        type: object
+                    type: object
+                type: object
+              usedVLAN:
+                type: string
               vlanRange:
                 default: 1-4096
                 description: Indicates the range of VLANs allowed
                 pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
                 type: string
-            type: object
-          status:
-            description: SwitchResourceLimitStatus defines the observed state of SwitchResourceLimit
+            required:
+            - switchResourceRef
             type: object
         type: object
     served: true
