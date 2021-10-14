@@ -34,17 +34,15 @@ func (rl *SwitchResourceLimit) FetchSwitchResource(ctx context.Context, client c
 	}
 
 	instance := &SwitchResource{}
-	var err error
-	if rl.Status.SwitchResourceRef != nil {
-		err = client.Get(
-			ctx,
-			types.NamespacedName{
-				Name:      rl.Status.SwitchResourceRef.Name,
-				Namespace: rl.Status.SwitchResourceRef.Namespace,
-			},
-			instance,
-		)
-	}
+
+	err := client.Get(
+		ctx,
+		types.NamespacedName{
+			Name:      rl.Status.SwitchResourceRef.Name,
+			Namespace: rl.Status.SwitchResourceRef.Namespace,
+		},
+		instance,
+	)
 
 	return instance, err
 }
@@ -105,9 +103,14 @@ type SwitchResourceLimitStatus struct {
 	// Indicates the range of VLANs allowed
 	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
 	// +kubebuilder:default:="1-4096"
-	VLANRange         string          `json:"vlanRange,omitempty"`
-	SwitchResourceRef *SwitchResource `json:"switchResourceRef"`
-	UsedVLAN          string          `json:"usedVLAN,omitempty"`
+	VLANRange         string            `json:"vlanRange,omitempty"`
+	SwitchResourceRef SwitchResourceRef `json:"switchResourceRef,omitempty"`
+	UsedVLAN          string            `json:"usedVLAN,omitempty"`
+}
+
+type SwitchResourceRef struct {
+	Namespace string `json:"namespace,omitempty"`
+	Name      string `json:"name,omitempty"`
 }
 
 // +kubebuilder:object:root=true

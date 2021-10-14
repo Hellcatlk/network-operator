@@ -24,6 +24,13 @@ func (r *SwitchResourceReconciler) noneHandler(ctx context.Context, info *machin
 
 	i.Status.AvailableVLAN = i.Spec.VLANRange
 
+	for _, limit := range i.Spec.TenantLimits {
+		err := limit.Verify(&i.Status)
+		if err != nil {
+			return machine.ResultContinue(v1alpha1.SwitchResourceNone, 0, err)
+		}
+	}
+
 	return machine.ResultContinue(v1alpha1.SwitchResourceVerifying, 0, nil)
 }
 
@@ -37,21 +44,23 @@ func (r *SwitchResourceReconciler) verifyingHandler(ctx context.Context, info *m
 	// Delete SwitchResourceLimit which isn't included i.Spec
 	for name, limit := range i.Status.TenantLimits {
 		_, exit := i.Spec.TenantLimits[name]
-		if !exit {
+		if !exit || !reflect.DeepEqual(i.Spec.TenantLimits[name], i.Status.TenantLimits[name]) {
 			sr, err := limit.FetchSwitchResourceLimit(ctx, info.Client)
 			if err != nil {
+				if errors.IsNotFound(err) {
+					continue
+				}
 				return machine.ResultContinue(v1alpha1.SwitchResourceVerifying, requeueAfterTime, err)
 			}
 			if sr.Status.UsedVLAN != "" {
 				err = fmt.Errorf("SwitchResourceLimit %s still has vlan %s being used and cannot be deleted", sr.Name, sr.Status.UsedVLAN)
 				return machine.ResultContinue(v1alpha1.SwitchResourceVerifying, requeueAfterTime, err)
 			}
-		}
-		if !exit || !reflect.DeepEqual(i.Spec.TenantLimits[name], i.Status.TenantLimits[name]) {
+
 			switchResourceLimit := &v1alpha1.SwitchResourceLimit{}
 			switchResourceLimit.Name = "user-limit"
 			switchResourceLimit.Namespace = limit.Namespace
-			err := info.Client.Delete(ctx, switchResourceLimit)
+			err = info.Client.Delete(ctx, switchResourceLimit)
 			if err != nil {
 				if errors.IsNotFound(err) {
 					continue
@@ -62,13 +71,6 @@ func (r *SwitchResourceReconciler) verifyingHandler(ctx context.Context, info *m
 			if err != nil {
 				return machine.ResultContinue(v1alpha1.SwitchResourceVerifying, 0, err)
 			}
-		}
-	}
-
-	for _, limit := range i.Spec.TenantLimits {
-		err := limit.Verify(&i.Status)
-		if err != nil {
-			return machine.ResultContinue(v1alpha1.SwitchResourceVerifying, 0, err)
 		}
 	}
 
@@ -85,7 +87,7 @@ func (r *SwitchResourceReconciler) creatingHandler(ctx context.Context, info *ma
 	}
 
 	// Create SwitchResourceLimit
-	for _, limit := range i.Spec.TenantLimits {
+	for name, limit := range i.Status.TenantLimits {
 		// Get switchResourceLimit
 		err := info.Client.Get(
 			ctx, types.NamespacedName{
@@ -105,14 +107,12 @@ func (r *SwitchResourceReconciler) creatingHandler(ctx context.Context, info *ma
 
 		err = limit.Verify(&i.Status)
 		if err != nil {
+			err = fmt.Errorf("cann't create switchResourceLimit for %s, %s", name, err)
 			return machine.ResultContinue(v1alpha1.SwitchResourceCreating, 0, err)
 		}
 		switchResourceLimit := &v1alpha1.SwitchResourceLimit{}
 		switchResourceLimit.Name = "user-limit"
 		switchResourceLimit.Namespace = limit.Namespace
-		switchResourceLimit.Status.VLANRange = limit.VLANRange
-		switchResourceLimit.Status.SwitchResourceRef.Name = i.Name
-		switchResourceLimit.Status.SwitchResourceRef.Namespace = i.Namespace
 
 		err = info.Client.Create(ctx, switchResourceLimit)
 		if err != nil {
@@ -120,6 +120,18 @@ func (r *SwitchResourceReconciler) creatingHandler(ctx context.Context, info *ma
 			if errors.IsAlreadyExists(err) {
 				continue
 			}
+			return machine.ResultContinue(v1alpha1.SwitchResourceCreating, requeueAfterTime, err)
+		}
+
+		switchResourceLimit.Status.VLANRange = limit.VLANRange
+		switchResourceLimit.Status.SwitchResourceRef = v1alpha1.SwitchResourceRef{
+			Name:      i.Name,
+			Namespace: i.Namespace,
+		}
+
+		err = r.Status().Update(ctx, switchResourceLimit)
+		if err != nil {
+			fmt.Println(err)
 			return machine.ResultContinue(v1alpha1.SwitchResourceCreating, requeueAfterTime, err)
 		}
 
@@ -168,7 +180,18 @@ func (r *SwitchResourceReconciler) runningHandler(ctx context.Context, info *mac
 
 func (r *SwitchResourceReconciler) deletingHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchResource)
-
+	for _, limit := range i.Status.TenantLimits {
+		switchResourceLimit := &v1alpha1.SwitchResourceLimit{}
+		switchResourceLimit.Name = "user-limit"
+		switchResourceLimit.Namespace = limit.Namespace
+		err := info.Client.Delete(ctx, switchResourceLimit)
+		if err != nil {
+			if errors.IsNotFound(err) {
+				continue
+			}
+			return machine.ResultContinue(v1alpha1.SwitchResourceDeleting, requeueAfterTime, err)
+		}
+	}
 	// Foreground delete
 	propagationPolicy := metav1.DeletePropagationForeground
 	err := info.Client.Delete(ctx, i, &client.DeleteOptions{PropagationPolicy: &propagationPolicy})
