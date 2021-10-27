@@ -40,3 +40,18 @@ jobs:
       - uses: actions/checkout@v2
       - name: docker
         run: make docker
+  test-integration:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: install kubernetes
+        uses: helm/kind-action@v1.2.0
+      - name: install CRDs
+        run: make install
+      - name: build image
+        run: make docker
+      - name: deploy controller
+        run: make deploy
+      - name: integration test
+        run: ./hack/test_integration.sh
