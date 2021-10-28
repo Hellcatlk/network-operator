@@ -82,18 +82,18 @@ func (a *ansible) GetPortAttr(ctx context.Context, port string) (*v1alpha1.Switc
 	}
 
 	return &v1alpha1.SwitchPortConfigurationSpec{
-		UntaggedVLAN: portConfiguration.VLAN,
-		VLANs:        portConfiguration.TrunkedVLANs,
+		UntaggedVLAN:    portConfiguration.VLAN,
+		TaggedVLANRange: portConfiguration.TrunkedVLANs,
 	}, nil
 }
 
 // SetPortAttr set the configuration to the port
 func (a *ansible) SetPortAttr(ctx context.Context, port string, configuration *v1alpha1.SwitchPortConfigurationSpec) error {
-	if configuration.VLANs == "" {
+	if configuration.TaggedVLANRange == "" {
 		return a.configureAccessPort(port, configuration.UntaggedVLAN)
 	}
 
-	vlans, err := ustrings.RangeToSlice(configuration.VLANs)
+	vlans, err := ustrings.RangeToSlice(configuration.TaggedVLANRange)
 	if err != nil {
 		return err
 	}

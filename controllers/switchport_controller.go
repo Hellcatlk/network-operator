@@ -83,7 +83,7 @@ func (r *SwitchPortReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		map[machine.StateType]machine.Handler{
 			metal3iov1alpha1.SwitchPortNone:        r.noneHandler,
 			metal3iov1alpha1.SwitchPortIdle:        r.idleHandler,
-			metal3iov1alpha1.SwitchPortVerifying:   r.verifyingHandler,
+			metal3iov1alpha1.SwitchPortValidating:  r.validatingHandler,
 			metal3iov1alpha1.SwitchPortConfiguring: r.configuringHandler,
 			metal3iov1alpha1.SwitchPortActive:      r.activeHandler,
 			metal3iov1alpha1.SwitchPortCleaning:    r.cleaningHandler,

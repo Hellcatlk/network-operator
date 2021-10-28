@@ -32,7 +32,7 @@ func (c *fakeClient) Get(ctx context.Context, key types.NamespacedName, obj clie
 				},
 				Ports: map[string]*v1alpha1.Port{
 					"SwitchPort": {
-						Name: "test",
+						PhysicalPortName: "test",
 					},
 				},
 			},
@@ -77,7 +77,7 @@ func TestSwitchPortStateMachine(t *testing.T) {
 		map[machine.StateType]machine.Handler{
 			v1alpha1.SwitchPortNone:        r.noneHandler,
 			v1alpha1.SwitchPortIdle:        r.idleHandler,
-			v1alpha1.SwitchPortVerifying:   r.verifyingHandler,
+			v1alpha1.SwitchPortValidating:  r.validatingHandler,
 			v1alpha1.SwitchPortConfiguring: r.configuringHandler,
 			v1alpha1.SwitchPortActive:      r.activeHandler,
 			v1alpha1.SwitchPortCleaning:    r.cleaningHandler,
@@ -105,13 +105,13 @@ func TestSwitchPortStateMachine(t *testing.T) {
 			expectedState: v1alpha1.SwitchPortIdle,
 		},
 		{
-			name:                  "Idle -> Verifying",
+			name:                  "Idle -> Validating",
 			configurationRefExist: true,
 			expectedDirty:         machine.Status,
-			expectedState:         v1alpha1.SwitchPortVerifying,
+			expectedState:         v1alpha1.SwitchPortValidating,
 		},
 		{
-			name:                  "Verifying -> Configuring",
+			name:                  "Validating -> Configuring",
 			configurationRefExist: true,
 			expectedDirty:         machine.Status,
 			expectedState:         v1alpha1.SwitchPortConfiguring,

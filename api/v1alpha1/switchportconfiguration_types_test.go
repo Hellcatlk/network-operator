@@ -30,30 +30,30 @@ func TestIsEqual(t *testing.T) {
 		},
 		{
 			target: &SwitchPortConfigurationSpec{
-				VLANs: "1-10,11",
+				TaggedVLANRange: "1-10,11",
 			},
 			actual: &SwitchPortConfigurationSpec{
-				VLANs: "1-12",
+				TaggedVLANRange: "1-12",
 			},
 			expected: false,
 		},
 		{
 			target: &SwitchPortConfigurationSpec{
-				VLANs: "1-10,11,12",
+				TaggedVLANRange: "1-10,11,12",
 			},
 			actual: &SwitchPortConfigurationSpec{
-				VLANs: "1-12",
+				TaggedVLANRange: "1-12",
 			},
 			expected: true,
 		},
 		{
 			target: &SwitchPortConfigurationSpec{
-				UntaggedVLAN: new(int),
-				VLANs:        "1-10,11,12",
+				UntaggedVLAN:    new(int),
+				TaggedVLANRange: "1-10,11,12",
 			},
 			actual: &SwitchPortConfigurationSpec{
-				UntaggedVLAN: new(int),
-				VLANs:        "1-12",
+				UntaggedVLAN:    new(int),
+				TaggedVLANRange: "1-12",
 			},
 			expected: true,
 		},

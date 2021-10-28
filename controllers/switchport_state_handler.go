@@ -68,11 +68,11 @@ func (r *SwitchPortReconciler) idleHandler(ctx context.Context, info *machine.Re
 		return machine.ResultComplete(v1alpha1.SwitchPortIdle, nil)
 	}
 
-	return machine.ResultContinue(v1alpha1.SwitchPortVerifying, 0, nil)
+	return machine.ResultContinue(v1alpha1.SwitchPortValidating, 0, nil)
 }
 
-// verifyingHandler verify the configuration meets the requirements of the switch or not
-func (r *SwitchPortReconciler) verifyingHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
+// validatingHandler verify the configuration meets the requirements of the switch or not
+func (r *SwitchPortReconciler) validatingHandler(ctx context.Context, info *machine.ReconcileInfo, instance interface{}) (machine.StateType, ctrl.Result, error) {
 	i := instance.(*v1alpha1.SwitchPort)
 
 	if !i.DeletionTimestamp.IsZero() || i.Spec.Configuration == nil {
@@ -82,42 +82,36 @@ func (r *SwitchPortReconciler) verifyingHandler(ctx context.Context, info *machi
 	// Fetch switch
 	owner, err := i.FetchOwnerReference(ctx, info.Client)
 	if err != nil {
-		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
+		return machine.ResultContinue(v1alpha1.SwitchPortValidating, requeueAfterTime, err)
 	}
 
 	// Fetch configuration
 	configuration, err := i.Spec.Configuration.Fetch(ctx, info.Client)
 	if err != nil {
-		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
-	}
-
-	// Check switch limit
-	err = owner.Spec.Limit.VerifyConfiguration(configuration)
-	if err != nil {
-		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
+		return machine.ResultContinue(v1alpha1.SwitchPortValidating, requeueAfterTime, err)
 	}
 
 	// Check switch port limit
 	err = owner.Status.Ports[i.Name].Verify(configuration)
 	if err != nil {
-		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
+		return machine.ResultContinue(v1alpha1.SwitchPortValidating, requeueAfterTime, err)
 	}
 
 	// Check user limit
 	resourceLimit, err := i.FetchSwitchResourceLimit(ctx, info.Client)
 	if err != nil && !errors.IsNotFound(err) {
-		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
+		return machine.ResultContinue(v1alpha1.SwitchPortValidating, requeueAfterTime, err)
 	}
 	if resourceLimit != nil {
 		resource, err := resourceLimit.FetchSwitchResource(ctx, info.Client)
 		if err != nil {
-			return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
+			return machine.ResultContinue(v1alpha1.SwitchPortValidating, requeueAfterTime, err)
 		}
 		for _, limit := range resource.Status.TenantLimits {
 			if limit.Namespace == resourceLimit.Namespace {
 				err = limit.VerifyConfiguration(configuration)
 				if err != nil {
-					return machine.ResultContinue(v1alpha1.SwitchPortVerifying,
+					return machine.ResultContinue(v1alpha1.SwitchPortValidating,
 						requeueAfterTime,
 						fmt.Errorf("%s, %s", err, "please check `SwitchResourceLimit/user-limit`"),
 					)
@@ -130,16 +124,16 @@ func (r *SwitchPortReconciler) verifyingHandler(ctx context.Context, info *machi
 	// Check connection with switch
 	backend, err := getSwitchBackend(ctx, info.Client, owner)
 	if err != nil {
-		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
+		return machine.ResultContinue(v1alpha1.SwitchPortValidating, requeueAfterTime, err)
 	}
 	err = backend.IsAvailable()
 	if err != nil {
-		return machine.ResultContinue(v1alpha1.SwitchPortVerifying, requeueAfterTime, err)
+		return machine.ResultContinue(v1alpha1.SwitchPortValidating, requeueAfterTime, err)
 	}
 
 	// Copy configuration to Status.Configuration
 	i.Status.Configuration = &configuration.Spec
-	i.Status.PortName = owner.Status.Ports[i.Name].Name
+	i.Status.PhysicalPortName = owner.Status.Ports[i.Name].PhysicalPortName
 	return machine.ResultContinue(v1alpha1.SwitchPortConfiguring, 0, nil)
 }
 
@@ -165,7 +159,7 @@ func (r *SwitchPortReconciler) configuringHandler(ctx context.Context, info *mac
 	if err != nil {
 		return machine.ResultContinue(v1alpha1.SwitchPortConfiguring, requeueAfterTime, err)
 	}
-	err = backend.SetPortAttr(ctx, i.Status.PortName, i.Status.Configuration)
+	err = backend.SetPortAttr(ctx, i.Status.PhysicalPortName, i.Status.Configuration)
 	if err != nil {
 		return machine.ResultContinue(v1alpha1.SwitchPortConfiguring, requeueAfterTime, err)
 	}
@@ -211,7 +205,7 @@ func (r *SwitchPortReconciler) activeHandler(ctx context.Context, info *machine.
 	if err != nil {
 		return machine.ResultContinue(v1alpha1.SwitchPortActive, requeueAfterTime, err)
 	}
-	actualConfiguration, err := backend.GetPortAttr(ctx, i.Status.PortName)
+	actualConfiguration, err := backend.GetPortAttr(ctx, i.Status.PhysicalPortName)
 	if err != nil || i.Status.Configuration.IsEqual(actualConfiguration) {
 		return machine.ResultContinue(v1alpha1.SwitchPortActive, requeueAfterTime, err)
 	}
@@ -236,7 +230,7 @@ func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machin
 	if err != nil {
 		return machine.ResultContinue(v1alpha1.SwitchPortCleaning, requeueAfterTime, err)
 	}
-	err = backend.ResetPort(ctx, i.Status.PortName, i.Status.Configuration)
+	err = backend.ResetPort(ctx, i.Status.PhysicalPortName, i.Status.Configuration)
 	if err != nil {
 		return machine.ResultContinue(v1alpha1.SwitchPortCleaning, requeueAfterTime, err)
 	}
@@ -252,7 +246,7 @@ func (r *SwitchPortReconciler) cleaningHandler(ctx context.Context, info *machin
 		}
 	}
 	i.Status.Configuration = nil
-	i.Status.PortName = ""
+	i.Status.PhysicalPortName = ""
 	return machine.ResultContinue(v1alpha1.SwitchPortIdle, 0, nil)
 }
 
