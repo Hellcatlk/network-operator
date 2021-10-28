@@ -52,9 +52,9 @@ func (sr *SwitchResourceLimit) Expansion(configuration *SwitchPortConfigurationS
 		return nil
 	}
 	var err error
-	useVLAN := configuration.VLANs
+	useVLAN := configuration.TaggedVLANRange
 	if configuration.UntaggedVLAN != nil {
-		useVLAN, err = strings.Expansion(configuration.VLANs, strconv.Itoa(*configuration.UntaggedVLAN))
+		useVLAN, err = strings.Expansion(configuration.TaggedVLANRange, strconv.Itoa(*configuration.UntaggedVLAN))
 		if err != nil {
 			return err
 		}
@@ -76,9 +76,9 @@ func (sr *SwitchResourceLimit) Shrink(configuration *SwitchPortConfigurationSpec
 		return nil
 	}
 	var err error
-	useVLAN := configuration.VLANs
+	useVLAN := configuration.TaggedVLANRange
 	if configuration.UntaggedVLAN != nil {
-		useVLAN, err = strings.Expansion(configuration.VLANs, strconv.Itoa(*configuration.UntaggedVLAN))
+		useVLAN, err = strings.Expansion(configuration.TaggedVLANRange, strconv.Itoa(*configuration.UntaggedVLAN))
 		if err != nil {
 			return err
 		}

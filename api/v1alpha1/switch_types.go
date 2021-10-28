@@ -72,24 +72,13 @@ func (ref *SwitchProviderReference) Fetch(ctx context.Context, client client.Cli
 	return instance, err
 }
 
-// Limit of switch resource
-type Limit struct {
-	// Indicates the range of VLANs allowed
-	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
-	// +kubebuilder:default:="1-4096"
-	VLANRange string `json:"vlanRange,omitempty"`
-}
-
 // Verify configuration
-func (l *Limit) VerifyConfiguration(configuration *SwitchPortConfiguration) error {
-	if l == nil {
-		return nil
-	}
-	if l.VLANRange == "" {
+func VerifyConfiguration(VLANRange string, configuration *SwitchPortConfiguration) error {
+	if VLANRange == "" {
 		return nil
 	}
 	// Get allowed vlan range
-	vlanRange, err := strings.RangeToSlice(l.VLANRange)
+	vlanRange, err := strings.RangeToSlice(VLANRange)
 	if err != nil {
 		return err
 	}
@@ -99,7 +88,7 @@ func (l *Limit) VerifyConfiguration(configuration *SwitchPortConfiguration) erro
 	}
 
 	// Get target vlan range
-	target, err := strings.RangeToSlice(l.VLANRange)
+	target, err := strings.RangeToSlice(VLANRange)
 	if err != nil {
 		return err
 	}
@@ -121,10 +110,15 @@ func (l *Limit) VerifyConfiguration(configuration *SwitchPortConfiguration) erro
 // Port indicates the specific restriction on the port
 type Port struct {
 	// Describes the port name on the device
-	Name string `json:"name"`
+	PhysicalPortName string `json:"physicalPortName"`
 
 	// True if this port is not available, false otherwise
 	Disabled bool `json:"disabled,omitempty"`
+
+	// Indicates the range of VLANs allowed
+	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
+	// +kubebuilder:default:="1-4096"
+	VLANRange string `json:"vlanRange,omitempty"`
 
 	// True if this port can be used as a trunk port, false otherwise
 	TrunkDisabled bool `json:"trunkDisable,omitempty"`
@@ -136,7 +130,7 @@ func (p *Port) Verify(configuration *SwitchPortConfiguration) error {
 		return fmt.Errorf("the port is nil")
 	}
 
-	if p.Name == "" {
+	if p.PhysicalPortName == "" {
 		return fmt.Errorf("the port's name can't be empty")
 	}
 
@@ -144,11 +138,15 @@ func (p *Port) Verify(configuration *SwitchPortConfiguration) error {
 		return nil
 	}
 
+	if err := VerifyConfiguration(p.VLANRange, configuration); err != nil {
+		return err
+	}
+
 	if p.Disabled {
 		return fmt.Errorf("the port is disabled")
 	}
 
-	if p.TrunkDisabled && configuration.Spec.VLANs != "" {
+	if p.TrunkDisabled && configuration.Spec.TaggedVLANRange != "" {
 		return fmt.Errorf("the port can be used as a trunk port")
 	}
 
@@ -159,9 +157,6 @@ func (p *Port) Verify(configuration *SwitchPortConfiguration) error {
 type SwitchSpec struct {
 	// The reference of provider
 	Provider *SwitchProviderReference `json:"provider"`
-
-	// Limit of switch resource
-	Limit *Limit `json:"limit,omitempty"`
 
 	// Restricted ports in the switch
 	Ports map[string]*Port `json:"ports,omitempty"`

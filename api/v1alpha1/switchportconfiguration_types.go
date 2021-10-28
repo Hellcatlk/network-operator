@@ -57,8 +57,8 @@ func (ref *SwitchPortConfigurationReference) Fetch(ctx context.Context, client c
 
 // ACL describes the rules applied in the switch
 type ACL struct {
-	// +kubebuilder:validation:Enum=ipv4;ipv6
-	Type string `json:"type,omitempty"`
+	// +kubebuilder:validation:Enum=4;6
+	IpVersion string `json:"ipVersion,omitempty"`
 
 	// +kubebuilder:validation:Enum=allow;deny
 	Action string `json:"action,omitempty"`
@@ -66,15 +66,15 @@ type ACL struct {
 	// +kubebuilder:validation:Enum=TCP;UDP;ICMP;ALL
 	Protocol string `json:"protocol,omitempty"`
 
-	Src string `json:"src,omitempty"`
+	SourceIP string `json:"sourceIP,omitempty"`
 
 	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
-	SrcPortRange string `json:"srcPortRange,omitempty"`
+	SourcePortRange string `json:"sourcePortRange,omitempty"`
 
-	Des string `json:"des,omitempty"`
+	DestinationIP string `json:"destinationIP,omitempty"`
 
 	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
-	DesPortRange string `json:"desPortRange,omitempty"`
+	DestinationPortRange string `json:"destinationPortRange,omitempty"`
 }
 
 // SwitchPortConfigurationSpec defines the desired state of SwitchPortConfiguration
@@ -88,7 +88,7 @@ type SwitchPortConfigurationSpec struct {
 	// or use separate numbers. You can use `,` to combine the above two methods, for example:
 	// `1-10,11,13-20`
 	// +kubebuilder:validation:Pattern=`([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*`
-	VLANs string `json:"vlans,omitempty"`
+	TaggedVLANRange string `json:"taggedVLANRange,omitempty"`
 
 	// Disable port
 	Disable bool `json:"disable,omitempty"`
@@ -106,11 +106,11 @@ func (target *SwitchPortConfigurationSpec) IsEqual(actual *SwitchPortConfigurati
 		return true
 	}
 
-	rangeTarget, err := strings.RangeToSlice(target.VLANs)
+	rangeTarget, err := strings.RangeToSlice(target.TaggedVLANRange)
 	if err != nil {
 		return false
 	}
-	rangeActual, err := strings.RangeToSlice(actual.VLANs)
+	rangeActual, err := strings.RangeToSlice(actual.TaggedVLANRange)
 	if err != nil {
 		return false
 	}
@@ -119,9 +119,9 @@ func (target *SwitchPortConfigurationSpec) IsEqual(actual *SwitchPortConfigurati
 	}
 
 	targetCopy := target.DeepCopy()
-	targetCopy.VLANs = ""
+	targetCopy.TaggedVLANRange = ""
 	actualCopy := actual.DeepCopy()
-	actualCopy.VLANs = ""
+	actualCopy.TaggedVLANRange = ""
 	return reflect.DeepEqual(targetCopy, actualCopy)
 }
 

@@ -72,7 +72,7 @@ type SwitchPortStatus struct {
 	Configuration *SwitchPortConfigurationSpec `json:"configuration,omitempty"`
 
 	// The name of physics port
-	PortName string `json:"portName,omitempty"`
+	PhysicalPortName string `json:"physicalPortName,omitempty"`
 }
 
 const (
@@ -82,8 +82,8 @@ const (
 	// SwitchPortIdle means we are wait for configuration for the port
 	SwitchPortIdle machine.StateType = "Idle"
 
-	// SwitchPortVerifying means we are verify the configuration for the port
-	SwitchPortVerifying machine.StateType = "Verifying"
+	// SwitchPortValidating means we are validating the configuration for the port
+	SwitchPortValidating machine.StateType = "Validating"
 
 	// SwitchPortConfiguring means we are removing configuration from the port
 	SwitchPortConfiguring machine.StateType = "Configuring"

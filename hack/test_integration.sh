@@ -67,7 +67,7 @@ spec:
     name: ansible-example
   ports:
     \"switchport-example\":
-      name: \"port-test\"
+      physicalPortName: \"port-test\"
 ---
 apiVersion: metal3.io/v1alpha1
 kind: SwitchPortConfiguration

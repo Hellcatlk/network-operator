@@ -47,10 +47,15 @@ spec:
                       - allow
                       - deny
                       type: string
-                    des:
+                    destinationIP:
                       type: string
-                    desPortRange:
+                    destinationPortRange:
                       pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
+                      type: string
+                    ipVersion:
+                      enum:
+                      - 4
+                      - 6
                       type: string
                     protocol:
                       enum:
@@ -59,15 +64,10 @@ spec:
                       - ICMP
                       - ALL
                       type: string
-                    src:
+                    sourceIP:
                       type: string
-                    srcPortRange:
+                    sourcePortRange:
                       pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
-                      type: string
-                    type:
-                      enum:
-                      - ipv4
-                      - ipv6
                       type: string
                   type: object
                 maxItems: 10
@@ -75,14 +75,14 @@ spec:
               disable:
                 description: Disable port
                 type: boolean
-              untaggedVLAN:
-                type: integer
-              vlans:
+              taggedVLANRange:
                 description: 'The range of tagged vlans. You can use `-` to connect
                   two numbers to express the range or use separate numbers. You can
                   use `,` to combine the above two methods, for example: `1-10,11,13-20`'
                 pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
                 type: string
+              untaggedVLAN:
+                type: integer
             type: object
           status:
             description: SwitchPortConfigurationStatus defines the observed state

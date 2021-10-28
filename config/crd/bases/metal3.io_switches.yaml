@@ -45,15 +45,6 @@ spec:
           spec:
             description: SwitchSpec defines the desired state of Switch
             properties:
-              limit:
-                description: Limit of switch resource
-                properties:
-                  vlanRange:
-                    default: 1-4096
-                    description: Indicates the range of VLANs allowed
-                    pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
-                    type: string
-                type: object
               ports:
                 additionalProperties:
                   description: Port indicates the specific restriction on the port
@@ -61,15 +52,20 @@ spec:
                     disabled:
                       description: True if this port is not available, false otherwise
                       type: boolean
-                    name:
+                    physicalPortName:
                       description: Describes the port name on the device
                       type: string
                     trunkDisable:
                       description: True if this port can be used as a trunk port,
                         false otherwise
                       type: boolean
+                    vlanRange:
+                      default: 1-4096
+                      description: Indicates the range of VLANs allowed
+                      pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
+                      type: string
                   required:
-                  - name
+                  - physicalPortName
                   type: object
                 description: Restricted ports in the switch
                 type: object
@@ -106,15 +102,20 @@ spec:
                     disabled:
                       description: True if this port is not available, false otherwise
                       type: boolean
-                    name:
+                    physicalPortName:
                       description: Describes the port name on the device
                       type: string
                     trunkDisable:
                       description: True if this port can be used as a trunk port,
                         false otherwise
                       type: boolean
+                    vlanRange:
+                      default: 1-4096
+                      description: Indicates the range of VLANs allowed
+                      pattern: ([0-9]{1,})|([0-9]{1,}-[0-9]{1,})(,([0-9]{1,})|([0-9]{1,}-[0-9]{1,}))*
+                      type: string
                   required:
-                  - name
+                  - physicalPortName
                   type: object
                 description: Restricted ports in the switch
                 type: object
