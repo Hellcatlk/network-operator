@@ -11,9 +11,16 @@ Network operators is a kubernetes API for managing network devices.
 2. Run `make run`(run the controller locally) or `make docker && make deploy`(run the controller as a deployment).
 3. Apply CRs, [here](./config/samples) are some samples.
 
-**NOTE**: If you execute `make deploy` in a multi-node cluster environment, you need to upload the image to the image repository.
+## Resources
 
-**NOTE**: In most cases you needn't to apply `SwitchPort` manually, `Switch` controller will create it.
+* [API documentation](docs/api.md)
+* [Testing](docs/testing.md)
+
+### Important Notes
+
+If you execute `make deploy` in a multi-node cluster environment, you need to upload the image to the image repository.
+
+In most cases you needn't to apply `SwitchPort` manually, `Switch` controller will create it.
 
 ## Supported backend
 
