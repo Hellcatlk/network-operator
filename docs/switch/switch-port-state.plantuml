@@ -12,12 +12,12 @@
 "Validating*" --> [ The configuration meets the\n requirements of the switch ] "Configuring*"
 
 "Configuring*" --> [ Configuration finished ] "Active*"
-"Configuring*" --> [ spec.configurationRef is nil ||\n !instance.DeletionTimestamp.IsZero() ] "Cleaning*"
+"Configuring*" --> [ spec.configurationRef is nil ||\n !instance.DeletionTimestamp.IsZero() ] "Deconfiguring*"
 
 "Active*" --> [ Saved configuration and\n actual configuration mismatch ] "Configuring*"
-"Active*" --> [ spec.configurationRef is nil ||\n !instance.DeletionTimestamp.IsZero() ] "Cleaning*"
+"Active*" --> [ spec.configurationRef is nil ||\n !instance.DeletionTimestamp.IsZero() ] "Deconfiguring*"
 
-"Cleaning*" --> [ Clean finished ] "Idle"
+"Deconfiguring*" --> [ Clean finished ] "Idle"
 
 "Deleting" --> [ CR have been removed ] (*)
 

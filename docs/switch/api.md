@@ -1,70 +1,202 @@
 # API and Resource Definitions
 
-## Port
+## Switch
 
-**Port** CR represents a specific port of a network device, including port information,
+The **Switch** describes a switch.
+
+### Switch spec
+
+The `Switch's` spec defines the desire state of the switch.
+
+#### Provider
+
+A reference to a `SwitchProvider` contains the login information and back-end method of the switch.
+
+#### Ports
+
+Ports is a map whose key is the name of a SwitchPort CR and value is some info and limit of the port that SwitchPort CR represents.
+
+* Port -- Indicates the specific restriction on the port.
+  * physicalPortName -- The real port name in the switch.
+  * disabled -- True if this port is not available, false otherwise.
+  * vlanRange -- Indicates the range of VLANs allowed by this port in the switch.
+  * trunkDisable -- True if this port can be used as a trunk port, false otherwise.
+
+### Switch status
+
+ The `Switch's` status which represents the switch's current state.
+
+ #### State
+
+ The current configuration status of the switch.
+
+ #### Provider
+
+ The reference of switch provider.
+
+ #### Ports
+
+ Restricted ports in the switch.
+
+ #### Error
+
+The error message of the port.
+
+Example Switch:
+
+``` yaml
+apiVersion: metal3.io/v1alpha1
+kind: Switch
+metadata:
+  creationTimestamp: "2021-10-26T02:36:49Z"
+  finalizers:
+  - metal3.io
+  generation: 1
+  name: switch-example
+  namespace: default
+  resourceVersion: "2835135"
+  uid: b2d17d19-a74d-4c9d-9a30-be20312bd207
+spec:
+  ports:
+    switchport-example:
+      physicalPortName: br-test
+      vlanRange: 1-100
+  provider:
+    kind: AnsibleSwitch
+    name: ansible-example
+    namespace: default
+status:
+  ports:
+    switchport-example:
+      physicalPortName: br-test
+      vlanRange: 1-100
+  provider:
+    kind: AnsibleSwitch
+    name: ansible-example
+    namespace: default
+  state: Running
+```
+
+## AnsibleSwitch
+
+Use ansible as the backend to connect to the configuration switch.
+
+#### os
+
+The `os` is operator system of switch.
+
+#### ip
+
+The `ip` is ipv4 address of the switch.
+
+#### bridge
+
+Indicates the bridge where the port to be configured is located.Only for ovs switch.
+
+#### port
+
+The `port` is which port we can `ssh` to the switch.
+
+#### credentialsSecret
+
+The `credentialsSecret` is a secret resource contains username and password for the switch.
+
+Example AnsibleSwitch:
+
+```yaml
+apiVersion: metal3.io/v1alpha1
+kind: AnsibleSwitch
+metadata:
+  creationTimestamp: "2021-10-22T05:28:44Z"
+  generation: 3
+  name: ansible-example
+  namespace: default
+  resourceVersion: "2835123"
+  uid: 04c971ab-2f46-4d8f-8597-c3a71f436c0e
+spec:
+  bridge: br-test
+  credentials:
+    name: switch-example-secret
+    namespace: default
+  host: 192.168.0.1
+  os: openvswitch
+
+```
+
+## SwitchPort
+
+**SwitchPort** CR represents a specific port of a network device, including port information,
 the performance of the network device to which it belongs, and the performance of
 the connected network interface card.
 
-### Port Spec
+### SwitchPort Spec
 
-The *Port Spec* defines the port on which network device and what configuration should be configured.
+The *SwitchPort Spec* defines the port on which network device and what configuration should be configured.
 
-#### portID
+#### configuration
 
-The `portID` field is the port's ID on network device, it may look like `interface 0/14`.
+The reference of PortConfiguration CR.
 
-#### portConfigurationRef
+### SwitchPort status
+
+ The `SwitchPort's` status which represents the switchPort's current state.
+
+#### physicalPortName
+
+The `physicalPortName` field is the port's name on network device.
+
+#### configuration
 
 A reference to define which configuration should be configured.
-
-#### deviceRef
-
-A reference to define this port on which network device.
-
-### Port Status
 
 #### state
 
 The `state` shows the progress of configuring the network.
 
-* *\<empty string\>* -- means we haven't do any thing.
-* *Created* -- Means the port can be configured.
-* *Configuring* -- Means we are configuring configuration for the port.
-* *Configured* -- Means the port have been configured, you can use it now.
-* *deleting* -- Means we are removing configuration from the port.
-* *deleted* -- Means now configuration of the port have been removed.
+* *\<empty string\>* -- Indicates the status of the Port CR when it was first created.
+* *Idle* -- Indicates waiting for spec.configurationRef to be assigned.
+* *Configuring* -- Indicates that the port is being configured.
+* *Active* -- Indicates that the port configuration is complete.
+* *Deconfiguring* -- Indicates that the port configuration is being cleared.
+* *Deletingted* -- Indicates that the port configuration has been cleared.
 
-#### configurationRef
+#### error
 
-<!-- TODO -->
+The error message of the port.
 
-### Port Example
+#### deviceRef
+
+A reference to define this port on which network device.
+
+Example SwitchPort:
 
 ```yaml
-metaData:
-  name: port0
-  ownerRef:
-    name: bm0
-    kind: BareMetalHost
-    namespace: default
+apiVersion: metal3.io/v1alpha1
+kind: SwitchPort
+metadata:
+  creationTimestamp: "2021-10-26T02:36:49Z"
   finalizers:
-spec:
-  portID: 0
-  portConfigurationRef:
-    name: sc1
-    kind: SwitchPortConfiguration
-    namespace: default
-  deviceRef:
-    name: switch0
+  - metal3.io
+  generation: 4
+  name: switchport-example
+  namespace: default
+  ownerReferences:
+  - apiVersion: metal3.io/v1alpha1
+    blockOwnerDeletion: true
     kind: Switch
+    name: switch-example
+    uid: b2d17d19-a74d-4c9d-9a30-be20312bd207
+  resourceVersion: "3791497"
+  uid: d8e68088-8da6-436c-a683-2f6959ae84b6
+spec:
+  configuration:
+    name: switchportconfiguration-example
     namespace: default
 status:
-  state: Configured
-  configurationRef:
-    name: sc1
-    kind: SwitchPortConfiguration
-    namespace: default
+  configuration:
+    untaggedVLAN: 11
+  portName: br-test
+  state: Configuring
 ```
 
 ## SwitchPortConfiguration
@@ -81,110 +213,140 @@ The `acl` defines access control list of switch's port.
 
 The sub-fields are
 
-<!-- TODO -->
-* *type* --
+* *ipVersion* --
 * *action* --
 * *protocol* --
-* *src* --
-* *srcPortRange* --
-* *des* --
-* *desPortRange* --
+* *sourceIP* --
+* *sourcePortRange* --
+* *destinationIP* --
+* *destinationPortRange* --
 
-#### type
+#### untaggedVLAN
 
-Indicates which mode this port should be set to. Valid values are *access*, *trunk* or *hybrid*,
- default value is *access*.
+Indicates which VLAN this port should be placed in.
 
-#### vlans
+#### taggedVLANRange
 
-The `vlans` define port that use the configure should be configured to which vlans.
+The range of tagged vlans.
 
-### SwitchPortConfiguration Example
+#### disable
+
+Disable port if true.
+
+Example SwitchPort:
 
 ```yaml
-apiVersion: v1alpha1
-metaData:
-  name: sc1
+apiVersion: metal3.io/v1alpha1
+kind: SwitchPortConfiguration
+metadata:
+  creationTimestamp: "2021-10-22T05:28:44Z"
+  generation: 1
+  name: switchportconfiguration-example
   namespace: default
-  finalizers:
-    - m3m1
+  resourceVersion: "1005794"
+  uid: b37f856d-0faa-408d-ba0c-cde9b3718382
 spec:
-  acl:
-    - type: // ipv4, ipv6
-      action: // allow, deny
-      protocol: // TCP, UDP, ICMP, ALL
-      src: // xxx.xxx.xxx.xxx/xx
-      srcPortRange: // 22, 22-30
-      des: // xxx.xxx.xxx.xxx/xx
-      desPortRange: // 22, 22-30
-  type: accesss
-  vlans:
-    - id: 2
-    - id: 3
+  untaggedVLAN: 11
 ```
 
-## Switch
+## SwitchResourceLimit
 
-The **Switch** describes a switch.
+`SwitchResourceLimit` represents information about the resources currently
+available for the tenant in the switch.
+It is created by the `SwitchResource` controller according to the
+administrator's setting in the `SwitchResource`.
 
-### Switch spec
+### SwitchResourceLimit status
 
-The `spec` contains the connection information for the switch.
+The `SwitchResourceLimit's` status which represents the SwitchResourceLimit's current state.
 
-#### os
+#### vlanRange
 
-The `os` is operator system of switch.
+Indicates the range of VLANs allowed by the user.
 
-#### ip
+#### switchResourceRef
 
-The `ip` is ipv4 address of the switch.
+A reference to a switch.
 
-#### port
+#### usedVLAN
 
-The `port` is which port we can `ssh` to the switch.
+Indicates the vlan that the user has used.
 
-#### secret
 
-The `secret` is a secret resource contains username and password for the switch.
+Example SwitchResourceLimit:
 
-#### restrictedPorts
+```yaml
+apiVersion: metal3.io/v1alpha1
+kind: SwitchResourceLimit
+metadata:
+  creationTimestamp: "2021-10-26T02:36:49Z"
+  generation: 1
+  name: user-limit
+  namespace: default
+  resourceVersion: "3796423"
+  uid: 2942c30a-ce5e-4233-8f3d-af90f1f29cf1
+spec: {}
+status:
+  switchResourceRef:
+    name: switchresource-example
+    namespace: default
+  usedVLAN: "11"
+  vlanRange: 1-100
+```
 
-The `restrictedPorts` an restrict the use of ports on the switch.
+## SwitchResource
+
+`SwitchResource` represents the resource in the switch.
+The administrator writes the initial available resources
+in the `spec` according to the actual situation, and then the controller
+updates the real-time available resource to the `status`.
+The administrator writes the user's restrictions into tenantLimits field.
+
+### SwitchResource Spec
+
+#### vlanRange
+
+Indicates the initial allocatable vlan range.
+
+#### tenantLimits
+
+Indicates the resource limit for the tenant.
 
 The sub-fields are
+  * namespace -- The namespace where the restricted tenant is located.
+  * vlanRange -- The range of VLANs allowed to be used.
 
-* *portID* -- The port's ID on the switch.
-* *disabled* -- The port can't be used or not.
-* *vlanRange* -- The port can be divided into which vlans.
-* *trunkDisable* -- The port can't be set to trunk port or not.
+### SwitchResource Status
 
-### Switch Example
+#### availableVLAN
+
+Indicates the vlan range that the administrator can assign to the user currently.
+
+Example SwitchResource:
+
 ```yaml
-apiVersion: v1alpha1
-kind: Switch
+apiVersion: metal3.io/v1alpha1
+kind: SwitchResource
 metadata:
-  name: switch0
+  creationTimestamp: "2021-10-26T02:36:49Z"
+  finalizers:
+  - metal3.io
+  generation: 1
+  name: switchresource-example
   namespace: default
+  resourceVersion: "2835132"
+  uid: 1a6cd362-bbe4-4e49-a47f-63b6d430793b
 spec:
-  os: fos
-  ip: 192.168.0.1
-  port: 22
-  secret:
-    name: switch0-secret
-    namespace: default
-  restrictedPorts:
-    - portID: 0
-      disabled: false
-      vlanRange: 1, 6-10
-      trunkDisable: false
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: switch0-secret
-  namespace: default
-type: Opaque
-data:
-  username: YWRtaW4=
-  password: cGFzc3dvcmQ=
+  tenantLimits:
+    user-1:
+      namespace: default
+      vlanRange: 1-100
+  vlanRange: 1-1000
+status:
+  availableVLAN: 101-1000
+  state: Running
+  tenantLimits:
+    user-1:
+      namespace: default
+      vlanRange: 1-100
 ```
