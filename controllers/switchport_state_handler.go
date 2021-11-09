@@ -102,7 +102,7 @@ func (r *SwitchPortReconciler) validatingHandler(ctx context.Context, info *mach
 	if err != nil && !errors.IsNotFound(err) {
 		return machine.ResultContinue(v1alpha1.SwitchPortValidating, requeueAfterTime, err)
 	}
-	if resourceLimit != nil {
+	if !errors.IsNotFound(err) && resourceLimit != nil {
 		resource, err := resourceLimit.FetchSwitchResource(ctx, info.Client)
 		if err != nil {
 			return machine.ResultContinue(v1alpha1.SwitchPortValidating, requeueAfterTime, err)
