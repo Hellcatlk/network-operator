@@ -64,6 +64,7 @@ func (l *TenantLimit) Verify(available *SwitchResourceStatus) error {
 	return nil
 }
 
+// Expansion ...
 func (sr *SwitchResource) Expansion(limit *TenantLimit) error {
 	if limit == nil {
 		return nil
@@ -79,6 +80,7 @@ func (sr *SwitchResource) Expansion(limit *TenantLimit) error {
 	return nil
 }
 
+// Shrink ...
 func (sr *SwitchResource) Shrink(limit *TenantLimit) error {
 	if limit == nil {
 		return nil
@@ -95,8 +97,8 @@ func (sr *SwitchResource) Shrink(limit *TenantLimit) error {
 }
 
 // FetchSwitchResourceLimit fetch the SwitchResourceLimit/user-limit instance
-func (tl *TenantLimit) FetchSwitchResourceLimit(ctx context.Context, client client.Client) (*SwitchResourceLimit, error) {
-	if tl == nil {
+func (l *TenantLimit) FetchSwitchResourceLimit(ctx context.Context, client client.Client) (*SwitchResourceLimit, error) {
+	if l == nil {
 		return nil, fmt.Errorf("TenantLimit is nil")
 	}
 
@@ -105,7 +107,7 @@ func (tl *TenantLimit) FetchSwitchResourceLimit(ctx context.Context, client clie
 		ctx,
 		types.NamespacedName{
 			Name:      "user-limit",
-			Namespace: tl.Namespace,
+			Namespace: l.Namespace,
 		},
 		instance,
 	)
@@ -114,37 +116,37 @@ func (tl *TenantLimit) FetchSwitchResourceLimit(ctx context.Context, client clie
 }
 
 // GetMetadataAndSpec return metadata and spec field
-func (s *SwitchResource) GetMetadataAndSpec() interface{} {
-	deepCopy := s.DeepCopy()
+func (sr *SwitchResource) GetMetadataAndSpec() interface{} {
+	deepCopy := sr.DeepCopy()
 	deepCopy.Status = SwitchResourceStatus{}
 	return deepCopy
 }
 
 // GetStatus return status field
-func (s *SwitchResource) GetStatus() interface{} {
-	return s.Status.DeepCopy()
+func (sr *SwitchResource) GetStatus() interface{} {
+	return sr.Status.DeepCopy()
 }
 
 // GetState gets the current state of the SwitchResource
-func (s *SwitchResource) GetState() machine.StateType {
-	return s.Status.State
+func (sr *SwitchResource) GetState() machine.StateType {
+	return sr.Status.State
 }
 
 // SetState sets the state of the SwitchResource
-func (s *SwitchResource) SetState(state machine.StateType) {
-	s.Status.State = state
+func (sr *SwitchResource) SetState(state machine.StateType) {
+	sr.Status.State = state
 }
 
 // SetError sets the error of the SwitchResource
-func (s *SwitchResource) SetError(err error) {
+func (sr *SwitchResource) SetError(err error) {
 	if err != nil {
-		s.Status.Error = err.Error()
+		sr.Status.Error = err.Error()
 		return
 	}
-	s.Status.Error = ""
+	sr.Status.Error = ""
 }
 
-// Verify configuration
+// VerifyConfiguration verify that the configuration meets the limit.
 func (l *TenantLimit) VerifyConfiguration(configuration *SwitchPortConfiguration) error {
 	if l == nil {
 		return nil
@@ -192,10 +194,10 @@ const (
 	// SwitchResourceCreating means we are creating SwitchResourceLimit
 	SwitchResourceCreating machine.StateType = "Creating"
 
-	// SwitchRunning means all of SwitchResourceLimit have been created
+	// SwitchResourceRunning means all of SwitchResourceLimit have been created
 	SwitchResourceRunning machine.StateType = "Running"
 
-	// SwitchDeleting means we are deleting SwitchResourceLimit
+	// SwitchResourceDeleting means we are deleting SwitchResourceLimit
 	SwitchResourceDeleting machine.StateType = "Deleting"
 )
 

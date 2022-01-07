@@ -47,7 +47,8 @@ func (rl *SwitchResourceLimit) FetchSwitchResource(ctx context.Context, client c
 	return instance, err
 }
 
-func (sr *SwitchResourceLimit) Expansion(configuration *SwitchPortConfigurationSpec) error {
+// Expansion ...
+func (rl *SwitchResourceLimit) Expansion(configuration *SwitchPortConfigurationSpec) error {
 	if configuration == nil {
 		return nil
 	}
@@ -58,20 +59,20 @@ func (sr *SwitchResourceLimit) Expansion(configuration *SwitchPortConfigurationS
 		if err != nil {
 			return err
 		}
-
 	}
 
-	result, err := strings.Expansion(sr.Status.UsedVLAN, useVLAN)
+	result, err := strings.Expansion(rl.Status.UsedVLAN, useVLAN)
 	if err != nil {
 		return err
 	}
 
-	sr.Status.UsedVLAN = result
+	rl.Status.UsedVLAN = result
 
 	return nil
 }
 
-func (sr *SwitchResourceLimit) Shrink(configuration *SwitchPortConfigurationSpec) error {
+// Shrink ...
+func (rl *SwitchResourceLimit) Shrink(configuration *SwitchPortConfigurationSpec) error {
 	if configuration == nil {
 		return nil
 	}
@@ -82,14 +83,13 @@ func (sr *SwitchResourceLimit) Shrink(configuration *SwitchPortConfigurationSpec
 		if err != nil {
 			return err
 		}
-
 	}
-	result, err := strings.Shrink(sr.Status.UsedVLAN, useVLAN)
+	result, err := strings.Shrink(rl.Status.UsedVLAN, useVLAN)
 	if err != nil {
 		return err
 	}
 
-	sr.Status.UsedVLAN = result
+	rl.Status.UsedVLAN = result
 
 	return nil
 }
@@ -108,6 +108,7 @@ type SwitchResourceLimitStatus struct {
 	UsedVLAN          string            `json:"usedVLAN,omitempty"`
 }
 
+// SwitchResourceRef is the reference for SwitchResource CR
 type SwitchResourceRef struct {
 	Namespace string `json:"namespace,omitempty"`
 	Name      string `json:"name,omitempty"`

@@ -58,7 +58,7 @@ func (ref *SwitchPortConfigurationReference) Fetch(ctx context.Context, client c
 // ACL describes the rules applied in the switch
 type ACL struct {
 	// +kubebuilder:validation:Enum=4;6
-	IpVersion string `json:"ipVersion,omitempty"`
+	IPVersion string `json:"ipVersion,omitempty"`
 
 	// +kubebuilder:validation:Enum=allow;deny
 	Action string `json:"action,omitempty"`

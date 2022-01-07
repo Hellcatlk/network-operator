@@ -52,7 +52,7 @@ func New(info *ReconcileInfo, instance Instance, handlers map[StateType]Handler)
 	}
 }
 
-// DirtyType ...
+// DirtyType means which parts of instance have been modified.
 type DirtyType int
 
 const (
