@@ -75,7 +75,7 @@ gofmt:
 
 # Run go lint against code
 golint:
-	$(golint) ./...
+	$(golint) -set_exit_status ./...
 
 # Run go vet against code
 govet:
