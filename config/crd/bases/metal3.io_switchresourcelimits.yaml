@@ -41,6 +41,8 @@ spec:
             description: SwitchResourceLimitStatus defines the observed state of SwitchResourceLimit
             properties:
               switchResourceRef:
+                description: SwitchResourceRef is the reference for SwitchResource
+                  CR
                 properties:
                   name:
                     type: string
