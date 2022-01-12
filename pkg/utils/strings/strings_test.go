@@ -42,6 +42,44 @@ func TestRangeToSlice(t *testing.T) {
 	}
 }
 
+func TestRangeContains(t *testing.T) {
+	cases := []struct {
+		allowed       string
+		target        string
+		expectedError bool
+	}{
+		{
+			allowed:       "1-200",
+			target:        "1-200",
+			expectedError: false,
+		},
+		{
+			allowed:       "",
+			target:        "",
+			expectedError: false,
+		},
+		{
+			allowed:       "1-100",
+			target:        "1-200",
+			expectedError: true,
+		},
+		{
+			allowed:       "",
+			target:        "1-200",
+			expectedError: true,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(t.Name(), func(t *testing.T) {
+			err := RangeContains(c.allowed, c.target)
+			if (err != nil) != c.expectedError {
+				t.Errorf("got unexpected error: %v", err)
+			}
+		})
+	}
+}
+
 func TestLastJSON(t *testing.T) {
 	cases := []struct {
 		data          string
@@ -83,7 +121,7 @@ func TestLastJSON(t *testing.T) {
 	}
 }
 
-func TestContains(t *testing.T) {
+func TestSliceContains(t *testing.T) {
 	cases := []struct {
 		slice    []string
 		str      string

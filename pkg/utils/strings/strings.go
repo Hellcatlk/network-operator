@@ -91,29 +91,29 @@ func SliceToRange(nums []int) string {
 	return formatStr
 }
 
-// RangeContains if range1 contains range2 return nil, else return err.
-func RangeContains(allowedRange string, targetRange string) error {
+// RangeContains if allowed contains target return nil, else return err.
+func RangeContains(allowed string, target string) error {
 	// Get allowed vlan range
-	allowed, err := RangeToSlice(allowedRange)
+	allowedSlice, err := RangeToSlice(allowed)
 	if err != nil {
 		return err
 	}
 	allowedMap := make(map[int]struct{})
-	for _, value := range allowed {
+	for _, value := range allowedSlice {
 		allowedMap[value] = struct{}{}
 	}
 
 	// Get target vlan range
-	target, err := RangeToSlice(targetRange)
+	targetSlice, err := RangeToSlice(target)
 	if err != nil {
 		return err
 	}
 
 	// Check vlan range
-	for _, value := range target {
+	for _, value := range targetSlice {
 		_, existed := allowedMap[value]
 		if !existed {
-			return fmt.Errorf("%d is out of allowed range: %s", value, allowedRange)
+			return fmt.Errorf("%d is out of allowed range: %s", value, allowed)
 		}
 	}
 
