@@ -19,6 +19,7 @@ package v1alpha1
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/Hellcatlk/network-operator/pkg/machine"
 	"github.com/Hellcatlk/network-operator/pkg/utils/strings"
@@ -148,37 +149,20 @@ func (sr *SwitchResource) SetError(err error) {
 
 // VerifyConfiguration verify that the configuration meets the limit.
 func (l *TenantLimit) VerifyConfiguration(configuration *SwitchPortConfiguration) error {
-	if l == nil {
+	if l == nil || l.VLANRange == "" {
 		return nil
-	}
-	if l.VLANRange == "" {
-		return nil
-	}
-	// Get allowed vlan range
-	vlanRange, err := strings.RangeToSlice(l.VLANRange)
-	if err != nil {
-		return err
-	}
-	allowed := make(map[int]struct{})
-	for _, vlan := range vlanRange {
-		allowed[vlan] = struct{}{}
 	}
 
-	// Get target vlan range
-	target, err := strings.RangeToSlice(l.VLANRange)
-	if err != nil {
-		return err
-	}
+	vlanRange := configuration.Spec.TaggedVLANRange
 	if configuration.Spec.UntaggedVLAN != nil {
-		target = append(target, *configuration.Spec.UntaggedVLAN)
-	}
-
-	// Check vlan range
-	for _, vlan := range target {
-		_, existed := allowed[vlan]
-		if !existed {
-			return fmt.Errorf("vlan %d is out of permissible range", vlan)
+		if vlanRange != "" {
+			vlanRange = vlanRange + ","
 		}
+		vlanRange = vlanRange + strconv.Itoa(*configuration.Spec.UntaggedVLAN)
+	}
+	err := strings.RangeContains(l.VLANRange, vlanRange)
+	if err != nil {
+		return fmt.Errorf("vlan configuration verify failed: %s", err)
 	}
 
 	return nil

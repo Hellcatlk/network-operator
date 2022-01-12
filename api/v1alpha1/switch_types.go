@@ -19,6 +19,7 @@ package v1alpha1
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/Hellcatlk/network-operator/pkg/machine"
 	"github.com/Hellcatlk/network-operator/pkg/provider"
@@ -72,41 +73,6 @@ func (ref *SwitchProviderReference) Fetch(ctx context.Context, client client.Cli
 	return instance, err
 }
 
-// Verify configuration
-func VerifyConfiguration(VLANRange string, configuration *SwitchPortConfiguration) error {
-	if VLANRange == "" {
-		return nil
-	}
-	// Get allowed vlan range
-	vlanRange, err := strings.RangeToSlice(VLANRange)
-	if err != nil {
-		return err
-	}
-	allowed := make(map[int]struct{})
-	for _, vlan := range vlanRange {
-		allowed[vlan] = struct{}{}
-	}
-
-	// Get target vlan range
-	target, err := strings.RangeToSlice(VLANRange)
-	if err != nil {
-		return err
-	}
-	if configuration.Spec.UntaggedVLAN != nil {
-		target = append(target, *configuration.Spec.UntaggedVLAN)
-	}
-
-	// Check vlan range
-	for _, vlan := range target {
-		_, existed := allowed[vlan]
-		if !existed {
-			return fmt.Errorf("vlan %d is out of permissible range", vlan)
-		}
-	}
-
-	return nil
-}
-
 // Port indicates the specific restriction on the port
 type Port struct {
 	// Describes the port name on the device
@@ -134,20 +100,32 @@ func (p *Port) Verify(configuration *SwitchPortConfiguration) error {
 		return fmt.Errorf("the port's name can't be empty")
 	}
 
-	if configuration == nil {
-		return nil
-	}
-
-	if err := VerifyConfiguration(p.VLANRange, configuration); err != nil {
-		return err
-	}
-
 	if p.Disabled {
 		return fmt.Errorf("the port is disabled")
 	}
 
+	if configuration == nil {
+		return nil
+	}
+
 	if p.TrunkDisabled && configuration.Spec.TaggedVLANRange != "" {
 		return fmt.Errorf("the port can be used as a trunk port")
+	}
+
+	if p.VLANRange == "" {
+		return nil
+	}
+
+	vlanRange := configuration.Spec.TaggedVLANRange
+	if configuration.Spec.UntaggedVLAN != nil {
+		if vlanRange != "" {
+			vlanRange = vlanRange + ","
+		}
+		vlanRange = vlanRange + strconv.Itoa(*configuration.Spec.UntaggedVLAN)
+	}
+	err := strings.RangeContains(p.VLANRange, vlanRange)
+	if err != nil {
+		return fmt.Errorf("vlan configuration %s verify failed: %s", vlanRange, err)
 	}
 
 	return nil

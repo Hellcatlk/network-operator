@@ -91,6 +91,35 @@ func SliceToRange(nums []int) string {
 	return formatStr
 }
 
+// RangeContains if range1 contains range2 return nil, else return err.
+func RangeContains(allowedRange string, targetRange string) error {
+	// Get allowed vlan range
+	allowed, err := RangeToSlice(allowedRange)
+	if err != nil {
+		return err
+	}
+	allowedMap := make(map[int]struct{})
+	for _, value := range allowed {
+		allowedMap[value] = struct{}{}
+	}
+
+	// Get target vlan range
+	target, err := RangeToSlice(targetRange)
+	if err != nil {
+		return err
+	}
+
+	// Check vlan range
+	for _, value := range target {
+		_, existed := allowedMap[value]
+		if !existed {
+			return fmt.Errorf("%d is out of allowed range: %s", value, allowedRange)
+		}
+	}
+
+	return nil
+}
+
 // LastJSON find last json from string
 func LastJSON(str string) ([]byte, error) {
 	lastJSON := ""

@@ -23,6 +23,10 @@ func TestRangeToSlice(t *testing.T) {
 			name:          "1--5,7",
 			expectedError: true,
 		},
+		{
+			name:          ",7",
+			expectedError: true,
+		},
 	}
 
 	for _, c := range cases {

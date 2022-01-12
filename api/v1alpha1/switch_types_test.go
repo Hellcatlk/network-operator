@@ -13,7 +13,8 @@ func TestPortVerify(t *testing.T) {
 		{
 			name: "disabled",
 			port: &Port{
-				Disabled: true,
+				PhysicalPortName: "test",
+				Disabled:         true,
 			},
 			configuration: &SwitchPortConfiguration{
 				Spec: SwitchPortConfigurationSpec{
@@ -26,7 +27,8 @@ func TestPortVerify(t *testing.T) {
 		{
 			name: "vlan is out of range",
 			port: &Port{
-				VLANRange: "1-5",
+				PhysicalPortName: "test",
+				VLANRange:        "1-5",
 			},
 			configuration: &SwitchPortConfiguration{
 				Spec: SwitchPortConfigurationSpec{
@@ -39,7 +41,8 @@ func TestPortVerify(t *testing.T) {
 		{
 			name: "trunk disabled",
 			port: &Port{
-				TrunkDisabled: true,
+				PhysicalPortName: "test",
+				TrunkDisabled:    true,
 			},
 			configuration: &SwitchPortConfiguration{
 				Spec: SwitchPortConfigurationSpec{
@@ -48,6 +51,33 @@ func TestPortVerify(t *testing.T) {
 				},
 			},
 			expectedError: true,
+		},
+		{
+			name: "vlan in range",
+			port: &Port{
+				PhysicalPortName: "test",
+				VLANRange:        "1-20",
+			},
+			configuration: &SwitchPortConfiguration{
+				Spec: SwitchPortConfigurationSpec{
+					TaggedVLANRange: "1-10",
+					UntaggedVLAN:    &untaggedVLAN,
+				},
+			},
+			expectedError: false,
+		},
+		{
+			name: "vlan in range",
+			port: &Port{
+				PhysicalPortName: "test",
+				VLANRange:        "1-20",
+			},
+			configuration: &SwitchPortConfiguration{
+				Spec: SwitchPortConfigurationSpec{
+					UntaggedVLAN: &untaggedVLAN,
+				},
+			},
+			expectedError: false,
 		},
 	}
 
